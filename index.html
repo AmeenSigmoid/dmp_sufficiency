@@ -4606,7 +4606,7 @@ function onbKpiToggle(c){ const a=onb.ts.fact.kpis, i=a.indexOf(c); if(i>=0)a.sp
 function onbValidate(kind,v){ onb.ts[kind].validated=v; renderONB(); f6Toast(v==='correct'?'Selection marked correct.':'Marked for edit — adjust the selection above.'); }
 function onbGoStep(n){ if(onb.phase!=='form') onb.phase='form'; onb.formStep=n; renderONB(); window.scrollTo(0,0); }
 function onbFormStepper(){
-  const steps=['Table selection','Joining','Metadata','Grain','Expected grain','Heat map'];
+  const steps=['Table selection','Grain','Joining','Metadata','Expected grain','Heat map'];
   return `<div class="onb-steps onb-fsteps">${steps.map((s,idx)=>{ const n=idx+1;
     return `${idx?`<div class="onb-sline ${n<=onb.formStep?'on':''}"></div>`:''}<div class="onb-s clickable ${n===onb.formStep?'current':''} ${n<=onb.formStep?'active':''}" onclick="onbGoStep(${n})" title="Go to ${s}"><span class="onb-sd">${n<onb.formStep?'✓':n}</span><span class="onb-sl">${s}</span></div>`;
   }).join('')}</div>`;
@@ -4676,9 +4676,9 @@ function onbFormTableSelect(){
 function onbFormBody(){
   switch(onb.formStep){
     case 1: return onbFormTableSelect();
-    case 2: return onbJoining();
-    case 3: return onbMetadata();
-    case 4: return onbGrain();
+    case 2: return onbGrain();
+    case 3: return onbJoining();
+    case 4: return onbMetadata();
     case 5: return onbExpGrain();
     case 6: return onbHeatStep();
     default: return onbFormTableSelect();

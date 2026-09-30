@@ -1287,6 +1287,29 @@ td.grand-cell .val-num { font-weight: 800; }
   .onb-hm2-note, .onb-hm2-lvh { margin-left: 0; }
   .onb-hm2-row { grid-template-columns: 1fr; gap: 6px; }
 }
+/* AI-raised missing joins */
+.onb-gaps { border: 1.5px dashed #C6CDDA; border-radius: 14px; padding: 16px 18px; background: #FBFCFE; }
+.onb-gaps-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.onb-gap { border: 1px solid #F2DDB3; border-left: 4px solid #D08A00; background: #FFFCF5; border-radius: 12px; padding: 14px 16px; margin-top: 10px; }
+.onb-gap.done { border-color: #CFE8DC; border-left-color: #248169; background: #F6FBF9; padding: 10px 14px; }
+.onb-gap-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.onb-gap-pair { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; font-weight: 700; color: #101828; }
+.onb-gap-x { color: #98A2B3; }
+.onb-gap-conf { font-size: 11px; font-weight: 700; color: #8A5300; background: #FFEFD2; border-radius: 20px; padding: 2px 10px; }
+.onb-gap-q { font-size: 14px; font-weight: 800; color: #101828; margin: 10px 0 0; }
+.onb-gap-acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.onb-input.sm.onb-gap-why { flex: 1; min-width: 220px; font-family: inherit; }
+.onb-gap-reason { font-size: 12px; color: #475467; font-style: italic; margin-top: 6px; }
+/* Add hierarchy / dimension — single section */
+.onb-hf-one { max-width: 820px; }
+.onb-hf-stepl { display: flex; align-items: center; font-size: 14px; font-weight: 800; color: #101828; margin: 20px 0 10px; }
+.onb-hf-stepl:first-child { margin-top: 0; }
+.onb-hf-kinds { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.onb-hf-kinds .onb-htype { flex-wrap: nowrap; align-items: flex-start; }
+.onb-hf-def-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid #F0F1F4; font-size: 13px; }
+.onb-hf-def-row:first-of-type { border-top: none; }
+.onb-hf-def-d { flex-basis: 100%; font-size: 12.5px; color: #475467; line-height: 1.5; }
+@media (max-width: 640px) { .onb-hf-kinds { grid-template-columns: 1fr; } }
 /* Heat map generation + approval */
 .onb-gen { border: 1px dashed #C6CDDA; border-radius: 16px; padding: 40px 24px; text-align: center; }
 .onb-gen-ico { width: 64px; height: 64px; border-radius: 16px; background: #EAF0FE; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
@@ -4616,7 +4639,8 @@ function onbNext(){
     if(onbStep<2){ onbStep++; renderONB(); window.scrollTo(0,0); }
     else { onb.phase='form'; renderONB(); window.scrollTo(0,0); f6Toast('Access request submitted (prototype).'); }
   } else {
-    if(onb.formStep===6 && onb.proc.status!=='done'){ f6Toast('Finish AI validation first — resolve any flagged items, then continue.'); return; }
+    if(onb.formStep===2 && onbGapsOpen()){ const n=onbGapsOpen(); f6Toast(`Answer the ${n} missing-join question${n>1?'s':''} from AI first — define the join or mark it as not required.`); return; }
+    if(onb.formStep===6 && onb.proc.status!=='done'){ f6Toast('Finish AI validation first — resolve any failed joins, then continue.'); return; }
     if(onb.formStep<7){ onb.formStep++; renderONB(); window.scrollTo(0,0); onbProcAutoStart(); }
     else { f6Toast('Complete the heat-map, approval and publish steps below.'); }
   }
@@ -4657,8 +4681,62 @@ function onbJoining(){
     </div>`;
   }).join('')}
   ${onbWeightCards()}
-  ${onbNewJoin()}
+  ${onbJoinGaps()}
   ${onbFooter()}`;
+}
+/* ── Missing joins raised by AI — user must define each join or mark it not required ── */
+const ONB_JOIN_GAPS=[
+  {fact:'uc_dc_prd.delv.otif_d_cnsmr_attr_detl_fm_detl', dim:'uc_dmp_data_sufficiency_01_dev.dev.geo_country_master', factKey:'GEO_CTRY_NM', dimKey:'Country_Name', conf:48,
+   why:'Values look similar but ~30% of fact rows use ISO codes (“DE”, “FR”) while the dimension stores full names (“Germany”).'},
+  {fact:'uc_dc_prd.delv.otif_d_cnsmr_attr_detl_fm_detl', dim:'uc_dmp_data_sufficiency_01_dev.dev.calendar_master', factKey:'EXPTD_RQST_DELV_DTTM', dimKey:'Cal_Date', conf:41,
+   why:'The fact column is a timestamp and the dimension key is a date — a cast is needed, and no existing join logic was found.'},
+  {fact:'uc_dc_prd.delv.otif_d_cnsmr_attr_detl', dim:'uc_dmp_data_sufficiency_01_dev.dev.gmc_prod_master', factKey:'MATL_NUM', dimKey:'GMC_SKU_Code', conf:35,
+   why:'This fact table has no product join. MATL_NUM may need the source-system prefix used for the other product joins.'}
+].map(g=>Object.assign({status:null, open:false, joinType:'left', dimCols:[], reason:''}, g));
+function onbGapList(){ const fs=onb.ts.fact.selected, ds=onb.ts.dim.selected; return ONB_JOIN_GAPS.map((g,i)=>({g,i})).filter(({g})=>(!fs.length||fs.includes(g.fact))&&(!ds.length||ds.includes(g.dim))); }
+function onbGapsOpen(){ return onbGapList().filter(({g})=>!g.status).length; }
+function onbGapDefine(i){ ONB_JOIN_GAPS.forEach((g,k)=>{ if(k!==i) g.open=false; }); ONB_JOIN_GAPS[i].open=true; renderONB(); }
+function onbGapSet(i,f,v){ ONB_JOIN_GAPS[i][f]=v; }
+function onbGapCol(i,ci){ const g=ONB_JOIN_GAPS[i], c=(ONB_DIM_COLUMNS[g.dim]||[])[ci], k=g.dimCols.indexOf(c); if(k>=0) g.dimCols.splice(k,1); else g.dimCols.push(c); renderONB(); }
+function onbGapCancel(i){ ONB_JOIN_GAPS[i].open=false; renderONB(); }
+function onbGapSave(i){ const g=ONB_JOIN_GAPS[i];
+  if(!g.factKey||!g.dimKey){ f6Toast('Pick both join keys.'); return; }
+  if(!g.dimCols.length){ f6Toast('Pick at least one dimension column to bring in.'); return; }
+  const dim=onbShortTable(g.dim).replace(/_(master|dim)$/,'').replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  ONB_JOINS.push({dim, type:'Manual', factTable:g.fact, factKey:g.factKey, logic:'', dimTable:g.dim, dimKey:g.dimKey, joinType:g.joinType, dimCols:'{'+g.dimCols.map(c=>`${c.toLowerCase()}: ${c}`).join(', ')+'}', val:'correct', open:false, manual:true, gap:i});
+  g.status='defined'; g.open=false; renderONB(); f6Toast('Join defined — it runs alongside the AI-extracted joins.'); }
+function onbGapNotRequired(i){ const g=ONB_JOIN_GAPS[i]; g.status='not_required'; g.open=false; renderONB(); }
+function onbGapReset(i){ const g=ONB_JOIN_GAPS[i]; if(g.status==='defined'){ const k=ONB_JOINS.findIndex(j=>j.gap===i); if(k>=0) ONB_JOINS.splice(k,1); } g.status=null; renderONB(); }
+function onbJoinGaps(){
+  const list=onbGapList(), open=list.filter(({g})=>!g.status).length;
+  const items=list.map(({g,i})=>{
+    const pair=`<span class="mono">${onbShortTable(g.fact)}</span><span class="onb-gap-x">⟷</span><span class="mono">${onbShortTable(g.dim)}</span>`;
+    if(g.status) return `<div class="onb-gap done"><div class="onb-gap-h"><div class="onb-gap-pair">${pair}</div><div class="onb-jactions"><span class="onb-issue-sev ok">${g.status==='defined'?'✓ Join defined':'✓ Join not required'}</span><button class="onb-editbtn" onclick="onbGapReset(${i})">Change</button></div></div>${g.status==='not_required'&&g.reason.trim()?`<div class="onb-gap-reason">“${onbEsc(g.reason)}”</div>`:''}</div>`;
+    const fcols=onbFactKeyCols(g.fact), dcols=ONB_DIM_COLUMNS[g.dim]||[];
+    return `<div class="onb-gap">
+      <div class="onb-gap-h"><div class="onb-gap-pair">${pair}</div><span class="onb-gap-conf">AI confidence ${g.conf}%</span></div>
+      <div class="onb-gap-q">How should <span class="mono">${onbShortTable(g.fact)}</span> join to <span class="mono">${onbShortTable(g.dim)}</span>?</div>
+      <div class="onb-issue-ai"><span class="onb-issue-ai-k">✦ AI</span><span>Closest candidate: <span class="mono">${g.factKey}</span> = <span class="mono">${g.dimKey}</span>. ${g.why}</span></div>
+      ${g.open?`<div class="onb-jgrid" style="margin-top:14px">
+        ${onbJfield('Fact table', g.fact, false, '')}
+        ${onbJfield('Dim table', g.dim, false, '')}
+        <div class="onb-jf"><label>Fact join key</label>${onbSel(fcols.includes(g.factKey)?fcols:[g.factKey,...fcols],g.factKey,`onbGapSet(${i},'factKey',this.value)`,'Select column')}</div>
+        <div class="onb-jf"><label>Dim join key</label>${onbSel(dcols,g.dimKey,`onbGapSet(${i},'dimKey',this.value)`,'Select column')}</div>
+        <div class="onb-jf"><label>Join type</label>${onbSel(ONB_JOIN_TYPES,g.joinType,`onbGapSet(${i},'joinType',this.value)`)}</div>
+        <div class="onb-jf onb-jf-wide"><label>Dim columns to bring in</label><div class="nuc-chips">${dcols.map((c,ci)=>{ const on=g.dimCols.includes(c); return `<span class="nuc-chip mono ${on?'on':''}" onclick="onbGapCol(${i},${ci})">${on?'✓ ':''}${c}</span>`; }).join('')}</div></div>
+      </div>
+      <div class="onb-jnew-foot"><button class="onb-btn" onclick="onbGapCancel(${i})">Cancel</button><button class="onb-btn primary" onclick="onbGapSave(${i})">Save join</button></div>`
+      :`<div class="onb-gap-acts">
+        <input class="onb-input sm onb-gap-why" placeholder="Reason (optional) — why this join isn’t needed" value="${onbEsc(g.reason)}" oninput="onbGapSet(${i},'reason',this.value)">
+        <button class="onb-btn onb-issue-btn" onclick="onbGapNotRequired(${i})">Join not required</button>
+        <button class="onb-btn primary onb-issue-btn" onclick="onbGapDefine(${i})">Define join</button>
+      </div>`}
+    </div>`; }).join('');
+  return `<div class="onb-gaps">
+    <div class="onb-gaps-h"><div><div class="onb-jnew-t">✦ AI couldn't find ${list.length===1?'this join':'these joins'}</div><div class="onb-dssub" style="margin:2px 0 0">These fact ↔ dimension table pairs look related, but AI couldn't work out how they join. Define the join or mark it as not required${list.length?' — every question needs an answer before you continue':''}.</div></div>
+      ${list.length?`<span class="onb-valprog" style="margin:0">${list.length-open}/${list.length} answered</span>`:''}</div>
+    ${list.length?items:'<div class="onb-proc-empty">No missing joins — AI matched every selected table.</div>'}
+  </div>`;
 }
 /* ── Define new join (manual, when AI extraction misses one) ── */
 function onbFactKeyCols(t){ return [...new Set((ONB_TABLE_COLUMNS[t]||[]).concat(ONB_GRAIN_COLS))]; }
@@ -4825,7 +4903,8 @@ const ONB_EXP_STD_DIMS=['Product','Customer','Geography','Time'];
 function onbExpTables(){ return [...new Set(ONB_GRAIN.map(g=>g.table))]; }
 function onbExpDims(){ const d=ONB_EXP_STD_DIMS.slice(); onb.hiers.forEach(n=>{ const h=ONB_HIERS[onbHierIdx(n)]; if(h && !d.includes(h.dim)) d.push(h.dim); }); return d; }
 function onbExpTypes(dim){ const hs=ONB_HIERS.filter(h=>h.dim===dim); if(!hs.length) return [{id:'Standard', hier:null, name:'Standard', levels:ONB_EXP_LEVELS[dim]||[]}];
-  const out=[]; hs.forEach(h=>h.types.forEach(t=>out.push({id:hs.length>1?`${h.name} · ${t.name}`:t.name, hier:h.name, name:t.name, levels:t.levels}))); return out; }
+  const out=[]; hs.forEach(h=>h.types.forEach(t=>out.push({id:hs.length>1?`${h.name} · ${t.name}`:t.name, hier:h.name, name:t.name, levels:t.levels})));
+  return out.length?out:[{id:'Standard', hier:null, name:'Standard', levels:ONB_EXP_LEVELS[dim]||[]}]; }
 function onbExpDefault(dim,levels){ const pref={Product:['SKU','EAN'], Customer:['Banner Name','GCC Banner Name','Banner','Ship-to'], Geography:['Country'], Time:['Daily']}[dim]||[]; return pref.find(p=>levels.includes(p))||levels[levels.length-1]||''; }
 function onbExpCell(t,dim){ const T=onb.expByTable[t]||(onb.expByTable[t]={});
   if(!T[dim]){ const types=onbExpTypes(dim); let ty=types[0];
@@ -4864,30 +4943,12 @@ const ONB_PROC_STAGES=[
 ];
 function onbProcLog(msg,kind){ onb.proc.log.push({t:new Date().toTimeString().slice(0,8), msg, kind:kind||'info'}); }
 function onbProcBuildIssues(){
+  // Only join failures are reported here.
   const out=[], seen=onb.proc.seen||[];
-  if(!onb.ucName.trim()) out.push({id:'ucname', stage:0, sev:'warning', kind:'Missing information', title:'Use case name is missing',
-    msg:'No use case name was provided on Table selection. The pipeline and heat map are registered under this name.', ai:'Enter a short, recognisable name — e.g. the KPI plus the business area.'});
   const jb=ONB_JOINS.findIndex(j=>j.dim==='Brand'), ji=jb>=0?jb:0, j=ONB_JOINS[ji];
-  if(j) out.push({id:'join', stage:1, sev:'error', kind:'Join error', ji, title:`Join issue · ${onbEsc(j.dim)}`,
+  if(j) out.push({id:'join', stage:1, sev:'error', kind:'Join failed', ji, title:`Join failed · ${onbEsc(j.dim)}`,
     msg:`We encountered an issue with this join. Only <b>62%</b> of rows in <span class="mono">${onbShortTable(j.factTable)}</span> matched <span class="mono">${onbShortTable(j.dimTable)}</span> — the key values look formatted differently on each side. Please confirm whether the following join is correct or correct it.`,
     ai:`<span class="mono">${onbEsc(j.factKey)}</span> carries a source-system prefix (e.g. “AP…”, “US…”) that <span class="mono">${onbEsc(j.dimKey)}</span> doesn't. Check the key pair, or pick different key columns and retry.`});
-  onb.hiers.forEach(n=>{ if(!onb.hierType[n]) out.push({id:'hier:'+n, stage:2, sev:'warning', kind:'Missing information', hier:n, title:`No hierarchy type selected · ${onbEsc(n)}`,
-    msg:`${onbEsc(n)} is selected but no hierarchy type was chosen, so its levels can't be mapped onto columns.`, ai:'Pick the type whose levels match your source data.'}); });
-  let mi=-1; ONB_META.forEach((m,i)=>{ if(!m.added && m.val!=='correct' && (mi<0||m.conf<ONB_META[mi].conf)) mi=i; });
-  if(mi>=0 && ONB_META[mi].conf<0.5){ const m=ONB_META[mi]; out.push({id:'meta', stage:3, sev:'warning', kind:'Possible hallucination', mi, title:`Possible hallucination · ${onbEsc(m.col)}`,
-    msg:`The AI-generated definition for <span class="mono">${onbEsc(m.col)}</span> in <span class="mono">${onbShortTable(m.table)}</span> has low confidence (<b>${Math.round(m.conf*100)}%</b>) and no matching entry was found in the source catalogue. Please confirm or correct it.`,
-    ai:'Compare against the data dictionary before confirming — low-confidence definitions are often inferred from the column name alone.'}); }
-  const ch=ONB_HIERS.find(h=>h.name==='Customer Hierarchy'), ct=ch&&(ch.types.find(t=>t.name===onb.hierType[ch.name])||ch.types[0]);
-  if(ct){ const gi=ONB_GRAIN.findIndex(g=>g.grains.some(x=>/customer/i.test(x.label) && !ct.levels.includes(x.level)));
-    if(gi>=0){ const gr=ONB_GRAIN[gi].grains.find(x=>/customer/i.test(x.label) && !ct.levels.includes(x.level)), sug=ct.levels[ct.levels.length-1];
-      out.push({id:'grain', stage:4, sev:'warning', kind:'Inconsistency', title:'Grain doesn’t match the customer hierarchy', from:gr.level, map:sug, levels:ct.levels,
-        msg:`The Grain step reports Customer grain <b>“${onbEsc(gr.level)}”</b> (<span class="mono">${onbEsc(gr.col)}</span>) for <span class="mono">${onbShortTable(ONB_GRAIN[gi].table)}</span>, but Customer Hierarchy · ${onbEsc(ct.name)} has no “${onbEsc(gr.level)}” level. Map it to a hierarchy level so grain can roll up.`,
-        ai:`Closest level by column profile: <b>${onbEsc(sug)}</b>.`}); } }
-  onbExpTables().forEach(t=>{ const c=onb.expByTable[t]&&onb.expByTable[t].Time, g=ONB_GRAIN.find(x=>x.table===t), tg=g&&g.grains.find(x=>/time/i.test(x.label));
-    if(c && tg && ONB_TIME_LEVELS.indexOf(tg.level)>=0 && ONB_TIME_LEVELS.indexOf(c.grain)>ONB_TIME_LEVELS.indexOf(tg.level))
-      out.push({id:'exp:'+t, stage:5, sev:'warning', kind:'Inconsistency', table:t, avail:tg.level, sug:tg.level, title:`Expected time grain is finer than the data · ${onbShortTable(t)}`,
-        msg:`Expected time grain is <b>“${onbEsc(c.grain)}”</b> but <span class="mono">${onbShortTable(t)}</span> is only available at <b>“${onbEsc(tg.level)}”</b>. Sufficiency for this dimension would score 0.`,
-        ai:`Set the expected time grain to <b>${onbEsc(tg.level)}</b>, or keep it if a finer feed is planned.`}); });
   return out.filter(x=>!seen.includes(x.id)).map(x=>Object.assign({resolved:false, outcome:null}, x));
 }
 function onbProcStart(){ clearInterval(onbProcTimer);
@@ -4970,13 +5031,13 @@ function onbProcess(){
   const shown=p.issues.map((x,k)=>({x,k})).filter(({x})=>p.status==='done'||x.stage<p.stage||(x.stage===p.stage&&(p.status==='paused'||x.resolved)));
   const open=shown.filter(s=>!s.x.resolved), done=shown.filter(s=>s.x.resolved), reviewed=p.issues.filter(x=>x.resolved).length;
   let head;
-  if(p.status==='idle') head=`<div class="onb-proc-status"><div><div class="onb-appr-t">Ready to process</div><div class="onb-appr-s">AI runs the joins and pipelines using everything captured in the previous steps, and stops to ask you whenever something looks off.</div></div><button class="onb-btn primary" onclick="onbProcStart()">Run AI processing</button></div>`;
+  if(p.status==='idle') head=`<div class="onb-proc-status"><div><div class="onb-appr-t">Ready to process</div><div class="onb-appr-s">AI runs the joins and pipelines using everything captured in the previous steps, and stops to ask you if a join fails.</div></div><button class="onb-btn primary" onclick="onbProcStart()">Run AI processing</button></div>`;
   else if(p.status==='running') head=`<div class="onb-proc-status running"><span class="onb-proc-spin"></span><div class="onb-proc-grow"><div class="onb-appr-t">Processing · ${st.t}</div><div class="onb-appr-s">${st.d}</div></div><span class="onb-proc-pct">${pct}%</span></div>`;
   else if(p.status==='paused') head=`<div class="onb-proc-status paused"><div><div class="onb-appr-t">⚠ Needs your review</div><div class="onb-appr-s">${open.length?`${open.length} item${open.length>1?'s':''} flagged during “${st.t}”. Confirm or correct ${open.length>1?'them':'it'} below, then retry.`:'All flagged items resolved — retry to continue processing.'}</div></div><span class="onb-proc-pct" style="color:#8A5300">${pct}%</span><button class="onb-btn ${open.length?'':'primary'}" ${open.length?'disabled':''} onclick="onbProcContinue()">Retry &amp; continue</button></div>`;
   else head=`<div class="onb-proc-status done"><div><div class="onb-appr-t">✓ Processing complete</div><div class="onb-appr-s">All joins and pipelines ran successfully${reviewed?` · ${reviewed} item${reviewed>1?'s':''} reviewed by you`:''}. The heat map will use these results.</div></div><button class="onb-btn" onclick="onbProcStart()">Re-run</button><button class="onb-btn primary" onclick="onbGoStep(7)">Continue to heat map</button></div>`;
   const stages=`<ul class="nuc-calc-steps">${ONB_PROC_STAGES.map((s,i)=>{ const cls=(p.status==='done'||i<p.stage)?'done':(i===p.stage&&p.status==='running')?'active':(i===p.stage&&p.status==='paused')?'warn':''; return `<li class="nuc-calc-step ${cls}"><span class="nuc-calc-ic"></span><span>${s.t}<span class="onb-proc-sd">${s.d}</span></span></li>`; }).join('')}</ul>`;
-  const empty=p.status==='idle'?'Run AI processing to execute the joins and pipelines.':p.status==='done'?'No issues were found — everything validated cleanly.':'No issues so far — AI is checking each stage and will stop here if it needs you.';
-  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">AI validation &amp; processing</h2><div class="onb-dssub">AI executes the joins and pipelines in the background using the information from the previous steps. If it finds missing information, a join error, an inconsistency or a possible hallucination, it pauses and asks you to confirm or correct it.</div></div>
+  const empty=p.status==='idle'?'Run AI processing to execute the joins and pipelines.':p.status==='done'?'All joins ran successfully.':'No join failures so far — AI will stop here if a join fails.';
+  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">AI validation &amp; processing</h2><div class="onb-dssub">AI executes the joins and pipelines in the background using the information from the previous steps. If a join fails, it pauses and asks you to confirm or correct it.</div></div>
   ${onbProcInputs()}
   ${head}
   <div class="onb-proc-bar ${p.status}"><i style="width:${pct}%"></i></div>
@@ -5069,7 +5130,7 @@ function onbHierCard(n){ const i=onbHierIdx(n); if(i<0) return ''; const h=ONB_H
       <div class="onb-jtitle"><span class="onb-jdim">${onbEsc(n)}</span>${h.custom?'<span class="onb-jtag">Custom</span>':''}${sel?`<span class="onb-sec-ok">✓ ${onbEsc(sel)}</span>`:'<span class="onb-hcard-need">Select a hierarchy type</span>'}</div>
       <button class="onb-editbtn" onclick="onbHierModalOpen(${i})">＋ Add type</button>
     </div>
-    ${onbHierTypeOpts(i)}
+    ${h.types.length?onbHierTypeOpts(i):'<div class="onb-hf-meta muted">No types yet — use “Add type” to define this vertical’s levels.</div>'}
   </div>`; }
 function onbDimsHierSection(){
   const dims=onbDimOpts();
@@ -5344,168 +5405,46 @@ function onbStepServiceNow(){
   </div>
   ${onbFooter()}`;
 }
-/* ═══════════ Add hierarchy / dimension — guided definition form ═══════════
-   Captures the 5 questions the AI uses per hierarchy (identity, ordered levels + columns,
-   level definitions/examples/format, lowest usable grain + lookalikes, summary) for one or
-   more types, then registers the result in ONB_HIERS so the rest of the flow can use it. */
-const ONB_HF_VERTICALS=['Customer','Product','Geography','Time','Other'];
-const ONB_HF_Q=[
-  {t:'Identity', f:'Identity + disambiguation'},
-  {t:'Levels & columns', f:'Ordering (grain scale) + column identification'},
-  {t:'Level details', f:'Reasoning + grain detection'},
-  {t:'Lowest grain & lookalikes', f:'Heatmap flag + collision safety'},
-  {t:'Summary', f:'Connective tissue'}
-];
-let onbHfSeq=0;
-function onbHfLevel(){ return {id:++onbHfSeq, name:'', cols:[], def:'', examples:[], format:''}; }
-function onbHfType(n){ return {name:`Type ${n}`, levels:[onbHfLevel(),onbHfLevel(),onbHfLevel()], lowest:null, looks:[], summary:''}; }
-function onbHfT(){ return onb.hf.types[onb.hf.ti]; }
-function onbHfWords(s){ return String(s||'').trim().split(/\s+/).filter(Boolean).length; }
-function onbHfOpen(i){ const h=(typeof i==='number')?ONB_HIERS[i]:null;
-  onb.hf=(h&&h.spec)?Object.assign(JSON.parse(JSON.stringify(h.spec)),{edit:i, ti:0}):{name:'', vertical:'', vOther:'', diff:'', types:[onbHfType(1)], ti:0, edit:null};
-  onb.phase='hierform'; renderONB(); window.scrollTo(0,0); }
+/* ═══════════ Add hierarchy / dimension ═══════════
+   Domain → Dimension or Vertical → name → description (min 200 chars).
+   A dimension joins the Dimensions chips; a vertical becomes a hierarchy chip whose levels are defined via "Add type". */
+const ONB_HF_MIN=200;
+function onbHfOpen(){ onb.hf={domain:'', kind:'', name:'', desc:''}; onb.phase='hierform'; renderONB(); window.scrollTo(0,0); }
 function onbHfClose(){ onb.hf=null; onb.phase='form'; renderONB(); window.scrollTo(0,0); }
-function onbHfSet(f,v,re){ onb.hf[f]=v; if(re) renderONB(); else onbHfRailPaint(); }
-function onbHfTab(ti){ onb.hf.ti=ti; renderONB(); }
-function onbHfAddType(){ const T=onb.hf.types; T.push(onbHfType(T.length+1)); onb.hf.ti=T.length-1; renderONB(); }
-function onbHfDelType(){ const hf=onb.hf; if(hf.types.length<=1){ f6Toast('A hierarchy needs at least one type.'); return; } hf.types.splice(hf.ti,1); hf.ti=Math.max(0,hf.ti-1); renderONB(); }
-function onbHfTypeSet(f,v){ onbHfT()[f]=v; if(f==='name'){ const el=document.querySelector('.onb-hf-tab.on'); if(el) el.textContent=v||'Untitled type'; } onbHfRailPaint(); }
-/* levels */
-function onbHfLvAdd(){ onbHfT().levels.push(onbHfLevel()); renderONB(); }
-function onbHfLvDel(li){ const t=onbHfT(), L=t.levels; if(L.length<=2){ f6Toast('A hierarchy needs at least 2 levels.'); return; } const id=L[li].id; L.splice(li,1); if(t.lowest===id) t.lowest=null; t.looks=t.looks.filter(x=>x.a!==id&&x.b!==id); renderONB(); }
-function onbHfLvMove(li,d){ const L=onbHfT().levels, j=li+d; if(j<0||j>=L.length) return; [L[li],L[j]]=[L[j],L[li]]; renderONB(); }
-function onbHfLvSet(li,f,v){ onbHfT().levels[li][f]=v; onbHfRailPaint(); }
-function onbHfLvName(li,v){ onbHfT().levels[li].name=v; onbHfQ4Paint(); onbHfRailPaint(); }
-function onbHfDef(li,el){ const L=onbHfT().levels[li]; L.def=el.value; const m=document.getElementById('hfwc-'+li); if(m){ const w=onbHfWords(L.def); m.textContent=`${w} word${w===1?'':'s'} · aim for 30–40`; m.className='onb-hf-meta'+(w>=30&&w<=40?' ok':w?'':' muted'); } onbHfRailPaint(); }
-/* chip inputs (column names/codes · example values) */
-function onbHfChipBox(li,kind){ const L=onbHfT().levels[li], arr=L[kind], cols=kind==='cols';
-  const meta=cols?`<div class="onb-hf-meta ${arr.length?'ok':'muted'}">${arr.length?`${arr.length} column${arr.length>1?'s':''} / code${arr.length>1?'s':''}`:'Press Enter or comma to add — add every name this level appears as'}</div>`
-    :`<div class="onb-hf-meta ${arr.length>=10?'ok':arr.length?'':'muted'}">${arr.length}/10 example values${arr.length?'':' — paste a comma-separated list or add one at a time'}</div>`;
-  return `<div id="hfchip-${li}-${kind}"><div class="onb-hf-chipin" onclick="if(event.target===this)this.querySelector('input').focus()">${arr.map((v,k)=>`<span class="onb-hf-chip ${cols?'mono':''}">${onbEsc(v)}<button type="button" aria-label="Remove ${onbEsc(v)}" onclick="onbHfChipDel(${li},'${kind}',${k})">✕</button></span>`).join('')}<input ${cols?'list="onbHfCols"':''} placeholder="${cols?(arr.length?'Add another':'e.g. SHIP_TO_CUST_NUM'):(arr.length?'Add value':'e.g. 0001234567')}" onkeydown="onbHfChipKey(event,${li},'${kind}',this)" onblur="onbHfChipCommit(${li},'${kind}',this)" onpaste="setTimeout(()=>onbHfChipCommit(${li},'${kind}',this,1),0)"></div>${meta}</div>`; }
-function onbHfChipPaint(li,kind,focus){ const el=document.getElementById(`hfchip-${li}-${kind}`); if(!el) return; el.outerHTML=onbHfChipBox(li,kind); if(focus){ const i=document.querySelector(`#hfchip-${li}-${kind} input`); if(i) i.focus(); } onbHfRailPaint(); if(kind==='cols') onbHfQ4Paint(); }
-function onbHfChipCommit(li,kind,el,focus){ const raw=el.value; if(!raw.trim()) return; const a=onbHfT().levels[li][kind]; raw.split(/[,\n\t]+/).map(x=>x.trim()).filter(Boolean).forEach(v=>{ if(!a.includes(v)) a.push(v); }); el.value=''; onbHfChipPaint(li,kind,focus); }
-function onbHfChipKey(e,li,kind,el){ if(e.key==='Enter'||e.key===','){ e.preventDefault(); onbHfChipCommit(li,kind,el,1); } else if(e.key==='Backspace'&&!el.value){ const a=onbHfT().levels[li][kind]; if(a.length){ a.pop(); onbHfChipPaint(li,kind,1); } } }
-function onbHfChipDel(li,kind,k){ onbHfT().levels[li][kind].splice(k,1); onbHfChipPaint(li,kind); }
-/* Q4 — lowest usable grain + lookalikes */
-function onbHfLowest(id){ onbHfT().lowest=id; onbHfQ4Paint(); onbHfRailPaint(); }
-function onbHfLookAdd(){ onbHfT().looks.push({a:null,b:null,how:''}); onbHfQ4Paint(); onbHfRailPaint(); }
-function onbHfLookDel(k){ onbHfT().looks.splice(k,1); onbHfQ4Paint(); onbHfRailPaint(); }
-function onbHfLookSet(k,f,v){ onbHfT().looks[k][f]=(f==='how')?v:(v?+v:null); onbHfRailPaint(); }
-function onbHfQ4(){ const t=onbHfT(), named=t.levels.filter(l=>l.name.trim());
-  const opt=(sel)=>`<option value="">Select level</option>${named.map(l=>`<option value="${l.id}" ${l.id===sel?'selected':''}>${onbEsc(l.name)}</option>`).join('')}`;
-  return `<div id="hfq4" class="onb-sec">
-    <div class="onb-sec-h"><span class="onb-hf-q">4</span>Lowest usable grain &amp; lookalikes<span class="onb-hf-feeds">${ONB_HF_Q[3].f}</span></div>
-    <div class="onb-sec-note">Which single level is the lowest usable grain for the Data Sufficiency heat map? And which levels have lookalike values that could be confused — how do you tell them apart?</div>
-    <label class="onb-flabel">Lowest usable grain</label>
-    ${named.length?`<div class="onb-hf-low">${named.map(l=>`<div class="onb-htype ${t.lowest===l.id?'on':''}" role="radio" aria-checked="${t.lowest===l.id}" onclick="onbHfLowest(${l.id})"><span class="onb-radio" style="margin-top:2px"></span><div><div class="onb-hf-low-n">${onbEsc(l.name)}</div>${l.cols.length?`<div class="onb-hf-low-c mono">${l.cols.map(onbEsc).join(', ')}</div>`:''}</div></div>`).join('')}</div>`:'<div class="onb-hf-meta muted">Name the levels above first.</div>'}
-    <label class="onb-flabel" style="margin-top:18px">Lookalike levels</label>
-    ${t.looks.length?`<div class="onb-hf-look onb-hf-look-h"><span>Level</span><span>Can be confused with</span><span>How to tell them apart</span><span></span></div>`:''}
-    ${t.looks.map((x,k)=>`<div class="onb-hf-look">
-      <span class="onb-select-wrap"><select class="onb-select sm" onchange="onbHfLookSet(${k},'a',this.value)">${opt(x.a)}</select></span>
-      <span class="onb-select-wrap"><select class="onb-select sm" onchange="onbHfLookSet(${k},'b',this.value)">${opt(x.b)}</select></span>
-      <input class="onb-input sm" style="font-family:inherit" placeholder="e.g. Ship-to IDs are 10 digits; Sold-to IDs carry a region prefix" value="${onbEsc(x.how)}" oninput="onbHfLookSet(${k},'how',this.value)">
-      <button class="onb-tsrow-del" title="Remove pair" onclick="onbHfLookDel(${k})">${ONB_TRASH}</button>
-    </div>`).join('')}
-    <button class="onb-btn onb-addrow" style="padding:8px 16px" onclick="onbHfLookAdd()">＋ Add lookalike pair</button>
-  </div>`; }
-function onbHfQ4Paint(){ const el=document.getElementById('hfq4'); if(el) el.outerHTML=onbHfQ4(); }
-/* completeness */
-function onbHfStatus(t){ const hf=onb.hf, named=t.levels.filter(l=>l.name.trim());
-  const q1=!!(hf.name.trim()&&hf.vertical&&(hf.vertical!=='Other'||hf.vOther.trim())&&hf.diff.trim());
-  const mapped=named.filter(l=>l.cols.length).length, q2=named.length>=2&&mapped===named.length;
-  const q3n=named.filter(l=>{ const w=onbHfWords(l.def); return w>=30&&w<=40&&l.examples.length>=10&&l.format.trim(); }).length;
-  const low=named.find(l=>l.id===t.lowest), looksOk=t.looks.every(x=>x.a&&x.b&&x.a!==x.b&&x.how.trim()), q4=!!low&&looksOk;
-  const q5=onbHfWords(t.summary)>0;
-  return [
-    {ok:q1, s:q1?'Complete':'Add name, vertical and how it differs'},
-    {ok:q2, s:`${named.length} level${named.length===1?'':'s'} · ${mapped} mapped to columns${named.length<2?' (need 2+)':''}`},
-    {ok:named.length>0&&q3n===named.length, s:`${q3n}/${named.length} levels fully described`},
-    {ok:q4, s:!low?'Pick the lowest usable grain':looksOk?`Lowest: ${low.name}`:'Finish the lookalike pairs'},
-    {ok:q5, s:q5?'Complete':'Write the overall summary'}
-  ]; }
-function onbHfRail(){ const hf=onb.hf, t=onbHfT(), st=onbHfStatus(t);
-  return `<aside class="onb-hf-rail" id="hfRail">
-    <div class="onb-hf-rail-h">Completeness · ${onbEsc(t.name||'Untitled type')}</div>
-    ${st.map((x,i)=>`<div class="onb-hf-rq ${x.ok?'ok':''}"><span class="onb-hf-rdot">${x.ok?'✓':i+1}</span><div><div class="onb-hf-rt">${ONB_HF_Q[i].t}</div><div class="onb-hf-rf">Feeds ${ONB_HF_Q[i].f}</div><div class="onb-hf-rs">${onbEsc(x.s)}</div></div></div>`).join('')}
-    <div class="onb-hf-rtypes">${hf.types.map((ty,ti)=>{ const n=onbHfStatus(ty).filter(x=>x.ok).length; return `<div class="onb-hf-rtype ${ti===hf.ti?'on':''}" onclick="onbHfTab(${ti})"><span>${onbEsc(ty.name||'Untitled type')}</span><b>${n}/5</b></div>`; }).join('')}</div>
-  </aside>`; }
-function onbHfRailPaint(){ const el=document.getElementById('hfRail'); if(el) el.outerHTML=onbHfRail(); }
-/* save → registers into ONB_HIERS (+ a new dimension for a custom vertical) */
-function onbHfSave(){ const hf=onb.hf, name=hf.name.trim(), vert=hf.vertical==='Other'?hf.vOther.trim():hf.vertical;
-  if(!name){ f6Toast('Q1 · Give the hierarchy a name.'); return; }
-  if(!vert){ f6Toast('Q1 · Pick the vertical.'); return; }
-  if(ONB_HIERS.some((h,i)=>i!==hf.edit && h.name.toLowerCase()===name.toLowerCase())){ f6Toast('A hierarchy with that name already exists.'); return; }
-  const tn=hf.types.map(t=>t.name.trim().toLowerCase());
-  for(let ti=0; ti<hf.types.length; ti++){ const t=hf.types[ti], named=t.levels.filter(l=>l.name.trim()), lbl=t.name.trim()||`Type ${ti+1}`;
-    const fail=m=>{ hf.ti=ti; renderONB(); f6Toast(`${lbl} · ${m}`); };
-    if(!t.name.trim()) return fail('Give this type a name.');
-    if(tn.indexOf(tn[ti])!==ti) return fail('Type names must be unique.');
-    if(named.length<2) return fail('Q2 · Add at least 2 named levels.');
-    if(named.some(l=>!l.cols.length)) return fail('Q2 · Every level needs at least one column name or code.');
-    if(!named.find(l=>l.id===t.lowest)) return fail('Q4 · Pick the lowest usable grain.'); }
-  const spec=JSON.parse(JSON.stringify({name, vertical:hf.vertical, vOther:hf.vOther, diff:hf.diff, types:hf.types}));
-  const entry={name, dim:vert, custom:true, spec, types:hf.types.map(t=>{ const L=t.levels.filter(l=>l.name.trim()); return {name:t.name.trim(), levels:L.map(l=>l.name.trim()), cols:L.map(l=>l.cols.join(', ')), lowest:(L.find(l=>l.id===t.lowest)||{}).name}; })};
-  if(hf.edit!==null){ const old=ONB_HIERS[hf.edit].name; ONB_HIERS[hf.edit]=entry;
-    if(old!==name){ const k=onb.hiers.indexOf(old); if(k>=0) onb.hiers[k]=name; if(old in onb.hierType){ onb.hierType[name]=onb.hierType[old]; delete onb.hierType[old]; } } }
-  else ONB_HIERS.push(entry);
-  if(!onb.hiers.includes(name)) onb.hiers.push(name);
-  if(!entry.types.some(t=>t.name===onb.hierType[name])){ if(entry.types.length===1) onb.hierType[name]=entry.types[0].name; else delete onb.hierType[name]; }
-  if(hf.vertical==='Other' && !onbDimOpts().some(d=>d.toLowerCase()===vert.toLowerCase())){ onb.dimCustom.push(vert); onb.dims.push(vert); }
-  const gaps=hf.types.reduce((n,t)=>n+onbHfStatus(t).filter(x=>!x.ok).length,0);
-  onbHfClose(); f6Toast(`${name} saved with ${entry.types.length} type${entry.types.length>1?'s':''}${gaps?` · ${gaps} optional item${gaps>1?'s':''} still incomplete`:''}.`); }
-/* page */
-function onbHfLevelCard(l,li,n){ return `<div class="onb-hf-lv">
-    <div class="onb-hf-lv-h">
-      <span class="onb-hlv-n">${li+1}</span>
-      <input class="onb-input sm" style="font-family:inherit" placeholder="${li===0?'Coarsest level, e.g. Channel':li===n-1?'Finest level, e.g. Ship-to':'Level name'}" value="${onbEsc(l.name)}" oninput="onbHfLvSet(${li},'name',this.value)" onchange="onbHfLvName(${li},this.value)">
-      <span class="onb-hlv-acts"><button class="onb-hlv-btn" title="Move up (coarser)" onclick="onbHfLvMove(${li},-1)" ${li===0?'disabled':''}>↑</button><button class="onb-hlv-btn" title="Move down (finer)" onclick="onbHfLvMove(${li},1)" ${li===n-1?'disabled':''}>↓</button><button class="onb-tsrow-del" title="Remove level" onclick="onbHfLvDel(${li})">${ONB_TRASH}</button></span>
-    </div>
-    <div class="onb-hf-lv-grid">
-      <div class="onb-jf onb-jf-wide"><label>Column name(s) / codes in source tables<span class="onb-hf-qs">Q2</span></label>${onbHfChipBox(li,'cols')}</div>
-      <div class="onb-jf onb-jf-wide"><label>Definition<span class="onb-hf-qs">Q3</span></label><textarea class="nuc-textarea onb-hf-def" placeholder="30–40 words: what one value at this level represents, who owns it and how it's assigned…" oninput="onbHfDef(${li},this)">${onbEsc(l.def)}</textarea><div id="hfwc-${li}" class="onb-hf-meta ${onbHfWords(l.def)>=30&&onbHfWords(l.def)<=40?'ok':onbHfWords(l.def)?'':'muted'}">${onbHfWords(l.def)} word${onbHfWords(l.def)===1?'':'s'} · aim for 30–40</div></div>
-      <div class="onb-jf"><label>10 example values<span class="onb-hf-qs">Q3</span></label>${onbHfChipBox(li,'examples')}</div>
-      <div class="onb-jf"><label>Value format / pattern<span class="onb-hf-qs">Q3</span></label><input class="onb-input sm" placeholder="e.g. 10-digit numeric, zero-padded" value="${onbEsc(l.format)}" oninput="onbHfLvSet(${li},'format',this.value)"></div>
-    </div>
-  </div>`; }
-function onbHfPage(){ const hf=onb.hf, t=onbHfT(), vert=hf.vertical==='Other'?hf.vOther.trim():hf.vertical;
-  const sibs=vert?ONB_HIERS.filter((h,i)=>i!==hf.edit && h.dim.toLowerCase()===vert.toLowerCase()):[];
-  const lib=ONB_HIERS.map((h,i)=>({h,i})).filter(x=>x.h.spec);
+function onbHfSet(f,v,re){ onb.hf[f]=v; if(re) renderONB(); }
+function onbHfDesc(el){ onb.hf.desc=el.value; const n=el.value.trim().length, m=document.getElementById('hfDescN'); if(m){ m.textContent=`${n} / ${ONB_HF_MIN} characters minimum`; m.className='onb-hf-meta'+(n>=ONB_HF_MIN?' ok':n?'':' muted'); } }
+function onbHfSave(){ const hf=onb.hf, name=hf.name.trim(), desc=hf.desc.trim();
+  if(!hf.domain){ f6Toast('Select a domain.'); return; }
+  if(!hf.kind){ f6Toast('Choose whether you are adding a dimension or a vertical.'); return; }
+  if(!name){ f6Toast(`Enter the ${hf.kind} name.`); return; }
+  if(desc.length<ONB_HF_MIN){ f6Toast(`Description needs at least ${ONB_HF_MIN} characters (${desc.length} so far).`); return; }
+  if(hf.kind==='dimension'){
+    if(onbDimOpts().some(d=>d.toLowerCase()===name.toLowerCase())){ f6Toast('That dimension already exists.'); return; }
+    onb.dimCustom.push(name); onb.dims.push(name);
+  } else {
+    const hn=/hierarchy$/i.test(name)?name:`${name} Hierarchy`, dim=name.replace(/\s*hierarchy\s*$/i,'').trim()||name;
+    if(ONB_HIERS.some(h=>h.name.toLowerCase()===hn.toLowerCase()||h.dim.toLowerCase()===dim.toLowerCase())){ f6Toast('That vertical already exists.'); return; }
+    ONB_HIERS.push({name:hn, dim, custom:true, types:[]});
+  }
+  (onb.defs||(onb.defs=[])).push({domain:hf.domain, kind:hf.kind, name, desc});
+  onbHfClose(); f6Toast(hf.kind==='dimension'?`Dimension “${name}” added — select it under Dimensions & hierarchies.`:`Vertical “${name}” added — select it under Hierarchies, then use “Add type” to define its levels.`); }
+function onbHfPage(){ const hf=onb.hf, n=hf.desc.trim().length, defs=onb.defs||[];
+  const kinds=[['dimension','Dimension','A new attribute the use case is cut by, e.g. Channel'],['vertical','Vertical','A new hierarchy family whose levels you define with “Add type”']];
   return `<div class="onb-prereq-back" onclick="onbHfClose()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> Back to onboarding</div>
-  <div class="onb-dshead"><h2 class="onb-h" style="margin:0">${hf.edit!==null?`Edit ${onbEsc(onb.hf.name||'hierarchy')}`:'Add hierarchy / dimension'}</h2><div class="onb-dssub">Answer five questions so AI can identify this hierarchy, order its grain, detect it in source columns and avoid lookalike collisions. Add one or more types if the hierarchy has variants.</div></div>
-  ${lib.length?`<div class="onb-hf-lib"><span class="onb-flabel" style="margin:0">Defined here</span>${lib.map(({h,i})=>`<span class="nuc-chip ${hf.edit===i?'on':''}" onclick="onbHfOpen(${i})" title="Edit">${onbEsc(h.name)} · ${h.types.length} type${h.types.length>1?'s':''}</span>`).join('')}${hf.edit!==null?`<span class="nuc-chip onb-chip-add" onclick="onbHfOpen()">＋ New</span>`:''}</div>`:''}
-  <datalist id="onbHfCols">${onbHierColOpts().map(c=>`<option value="${c}">`).join('')}</datalist>
-  <div class="onb-hf-grid"><div>
-    <div class="onb-sec">
-      <div class="onb-sec-h"><span class="onb-hf-q">1</span>Identity<span class="onb-hf-feeds">${ONB_HF_Q[0].f}</span></div>
-      <div class="onb-sec-note">Name this hierarchy, pick its vertical, and in one line say how it differs from the other hierarchies in that vertical.</div>
-      <label class="onb-flabel">Hierarchy name</label>
-      <input class="onb-input" placeholder="e.g. Customer Hierarchy — Retail banner view" value="${onbEsc(hf.name)}" oninput="onbHfSet('name',this.value)">
-      <label class="onb-flabel" style="margin-top:16px">Vertical</label>
-      <div class="nuc-chips">${ONB_HF_VERTICALS.map(v=>`<span class="nuc-chip ${hf.vertical===v?'on':''}" onclick="onbHfSet('vertical','${v}',1)">${hf.vertical===v?'✓ ':''}${v}</span>`).join('')}</div>
-      ${hf.vertical==='Other'?`<input class="onb-input" style="margin-top:10px" placeholder="Name the vertical / dimension, e.g. Channel" value="${onbEsc(hf.vOther)}" oninput="onbHfSet('vOther',this.value)" onchange="renderONB()">`:''}
-      ${vert?`<div class="onb-hf-hint">${sibs.length?`Other hierarchies in <b>${onbEsc(vert)}</b>: ${sibs.map(h=>`<b>${onbEsc(h.name)}</b> (${h.types.map(x=>onbEsc(x.name)).join(', ')})`).join('; ')}. Say how this one differs.`:`No other hierarchies in <b>${onbEsc(vert)}</b> yet${hf.vertical==='Other'?' — it will also be added as a new dimension':''}.`}</div>`:''}
-      <label class="onb-flabel" style="margin-top:16px">How it differs (one line)</label>
-      <input class="onb-input" placeholder="e.g. Rolls stores up by retail banner rather than by legal customer entity" value="${onbEsc(hf.diff)}" oninput="onbHfSet('diff',this.value)">
-    </div>
-    <div class="onb-hf-tabs" role="tablist">${hf.types.map((ty,ti)=>`<button class="onb-hf-tab ${ti===hf.ti?'on':''}" role="tab" aria-selected="${ti===hf.ti}" onclick="onbHfTab(${ti})">${onbEsc(ty.name||'Untitled type')}</button>`).join('')}<button class="onb-hf-tab onb-hf-tab-add" onclick="onbHfAddType()">＋ Add type</button></div>
-    <div class="onb-hf-typebar">
-      <div><label class="onb-flabel">Type name</label><input class="onb-input sm" style="font-family:inherit" value="${onbEsc(t.name)}" oninput="onbHfTypeSet('name',this.value)"></div>
-      ${hf.types.length>1?`<button class="onb-editbtn" onclick="onbHfDelType()">${ONB_TRASH} Remove this type</button>`:''}
-    </div>
-    <div class="onb-sec">
-      <div class="onb-sec-h"><span class="onb-hf-q">2</span>Levels · coarsest → finest<span class="onb-hf-feeds">${ONB_HF_Q[1].f}</span></div>
-      <div class="onb-sec-note">List every level from coarsest to finest with the exact column name(s)/codes it appears as. For each level, add a 30–40 word definition, 10 example values and the value format <span class="onb-hf-qs" style="margin:0">Q3 · ${ONB_HF_Q[2].f}</span></div>
-      ${t.levels.map((l,li)=>onbHfLevelCard(l,li,t.levels.length)).join('')}
-      <button class="onb-btn onb-addrow" style="padding:8px 16px" onclick="onbHfLvAdd()">＋ Add level</button>
-    </div>
-    ${onbHfQ4()}
-    <div class="onb-sec">
-      <div class="onb-sec-h"><span class="onb-hf-q">5</span>Overall summary<span class="onb-hf-feeds">${ONB_HF_Q[4].f}</span></div>
-      <div class="onb-sec-note">What this hierarchy represents and how the levels roll up into each other.</div>
-      <textarea class="nuc-textarea" placeholder="e.g. Stores roll up to customers, customers to banners, banners to the parent company and then to channel…" oninput="onbHfTypeSet('summary',this.value)">${onbEsc(t.summary)}</textarea>
-    </div>
-    <div class="onb-hf-foot"><button class="onb-btn" onclick="onbHfClose()">Cancel</button><button class="onb-btn primary" onclick="onbHfSave()">${hf.edit!==null?'Save changes':'Save hierarchy'}</button></div>
-  </div>${onbHfRail()}</div>`; }
+  <div class="onb-dshead"><h2 class="onb-h" style="margin:0">Add hierarchy / dimension</h2><div class="onb-dssub">Select the domain, choose what you're adding, then name and describe it so AI can identify it.</div></div>
+  <div class="onb-sec onb-hf-one">
+    <div class="onb-hf-stepl"><span class="onb-hf-q">1</span>Domain</div>
+    <div class="nuc-chips">${Object.keys(NUC_HIER).map(f=>{ const c=nucDomColor(f), on=hf.domain===f; return `<span class="nuc-chip ${on?'on':''}" ${on?`style="background:${c};border-color:${c};color:#fff"`:''} onclick="onbHfSet('domain','${f.replace(/'/g,"\\'")}',1)"><span class="nuc-cdot" style="background:${on?'#fff':c}"></span>${f}</span>`; }).join('')}</div>
+    <div class="onb-hf-stepl"><span class="onb-hf-q">2</span>What are you adding?</div>
+    <div class="onb-hf-kinds">${kinds.map(([k,l,d])=>`<div class="onb-htype ${hf.kind===k?'on':''}" role="radio" aria-checked="${hf.kind===k}" onclick="onbHfSet('kind','${k}',1)"><span class="onb-radio" style="margin-top:2px"></span><div><div class="onb-hf-low-n">${l}</div><div class="onb-hf-rf">${d}</div></div></div>`).join('')}</div>
+    <div class="onb-hf-stepl"><span class="onb-hf-q">3</span>${hf.kind==='vertical'?'Vertical':hf.kind==='dimension'?'Dimension':'Dimension / vertical'} name</div>
+    <input class="onb-input" placeholder="${hf.kind==='vertical'?'e.g. Channel':'e.g. Sales Organisation'}" value="${onbEsc(hf.name)}" oninput="onbHfSet('name',this.value)">
+    <div class="onb-hf-stepl"><span class="onb-hf-q">4</span>Description</div>
+    <textarea class="nuc-textarea" style="min-height:130px" placeholder="Describe what this ${hf.kind||'dimension / vertical'} represents, where it comes from, how its values are assigned and how it relates to the other dimensions in this domain…" oninput="onbHfDesc(this)">${onbEsc(hf.desc)}</textarea>
+    <div id="hfDescN" class="onb-hf-meta ${n>=ONB_HF_MIN?'ok':n?'':'muted'}">${n} / ${ONB_HF_MIN} characters minimum</div>
+    <div class="onb-hf-foot"><button class="onb-btn" onclick="onbHfClose()">Cancel</button><button class="onb-btn primary" onclick="onbHfSave()">Save</button></div>
+  </div>
+  ${defs.length?`<div class="onb-sec onb-hf-one"><div class="onb-sec-h">Added in this session</div>${defs.map(d=>`<div class="onb-hf-def-row"><span class="onb-jtag">${d.kind}</span><b>${onbEsc(d.name)}</b><span class="onb-hf-rf">${onbEsc(d.domain)}</span><div class="onb-hf-def-d">${onbEsc(d.desc)}</div></div>`).join('')}</div>`:''}`; }
 function onbTopBar(){ return `<div class="onb-topbar"><button class="onb-btn onb-topbtn" onclick="onbHfOpen()"><span class="onb-topbtn-plus">＋</span> Add hierarchy / dimension</button></div>`; }
 function renderONB(){
   const inner = onb.phase==='prereq'

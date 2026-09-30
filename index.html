@@ -1260,6 +1260,33 @@ td.grand-cell .val-num { font-weight: 800; }
   .onb-hf-rail { position: static; }
   .onb-hf-lv-grid, .onb-hf-look { grid-template-columns: 1fr; }
 }
+/* Add type → Add New Hierarchy form */
+.onb-modal-wide.onb-hm2 { max-width: 720px; }
+.onb-hm2 .onb-modal-body { max-height: 70vh; padding-top: 16px; }
+.onb-hm2-step { display: flex; align-items: center; font-size: 14.5px; font-weight: 800; color: #101828; margin: 2px 0 8px; }
+.onb-hm2-note { font-size: 12.5px; color: #98A2B3; margin: -4px 0 10px 30px; }
+.onb-hm2-box { border: 1px solid #E7E9EE; border-radius: 12px; padding: 14px 16px; background: #FCFDFE; margin-left: 30px; }
+.onb-hm2-sec { margin-left: 30px; }
+.onb-hm2-arrow { text-align: center; color: #98A2B3; font-size: 15px; line-height: 1; margin: 8px 0; }
+.onb-hm2-lvh { display: flex; align-items: center; justify-content: space-between; margin: 0 0 6px 30px; font-size: 12px; font-weight: 800; letter-spacing: .02em; color: #344054; }
+.onb-hm2-row { display: grid; grid-template-columns: 120px 1fr; gap: 10px; align-items: center; }
+.onb-hm2-row + .onb-hm2-row { margin-top: 10px; }
+.onb-hm2-row > label { font-size: 12.5px; font-weight: 700; color: #475467; }
+.onb-hm2-inline { display: flex; gap: 6px; align-items: center; }
+.onb-hm2-inline .onb-hlv-btn { flex: none; height: 34px; width: 34px; }
+.onb-hm2-f + .onb-hm2-f, .onb-grid + .onb-hm2-f, .onb-hm2-f + .onb-grid { margin-top: 12px; }
+.onb-grid > .onb-hm2-f + .onb-hm2-f { margin-top: 0; }
+.onb-hm2-ex { display: flex; flex-wrap: wrap; gap: 8px; }
+.onb-hm2-ex .onb-input { width: 150px; }
+.onb-hm2-sumbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.onb-hm2-chain { min-width: 0; flex: 1; }
+.onb-modal-foot.onb-hm2-foot { justify-content: space-between; border-top: 1px solid #EEF0F4; padding-top: 14px; }
+.onb-select:disabled { background: #F4F5F7; color: #667085; cursor: not-allowed; }
+@media (max-width: 640px) {
+  .onb-hm2-box, .onb-hm2-sec { margin-left: 0; }
+  .onb-hm2-note, .onb-hm2-lvh { margin-left: 0; }
+  .onb-hm2-row { grid-template-columns: 1fr; gap: 6px; }
+}
 /* Heat map generation + approval */
 .onb-gen { border: 1px dashed #C6CDDA; border-radius: 16px; padding: 40px 24px; text-align: center; }
 .onb-gen-ico { width: 64px; height: 64px; border-radius: 16px; background: #EAF0FE; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
@@ -5050,56 +5077,112 @@ function onbDimsHierSection(){
     <div class="onb-sec-h">Dimensions &amp; hierarchies</div>
     <div class="onb-sec-note">Choose the dimensions this use case is cut by and the hierarchies used to roll grain up, then pick a hierarchy type for each selected hierarchy.</div>
     <label class="onb-flabel">Dimensions</label>
-    <div class="nuc-chips">${dims.map((d,i)=>{ const on=onb.dims.includes(d); return `<span class="nuc-chip ${on?'on':''}" onclick="onbToggleDim(${i})">${on?'✓ ':''}${onbEsc(d)}</span>`; }).join('')}${onb.dimAdding
-      ?`<span class="onb-chip-form"><input id="onbDimNew" class="onb-input sm" placeholder="New dimension name" value="${onbEsc(onb.dimNew)}" oninput="onb.dimNew=this.value" onkeydown="if(event.key==='Enter')onbDimAddConfirm();if(event.key==='Escape')onbDimAddCancel()"><button class="onb-vbtn on-correct" onclick="onbDimAddConfirm()">Add</button><button class="onb-vbtn" onclick="onbDimAddCancel()">Cancel</button></span>`
-      :`<span class="nuc-chip onb-chip-add" onclick="onbDimAddOpen()">＋ Add new dimension</span>`}</div>
+    <div class="nuc-chips">${dims.map((d,i)=>{ const on=onb.dims.includes(d); return `<span class="nuc-chip ${on?'on':''}" onclick="onbToggleDim(${i})">${on?'✓ ':''}${onbEsc(d)}</span>`; }).join('')}</div>
     <label class="onb-flabel" style="margin-top:18px">Hierarchies</label>
-    <div class="nuc-chips">${ONB_HIERS.map((h,i)=>{ const on=onb.hiers.includes(h.name); return `<span class="nuc-chip ${on?'on':''}" onclick="onbToggleHier(${i})">${on?'✓ ':''}${onbEsc(h.name)}</span>`; }).join('')}<span class="nuc-chip onb-chip-add" onclick="onbHierModalOpen()">＋ Add new hierarchy</span></div>
+    <div class="nuc-chips">${ONB_HIERS.map((h,i)=>{ const on=onb.hiers.includes(h.name); return `<span class="nuc-chip ${on?'on':''}" onclick="onbToggleHier(${i})">${on?'✓ ':''}${onbEsc(h.name)}</span>`; }).join('')}</div>
     ${onb.hiers.length?`<div class="onb-hier-list">${onb.hiers.map(onbHierCard).join('')}</div>`:''}
   </div>`;
 }
-/* ── Add new hierarchy / add type (modal) ── */
+/* ── Add type → "Add New Hierarchy" form (modal) ──
+   Opened from a hierarchy card's "Add type". Five sections: details · levels (coarsest → finest)
+   · per-level information (optional) · grain & collision check · summary. Saves as a new type. */
 function onbHierColOpts(){ const s=new Set(); onbAllColsFor(ONB_API_TABLES.fact).forEach(c=>s.add(c)); ONB_GRAIN_COLS.forEach(c=>s.add(c)); Object.values(ONB_DIM_COLUMNS).forEach(a=>a.forEach(c=>s.add(c))); return [...s]; }
-function onbHierModalOpen(i){ const ex=(typeof i==='number')?i:null, h=ex!==null?ONB_HIERS[ex]:null;
-  onb.hierModal={ex, name:h?h.name:'', typeName:h?`Type ${h.types.length+1}`:'Type 1', levels:[{name:'',col:''},{name:'',col:''},{name:'',col:''}]}; renderONB(); }
+function onbHmLevel(){ return {name:'', custom:false, col:'', def:'', examples:['','',''], format:''}; }
+function onbHierModalOpen(i){ const h=ONB_HIERS[i]; if(!h) return;
+  onb.hierModal={ex:i, name:h.name, vertical:h.dim, typeName:`Type ${h.types.length+1}`, diff:'', levels:[onbHmLevel(),onbHmLevel(),onbHmLevel()], info:0, lowest:'', looks:[], lookHow:'', summary:''}; renderONB(); }
 function onbHierModalCancel(){ onb.hierModal=null; renderONB(); }
-function onbHierModalSet(f,v){ if(onb.hierModal) onb.hierModal[f]=v; }
-function onbHierLvlSet(li,f,v){ if(onb.hierModal) onb.hierModal.levels[li][f]=v; }
-function onbHierLvlAdd(){ onb.hierModal.levels.push({name:'',col:''}); renderONB(); }
-function onbHierLvlDel(li){ const L=onb.hierModal.levels; if(L.length<=2){ f6Toast('A hierarchy needs at least 2 levels.'); return; } L.splice(li,1); renderONB(); }
-function onbHierLvlMove(li,d){ const L=onb.hierModal.levels, j=li+d; if(j<0||j>=L.length) return; [L[li],L[j]]=[L[j],L[li]]; renderONB(); }
-function onbHierModalSave(){ const m=onb.hierModal; if(!m) return; const name=m.name.trim(), tn=m.typeName.trim(), lv=m.levels.filter(l=>l.name.trim());
-  if(!name){ f6Toast('Enter a hierarchy name.'); return; }
-  if(!tn){ f6Toast('Enter a hierarchy type.'); return; }
-  if(lv.length<2){ f6Toast('Define at least 2 levels.'); return; }
-  if(lv.some(l=>!l.col)){ f6Toast('Map every level to a column.'); return; }
-  const type={name:tn, levels:lv.map(l=>l.name.trim()), cols:lv.map(l=>l.col)};
-  if(m.ex!==null){ const h=ONB_HIERS[m.ex]; if(h.types.some(t=>t.name.toLowerCase()===tn.toLowerCase())){ f6Toast('That type already exists for this hierarchy.'); return; } h.types.push(type); if(!onb.hiers.includes(h.name)) onb.hiers.push(h.name); onb.hierType[h.name]=tn; }
-  else { if(ONB_HIERS.some(h=>h.name.toLowerCase()===name.toLowerCase())){ f6Toast('A hierarchy with that name already exists.'); return; } ONB_HIERS.push({name, dim:name.replace(/\s*hierarchy\s*$/i,'').trim()||name, custom:true, types:[type]}); onb.hiers.push(name); onb.hierType[name]=tn; }
-  onb.hierModal=null; renderONB(); f6Toast(`${name} · ${tn} saved.`); }
-function onbHierModalHtml(){ const m=onb.hierModal; if(!m) return ''; const ex=m.ex!==null, cols=onbHierColOpts();
+function onbHmSet(f,v,re){ const m=onb.hierModal; if(!m) return; m[f]=v; if(re) renderONB(); }
+function onbHmNamed(){ return onb.hierModal.levels.filter(l=>l.name.trim()); }
+function onbHmLvName(li,v){ const L=onb.hierModal.levels[li]; if(v==='__custom'){ L.custom=true; L.name=''; renderONB(); const el=document.getElementById('hm2lv'+li); if(el) el.focus(); return; } L.name=v; renderONB(); }
+function onbHmLvType(li,v){ onb.hierModal.levels[li].name=v; onbHmChainPaint(); }
+function onbHmLvList(li){ const L=onb.hierModal.levels[li]; L.custom=false; L.name=''; renderONB(); }
+function onbHmLv(li,f,v){ onb.hierModal.levels[li][f]=v; }
+function onbHmLvAdd(){ onb.hierModal.levels.push(onbHmLevel()); renderONB(); }
+function onbHmLvDel(li){ const m=onb.hierModal, L=m.levels; if(L.length<=2){ f6Toast('A hierarchy needs at least 2 levels.'); return; } L.splice(li,1); if(m.info>=L.length) m.info=L.length-1; renderONB(); }
+function onbHmLvMove(li,d){ const m=onb.hierModal, L=m.levels, j=li+d; if(j<0||j>=L.length) return; [L[li],L[j]]=[L[j],L[li]]; if(m.info===li) m.info=j; else if(m.info===j) m.info=li; renderONB(); }
+function onbHmEx(li,k,v){ onb.hierModal.levels[li].examples[k]=v; }
+function onbHmExAdd(li){ const a=onb.hierModal.levels[li].examples; if(a.length>=10){ f6Toast('Up to 10 example values per level.'); return; } a.push(''); renderONB(); const el=document.getElementById(`hm2ex${li}-${a.length-1}`); if(el) el.focus(); }
+function onbHmLook(n){ const a=onb.hierModal.looks, k=a.indexOf(n); if(k>=0) a.splice(k,1); else a.push(n); renderONB(); }
+function onbHmChain(){ const m=onb.hierModal, n=onbHmNamed().map(l=>l.name.trim()); return n.length?onbChain(n,m.lowest):'<span class="onb-hf-meta muted">Name the levels above to preview the hierarchy.</span>'; }
+function onbHmChainPaint(){ const el=document.getElementById('hm2Chain'); if(el) el.innerHTML=onbHmChain(); }
+function onbHmGen(){ const m=onb.hierModal, n=onbHmNamed().map(l=>l.name.trim()); if(n.length<2){ f6Toast('Add at least 2 levels first.'); return; }
+  const fine=n.slice().reverse(), steps=fine.slice(0,-1).map((x,i)=>`${x} rolls up into ${fine[i+1]}`);
+  m.summary=`${m.name} · ${m.typeName.trim()||'new type'} describes the ${m.vertical} vertical from ${n[0]} (coarsest) down to ${n[n.length-1]} (finest). ${steps.join(', ')}.${m.lowest?` ${m.lowest} is the lowest usable grain for the Data Sufficiency heat map.`:''}`;
+  renderONB(); }
+function onbHierModalSave(){ const m=onb.hierModal; if(!m) return; const h=ONB_HIERS[m.ex], tn=m.typeName.trim(), named=onbHmNamed();
+  if(!tn){ f6Toast('Give this type a name.'); return; }
+  if(h.types.some(t=>t.name.toLowerCase()===tn.toLowerCase())){ f6Toast(`${h.name} already has a “${tn}”.`); return; }
+  if(named.length<2){ f6Toast('Define at least 2 levels.'); return; }
+  if(named.some(l=>!l.col)){ f6Toast('Pick a source column for every level.'); return; }
+  const names=named.map(l=>l.name.trim()); if(new Set(names.map(x=>x.toLowerCase())).size!==names.length){ f6Toast('Level names must be unique.'); return; }
+  const lowest=names.includes(m.lowest)?m.lowest:names[names.length-1];
+  h.types.push({name:tn, levels:names, cols:named.map(l=>l.col), lowest,
+    detail:{diff:m.diff.trim(), levels:named.map(l=>({name:l.name.trim(), col:l.col, def:l.def.trim(), examples:l.examples.map(x=>x.trim()).filter(Boolean), format:l.format.trim()})), looks:m.looks.filter(x=>names.includes(x)), lookHow:m.lookHow.trim(), summary:m.summary.trim()}});
+  if(!onb.hiers.includes(h.name)) onb.hiers.push(h.name);
+  onb.hierType[h.name]=tn; onb.hierModal=null; renderONB(); f6Toast(`${tn} added to ${h.name} and selected.`); }
+function onbHierModalHtml(){ const m=onb.hierModal; if(!m) return ''; const cols=onbHierColOpts(), named=onbHmNamed(), lvOpts=onbGrainLevels(m.vertical);
+  const verts=[...new Set(['Customer','Product','Geography','Time'].concat(ONB_HIERS.map(h=>h.dim)))];
+  const lvl=m.levels, cur=lvl[m.info]||lvl[0], ci=lvl.indexOf(cur);
+  const nameCtl=(l,li)=> l.custom
+    ? `<div class="onb-hm2-inline"><input id="hm2lv${li}" class="onb-input sm" style="font-family:inherit" placeholder="Custom level name" value="${onbEsc(l.name)}" oninput="onbHmLvType(${li},this.value)" onchange="renderONB()"><button class="onb-hlv-btn" title="Pick from list" onclick="onbHmLvList(${li})">▾</button></div>`
+    : `<span class="onb-select-wrap"><select class="onb-select sm" onchange="onbHmLvName(${li},this.value)"><option value="" ${l.name?'':'selected'}>Select level</option>${lvOpts.map(o=>`<option value="${onbEsc(o)}" ${o===l.name?'selected':''}>${onbEsc(o)}</option>`).join('')}<option value="__custom">＋ Custom level name…</option></select></span>`;
   return `<div class="onb-modal-back" onclick="onbHierModalCancel()">
-    <div class="onb-modal onb-modal-wide" role="dialog" aria-label="${ex?'Add hierarchy type':'Add new hierarchy'}" onclick="event.stopPropagation()">
-      <div class="onb-modal-h">${ex?`Add type to ${onbEsc(m.name)}`:'Add new hierarchy'}</div>
-      <div class="onb-modal-sub">Define the levels from top (broadest) to bottom (finest) and map each level to its source column.</div>
+    <div class="onb-modal onb-modal-wide onb-hm2" role="dialog" aria-label="Add New Hierarchy" onclick="event.stopPropagation()">
+      <div class="onb-modal-h">Add New Hierarchy</div>
+      <div class="onb-modal-sub">Define the hierarchy and its levels · adding a new type to <b style="color:#101828">${onbEsc(m.name)}</b></div>
       <div class="onb-modal-body">
-        <div class="onb-grid onb-grid-2" style="gap:14px">
-          <div><label class="onb-flabel">Hierarchy name</label><input class="onb-input" placeholder="e.g. Geography Hierarchy" value="${onbEsc(m.name)}" ${ex?'disabled':''} oninput="onbHierModalSet('name',this.value)"></div>
-          <div><label class="onb-flabel">Hierarchy type</label><input class="onb-input" placeholder="e.g. Type 1" value="${onbEsc(m.typeName)}" oninput="onbHierModalSet('typeName',this.value)"></div>
+
+        <div class="onb-hm2-step"><span class="onb-hf-q">1</span>Hierarchy Details</div>
+        <div class="onb-hm2-box">
+          <div class="onb-hm2-f"><label class="onb-flabel">Hierarchy Name</label><input class="onb-input sm" style="font-family:inherit" value="${onbEsc(m.name)}" disabled></div>
+          <div class="onb-grid onb-grid-2" style="gap:12px">
+            <div class="onb-hm2-f"><label class="onb-flabel">Vertical</label><span class="onb-select-wrap"><select class="onb-select sm" disabled>${verts.map(v=>`<option ${v===m.vertical?'selected':''}>${onbEsc(v)}</option>`).join('')}</select></span></div>
+            <div class="onb-hm2-f"><label class="onb-flabel">Type name</label><input class="onb-input sm" style="font-family:inherit" value="${onbEsc(m.typeName)}" oninput="onbHmSet('typeName',this.value)"></div>
+          </div>
+          <div class="onb-hm2-f"><label class="onb-flabel">How is this hierarchy different?</label><input class="onb-input sm" style="font-family:inherit" placeholder="Short description — e.g. rolls stores up by retail banner instead of legal entity" value="${onbEsc(m.diff)}" oninput="onbHmSet('diff',this.value)"></div>
         </div>
-        <label class="onb-flabel" style="margin-top:16px">Levels &amp; columns</label>
-        <div class="onb-hlv-head"><span></span><span>Level name</span><span>Column</span><span></span></div>
-        ${m.levels.map((l,li)=>`<div class="onb-hlv-row">
-          <span class="onb-hlv-n">${li+1}</span>
-          <input class="onb-input sm" style="font-family:inherit" placeholder="e.g. Country" value="${onbEsc(l.name)}" oninput="onbHierLvlSet(${li},'name',this.value)">
-          ${onbSel(cols,l.col,`onbHierLvlSet(${li},'col',this.value)`,'Select column')}
-          <span class="onb-hlv-acts"><button class="onb-hlv-btn" title="Move up" onclick="onbHierLvlMove(${li},-1)" ${li===0?'disabled':''}>↑</button><button class="onb-hlv-btn" title="Move down" onclick="onbHierLvlMove(${li},1)" ${li===m.levels.length-1?'disabled':''}>↓</button><button class="onb-tsrow-del" title="Remove level" onclick="onbHierLvlDel(${li})">${ONB_TRASH}</button></span>
-        </div>`).join('')}
-        <button class="onb-btn onb-addrow" style="margin-top:10px;padding:8px 16px" onclick="onbHierLvlAdd()">＋ Add level</button>
+        <div class="onb-hm2-arrow">↓</div>
+
+        <div class="onb-hm2-step"><span class="onb-hf-q">2</span>Define Hierarchy Levels</div>
+        <div class="onb-hm2-note">Add levels from coarsest → finest</div>
+        ${lvl.map((l,li)=>`${li?'<div class="onb-hm2-arrow">↓</div>':''}
+          <div class="onb-hm2-lvh"><span>Level ${li+1}</span><span class="onb-hlv-acts"><button class="onb-hlv-btn" title="Move up (coarser)" onclick="onbHmLvMove(${li},-1)" ${li===0?'disabled':''}>↑</button><button class="onb-hlv-btn" title="Move down (finer)" onclick="onbHmLvMove(${li},1)" ${li===lvl.length-1?'disabled':''}>↓</button><button class="onb-tsrow-del" title="Remove level" onclick="onbHmLvDel(${li})">${ONB_TRASH}</button></span></div>
+          <div class="onb-hm2-box">
+            <div class="onb-hm2-row"><label>Level Name</label>${nameCtl(l,li)}</div>
+            <div class="onb-hm2-row"><label>Source Column</label>${onbSel(cols,l.col,`onbHmLv(${li},'col',this.value)`,'Select column')}</div>
+          </div>`).join('')}
+        <div class="onb-hm2-sec"><button class="onb-btn onb-addrow" style="margin-top:12px;padding:8px 16px" onclick="onbHmLvAdd()">＋ Add another level</button></div>
+        <div class="onb-hm2-arrow">↓</div>
+
+        <div class="onb-hm2-step"><span class="onb-hf-q">3</span>Level Information</div>
+        <div class="onb-hm2-note">For each level, optionally provide:</div>
+        <div class="onb-hm2-sec">
+          <div class="nuc-chips" style="margin-bottom:12px">${lvl.map((l,li)=>`<span class="nuc-chip ${li===ci?'on':''}" onclick="onbHmSet('info',${li},1)">${onbEsc(l.name.trim()||`Level ${li+1}`)}</span>`).join('')}</div>
+          <div class="onb-hm2-box" style="margin-left:0">
+            <div class="onb-hm2-f"><label class="onb-flabel">Definition</label><textarea class="nuc-textarea onb-hf-def" placeholder="Describe what this level represents…" oninput="onbHmLv(${ci},'def',this.value)">${onbEsc(cur.def)}</textarea></div>
+            <div class="onb-hm2-f"><label class="onb-flabel">Example Values</label><div class="onb-hm2-ex">${cur.examples.map((x,k)=>`<input id="hm2ex${ci}-${k}" class="onb-input sm" style="font-family:inherit" placeholder="Example ${k+1}" value="${onbEsc(x)}" oninput="onbHmEx(${ci},${k},this.value)">`).join('')}${cur.examples.length<10?`<button class="onb-btn onb-addrow" style="padding:6px 14px" onclick="onbHmExAdd(${ci})">＋ Add</button>`:''}</div></div>
+            <div class="onb-hm2-f"><label class="onb-flabel">Value Format / Pattern</label><input class="onb-input sm" style="font-family:inherit" placeholder="e.g. alphanumeric / numeric / YYYY-MM-DD" value="${onbEsc(cur.format)}" oninput="onbHmLv(${ci},'format',this.value)"></div>
+          </div>
+        </div>
+        <div class="onb-hm2-arrow">↓</div>
+
+        <div class="onb-hm2-step"><span class="onb-hf-q">4</span>Grain &amp; Collision Check</div>
+        <div class="onb-hm2-box">
+          <div class="onb-hm2-f"><label class="onb-flabel">Lowest usable grain</label>${onbSel(named.map(l=>l.name.trim()),m.lowest,"onbHmSet('lowest',this.value);onbHmChainPaint()",'Select level')}</div>
+          <div class="onb-hm2-f"><label class="onb-flabel">Lookalike / potentially conflicting levels</label>${named.length?`<div class="nuc-chips">${named.map(l=>{ const n=l.name.trim(), on=m.looks.includes(n); return `<span class="nuc-chip ${on?'on':''}" onclick="onbHmLook('${onbEsc(n).replace(/'/g,"\\'")}')">${on?'✓ ':''}${onbEsc(n)}</span>`; }).join('')}</div>`:'<div class="onb-hf-meta muted">Name the levels above first.</div>'}</div>
+          <div class="onb-hm2-f"><label class="onb-flabel">How can they be distinguished?</label><textarea class="nuc-textarea" style="min-height:70px" placeholder="Describe distinguishing attributes — e.g. store codes are 8-digit numeric, customer codes carry a region prefix" oninput="onbHmSet('lookHow',this.value)">${onbEsc(m.lookHow)}</textarea></div>
+        </div>
+        <div class="onb-hm2-arrow">↓</div>
+
+        <div class="onb-hm2-step"><span class="onb-hf-q">5</span>Hierarchy Summary</div>
+        <div class="onb-hm2-box">
+          <textarea class="nuc-textarea" style="min-height:80px" placeholder="Automatically generated / user-entered summary…" oninput="onbHmSet('summary',this.value)">${onbEsc(m.summary)}</textarea>
+          <div class="onb-hm2-sumbar"><div id="hm2Chain" class="onb-hm2-chain">${onbHmChain()}</div><button class="onb-editbtn" onclick="onbHmGen()">✦ Generate from levels</button></div>
+        </div>
       </div>
-      <div class="onb-modal-foot">
+      <div class="onb-modal-foot onb-hm2-foot">
         <button class="onb-btn" onclick="onbHierModalCancel()">Cancel</button>
-        <button class="onb-btn primary" onclick="onbHierModalSave()">${ex?'Add type':'Save hierarchy'}</button>
+        <button class="onb-btn primary" onclick="onbHierModalSave()">Save Hierarchy</button>
       </div>
     </div>
   </div>`; }

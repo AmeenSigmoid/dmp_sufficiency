@@ -926,7 +926,7 @@ td.grand-cell .val-num { font-weight: 800; }
 .onb-btn.primary { background: #001DCA; border-color: #001DCA; color: #fff; }
 .onb-btn.primary:hover { background: #00337B; color: #fff; }
 /* form stepper (compact, 5 steps) */
-.onb-fsteps { max-width: 820px; }
+.onb-fsteps { max-width: 980px; }
 .onb-fsteps .onb-sd { width: 24px; height: 24px; font-size: 11.5px; }
 .onb-fsteps .onb-sl { font-size: 11.5px; }
 .onb-fsteps .onb-sline { margin-top: 12px; }
@@ -1020,14 +1020,14 @@ td.grand-cell .val-num { font-weight: 800; }
 .onb-jlogic-h { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: #001DCA; cursor: pointer; }
 .onb-code { background: #0E1526; color: #D7E0F2; border-radius: 10px; padding: 14px 16px; font-size: 11.5px; line-height: 1.55; overflow-x: auto; margin: 10px 0 0; font-family: 'Menlo', ui-monospace, monospace; white-space: pre; }
 /* Metadata table */
-#onb-meta-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
-#onb-meta-table thead th { position: sticky; top: 0; background: #F4F5F7; text-align: center; font-size: 10px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: #667085; padding: 10px 10px; border-bottom: 1px solid #D8D8D8; z-index: 2; }
-#onb-meta-table thead th.l { text-align: left; }
-#onb-meta-table tbody td { padding: 9px 10px; border-bottom: 1px solid #F0F1F4; text-align: center; color: #344054; vertical-align: top; }
-#onb-meta-table tbody td.l { text-align: left; }
-#onb-meta-table tbody tr.ok td { background: #F6FBF9; }
-#onb-meta-table tbody tr.bad td { background: #FDF7F6; }
-#onb-meta-table .onb-def { max-width: 380px; white-space: normal; line-height: 1.45; color: #475467; }
+.onb-meta-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
+.onb-meta-table thead th { position: sticky; top: 0; background: #F4F5F7; text-align: center; font-size: 10px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: #667085; padding: 10px 10px; border-bottom: 1px solid #D8D8D8; z-index: 2; }
+.onb-meta-table thead th.l { text-align: left; }
+.onb-meta-table tbody td { padding: 9px 10px; border-bottom: 1px solid #F0F1F4; text-align: center; color: #344054; vertical-align: top; }
+.onb-meta-table tbody td.l { text-align: left; }
+.onb-meta-table tbody tr.ok td { background: #F6FBF9; }
+.onb-meta-table tbody tr.bad td { background: #FDF7F6; }
+.onb-meta-table .onb-def { max-width: 380px; white-space: normal; line-height: 1.45; color: #475467; }
 .onb-conf { font-weight: 700; }
 .onb-flag { display: inline-block; font-size: 11px; font-weight: 800; border-radius: 20px; padding: 3px 11px; }
 .onb-flag.yes { background: #DDF0E6; color: #1E7E52; }
@@ -1076,6 +1076,128 @@ td.grand-cell .val-num { font-weight: 800; }
 .onb-exp-dim { font-size: 14px; font-weight: 800; color: #101828; display: flex; flex-direction: column; gap: 3px; }
 .onb-exp-note { font-size: 11.5px; font-weight: 500; color: #98A2B3; }
 .onb-exp-row .onb-select-wrap { min-width: 190px; }
+/* Dimensions & hierarchies */
+.onb-chip-add { border-style: dashed; color: #001DCA; font-weight: 700; }
+.onb-chip-add:hover { border-color: #001DCA; background: #EAF0FE; }
+.onb-chip-form { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.onb-chip-form .onb-input { width: 210px; }
+.onb-hier-list { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.onb-hcard { border: 1px solid #E7E9EE; border-radius: 12px; padding: 14px 16px; background: #FCFDFE; transition: border-color .12s, background .12s; }
+.onb-hcard.ok { border-color: #B7DECD; background: #F6FBF9; }
+.onb-hcard-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.onb-hcard-need { font-size: 11.5px; font-weight: 700; color: #8A5300; background: #FFEFD2; border-radius: 20px; padding: 2px 10px; }
+.onb-htypes { display: flex; flex-direction: column; gap: 8px; }
+.onb-htype { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border: 1px solid #E7E9EE; background: #fff; border-radius: 10px; padding: 10px 12px; cursor: pointer; transition: all .12s; }
+.onb-htype:hover { border-color: #B6BDC8; }
+.onb-htype.on { border-color: #001DCA; background: #EAF0FE; }
+.onb-htype.on .onb-radio { border-color: #001DCA; }
+.onb-htype.on .onb-radio::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: #001DCA; }
+.onb-htype-n { font-size: 12.5px; font-weight: 800; color: #101828; min-width: 58px; }
+.onb-chain { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+.onb-chain-l { font-size: 11.5px; font-weight: 600; color: #33415C; background: #EEF2FB; border: 1px solid #DCE3F0; border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+.onb-chain-l.hi { background: #001DCA; border-color: #001DCA; color: #fff; }
+.onb-chain-arr { color: #98A2B3; font-size: 11px; }
+/* Add-hierarchy modal */
+.onb-modal-wide { max-width: 660px; }
+.onb-modal-wide .onb-modal-body { max-height: 62vh; overflow-y: auto; }
+.onb-modal-sub { font-size: 12.5px; color: #98A2B3; padding: 0 22px; line-height: 1.5; }
+.onb-input:disabled { background: #F4F5F7; color: #667085; cursor: not-allowed; }
+.onb-hlv-head, .onb-hlv-row { display: grid; grid-template-columns: 26px 1fr 1fr 104px; gap: 8px; align-items: center; }
+.onb-hlv-head { font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: #98A2B3; margin-bottom: 6px; }
+.onb-hlv-row + .onb-hlv-row { margin-top: 8px; }
+.onb-hlv-n { width: 22px; height: 22px; border-radius: 50%; background: #EAF0FE; color: #001DCA; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; }
+.onb-hlv-acts { display: inline-flex; gap: 4px; justify-content: flex-end; }
+.onb-hlv-btn { width: 30px; height: 30px; border: 1px solid #E7E9EE; background: #fff; border-radius: 8px; color: #667085; cursor: pointer; font-size: 13px; }
+.onb-hlv-btn:hover:not(:disabled) { border-color: #001DCA; color: #001DCA; }
+.onb-hlv-btn:disabled { opacity: .4; cursor: default; }
+.onb-hlv-acts .onb-tsrow-del { width: 30px; height: 30px; }
+/* Define new join */
+.onb-jnew-cta { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; border: 1.5px dashed #C6CDDA; border-radius: 14px; padding: 16px 18px; background: #FBFCFE; }
+.onb-jnew-t { font-size: 14px; font-weight: 800; color: #101828; }
+.onb-jcard.onb-jnew { border-style: dashed; border-color: #9DB1F5; background: #FBFCFF; }
+.onb-jnew-foot { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+.onb-jnew-foot .onb-btn { padding: 9px 20px; }
+.onb-jf .onb-select-wrap::after { right: 12px; }
+/* Metadata — table-wise */
+.onb-sec.onb-msec { padding: 16px 18px; }
+.onb-msec-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+.onb-msec-t { font-size: 13px; font-weight: 700; color: #101828; word-break: break-all; }
+.onb-msec-h .onb-valprog { margin-left: 0; }
+.onb-mnew { display: grid; grid-template-columns: minmax(180px, 1fr) 2fr auto auto; gap: 8px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px dashed #E7E9EE; }
+.onb-btn.onb-mnew-btn { margin-top: 12px; padding: 8px 16px; }
+/* Expected grain — table-wise */
+.onb-exp2-head, .onb-exp2-row { display: grid; grid-template-columns: 120px 210px 190px 1fr; gap: 14px; align-items: center; }
+.onb-exp2-head { font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: #98A2B3; padding: 0 4px 8px; border-bottom: 1px solid #EEF0F4; }
+.onb-exp2-row { padding: 10px 4px; border-bottom: 1px solid #F3F4F6; }
+.onb-exp2-row:last-child { border-bottom: none; }
+.onb-exp2-chain { min-width: 0; }
+/* AI validation / processing */
+.onb-btn:disabled { opacity: .5; cursor: not-allowed; }
+.onb-proc-inputs { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; margin-bottom: 16px; }
+.onb-proc-in { border: 1px solid #E7E9EE; border-radius: 10px; padding: 9px 12px; background: #FBFCFE; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.onb-proc-in span { font-size: 10.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; color: #98A2B3; }
+.onb-proc-in b { font-size: 13px; color: #101828; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.onb-proc-status { display: flex; align-items: center; gap: 14px; border: 1px solid #E7E9EE; border-radius: 14px; padding: 16px 20px; flex-wrap: wrap; }
+.onb-proc-status > div:first-child, .onb-proc-grow { flex: 1; min-width: 220px; }
+.onb-proc-status.running { background: #F4F7FF; border-color: #C9D6FB; }
+.onb-proc-status.paused { background: #FFF8EC; border-color: #F5D9A8; }
+.onb-proc-status.done { background: #F1FAF4; border-color: #B7DECD; }
+.onb-proc-spin { width: 22px; height: 22px; border-radius: 50%; border: 2.5px solid #C7D6FB; border-top-color: #001DCA; animation: nucspin .8s linear infinite; flex: none; min-width: 0 !important; }
+.onb-proc-pct { font-size: 18px; font-weight: 800; color: #001DCA; }
+.onb-proc-bar { height: 6px; border-radius: 6px; background: #EEF0F4; overflow: hidden; margin: 12px 0 20px; }
+.onb-proc-bar i { display: block; height: 100%; background: #001DCA; border-radius: 6px; transition: width .2s; }
+.onb-proc-bar.paused i { background: #D08A00; }
+.onb-proc-bar.done i { background: #248169; }
+.onb-proc-grid { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+.onb-proc-stages { border: 1px solid #E7E9EE; border-radius: 14px; padding: 16px 18px; }
+.onb-proc-stages .nuc-calc-steps { margin: 0; gap: 12px; }
+.onb-proc-stages .nuc-calc-step { align-items: flex-start; }
+.onb-proc-stages .nuc-calc-ic { margin-top: 1px; }
+.onb-proc-sd { display: block; font-size: 11.5px; font-weight: 500; color: #98A2B3; margin-top: 2px; }
+.nuc-calc-step.warn { color: #8A5300; }
+.nuc-calc-step.warn .nuc-calc-ic { border-color: #D08A00; background: #D08A00; animation: none; }
+.nuc-calc-step.warn .nuc-calc-ic::after { content: '!'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; font-weight: 900; }
+.onb-proc-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.onb-proc-sub { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #98A2B3; margin-top: 4px; }
+.onb-issue { border: 1px solid #E7E9EE; border-left-width: 4px; border-radius: 12px; padding: 14px 16px; background: #fff; }
+.onb-issue.error { border-color: #E7C0BC; border-left-color: #C0392B; background: #FFFBFA; }
+.onb-issue.warning { border-color: #F2DDB3; border-left-color: #D08A00; background: #FFFCF5; }
+.onb-issue.resolved { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border-color: #CFE8DC; border-left-color: #248169; background: #F6FBF9; }
+.onb-issue-h { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.onb-issue-sev { font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; border-radius: 20px; padding: 3px 10px; }
+.onb-issue-sev.error { background: #FBE3E1; color: #B4362F; }
+.onb-issue-sev.warning { background: #FFEFD2; color: #8A5300; }
+.onb-issue-sev.ok { background: #DDF0E6; color: #1E7E52; }
+.onb-issue-stage { font-size: 11px; font-weight: 600; color: #98A2B3; }
+.onb-issue-t { font-size: 14.5px; font-weight: 800; color: #101828; margin-bottom: 4px; }
+.onb-issue-rt { font-size: 13px; font-weight: 700; color: #344054; flex: 1; min-width: 0; }
+.onb-issue-m { font-size: 13px; line-height: 1.55; color: #475467; }
+.onb-issue-ai { display: flex; gap: 8px; align-items: baseline; margin-top: 10px; background: #F1F4FF; border: 1px solid #DCE3FB; border-radius: 9px; padding: 9px 12px; font-size: 12.5px; color: #33415C; line-height: 1.5; }
+.onb-issue-ai-k { flex: none; font-size: 10.5px; font-weight: 800; color: #001DCA; letter-spacing: .04em; }
+.onb-issue-f { margin-top: 12px; }
+.onb-issue-ta { min-height: 76px; font-size: 13px; }
+.onb-issue-acts { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.onb-btn.onb-issue-btn { padding: 8px 18px; font-size: 12.5px; }
+.onb-issue-rate { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #B4362F; font-weight: 700; min-height: 34px; }
+.onb-issue-bar { width: 90px; height: 6px; border-radius: 6px; background: #F3D6D3; overflow: hidden; flex: none; }
+.onb-issue-bar i { display: block; height: 100%; background: #C0392B; }
+.onb-proc-empty { border: 1px dashed #D0D5DD; border-radius: 12px; padding: 18px; font-size: 13px; color: #667085; text-align: center; line-height: 1.5; }
+.onb-proc-log { border: 1px solid #E7E9EE; border-radius: 12px; padding: 12px 14px; max-height: 220px; overflow-y: auto; }
+.onb-proc-log-h { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #98A2B3; margin-bottom: 8px; }
+.onb-proc-log-r { display: flex; gap: 10px; font-size: 12px; color: #475467; padding: 3px 0; line-height: 1.45; }
+.onb-proc-log-r .mono { color: #98A2B3; font-size: 11px; flex: none; }
+.onb-proc-log-r.ok { color: #1E7E52; }
+.onb-proc-log-r.warn { color: #8A5300; }
+@media (max-width: 860px) {
+  .onb-exp2-head { display: none; }
+  .onb-exp2-row { grid-template-columns: 1fr 1fr; }
+  .onb-exp2-row .onb-exp-dim, .onb-exp2-chain { grid-column: 1 / -1; }
+  .onb-mnew { grid-template-columns: 1fr; }
+  .onb-proc-grid { grid-template-columns: 1fr; }
+  .onb-hlv-head { display: none; }
+  .onb-hlv-row { grid-template-columns: 26px 1fr; }
+  .onb-hlv-row > .onb-select-wrap, .onb-hlv-acts { grid-column: 2; }
+}
 /* Heat map generation + approval */
 .onb-gen { border: 1px dashed #C6CDDA; border-radius: 16px; padding: 40px 24px; text-align: center; }
 .onb-gen-ico { width: 64px; height: 64px; border-radius: 16px; background: #EAF0FE; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
@@ -4271,7 +4393,12 @@ function nucHeatmap(){
 let onbStep=1;
 const onb={
   phase:'form', formStep:1,
-  domains:[], desc:'', grainPopup:null,
+  ucName:'', domains:[], desc:'', grainPopup:null,
+  dims:[], dimCustom:[], dimAdding:false, dimNew:'',   // Dimensions (Table selection)
+  hiers:[], hierType:{}, hierModal:null,               // Hierarchies + chosen type per hierarchy
+  newJoin:null, metaNew:null,                          // Define-new-join form · Add-new-KDE form
+  expByTable:{},                                       // Expected grain per table: {table:{dim:{htype,grain}}}
+  proc:{ status:'idle', stage:0, prog:0, issues:[], log:[], seen:[] },  // AI validation / processing
   dataProductName:'',
   adGroups:[{name:'',desc:'',status:''}],
   catalog:[{appOwner:'Yes', dbx:'', adAvail:'Yes', env:'DEV', adDetails:'', extLoc:'', perm:''}],
@@ -4343,6 +4470,31 @@ const ONB_TABLE_COLUMNS={
   'uc_dc_prd.delv.otif_fact_order_line':['BASE_UOM_ORDR_QTY','FNL_ACTL_SKU_DELV_QTY','LINE_DENOM_MEAS_AT_DELV'],
   'prod_comx_sobg.core_integration.glbl_ps_of_detl':['EXPTD_RDD_BASE_UOM_CUM_DELV_QTY','NUMRTR_UNIT_QTY_DELV']
 };
+// Metadata is grouped by source table — each KDE belongs to the fact table exposing it
+ONB_META.forEach(m=>{ m.table=Object.keys(ONB_TABLE_COLUMNS).find(t=>ONB_TABLE_COLUMNS[t].includes(m.col))||ONB_META_TABLE; });
+// Dimension-table columns (used by manual joins and hierarchy column mapping)
+const ONB_DIM_COLUMNS={
+  'uc_dmp_data_sufficiency_01_dev.dev.soldto_customer_master':['Sold_To_Unique_ID','AG_Code','AG_Desc_Short','gcch_retail_banner_Code','gcch_retail_banner_Name','Channel','Inc_Name','GCC_Customer_Name','GCC_Store_Name'],
+  'uc_dmp_data_sufficiency_01_dev.dev.gmc_prod_master':['GMC_SKU_Code','C4_Category_Code','C4_Category','Sub_Category','B1_Brand_Code','B1_Brand','Sub_Brand','EAN'],
+  'uc_dmp_data_sufficiency_01_dev.dev.geo_country_master':['Country_Code','Country_Name','Region_Name'],
+  'uc_dmp_data_sufficiency_01_dev.dev.calendar_master':['Cal_Date','Cal_Week','Cal_Month','Cal_Year']
+};
+const ONB_JOIN_TYPES=['left','inner','right','full'];
+const ONB_DIM_OPTS=['Market','Banner/Customer','Brand','Category'];
+// Hierarchy registry — built-ins plus any the user defines via "Add new hierarchy"
+const ONB_HIERS=[
+  {name:'Customer Hierarchy', dim:'Customer', types:[
+    {name:'Type 1', levels:['Channel','Inc Name','Banner Name','GCC Customer Name','GCC Store Name']},
+    {name:'Type 2', levels:['Channel','Inc Name','GCC Banner Name','GCC Customer Name']}]},
+  {name:'Product Hierarchy', dim:'Product', types:[
+    {name:'Type 1', levels:['C4 Category','Sub Category','Brand','Sub Brand','SKU','GMC Code']},
+    {name:'Type 2', levels:['Category','Sub Category','Brand','EAN']}]},
+  {name:'Time Hierarchy', dim:'Time', types:[
+    {name:'Standard', levels:['Yearly','Monthly','Weekly','Daily','Hourly']}]}
+];
+const ONB_GRAIN_BASE_LEVELS={ Customer:['Global','Region','Banner','Sold-to','Ship-to'], Product:['Category','Sub-category','Brand','SKU'], Geography:['Global','Region','Country','State','City'], Time:['Yearly','Monthly','Weekly','Daily'] };
+const ONB_GRAIN_DEFAULT_COL={ Customer:'SHIP_TO_CUST_NUM', Product:'MATL_NUM', Geography:'GEO_CTRY_NM', Time:'EXPTD_RQST_DELV_DTTM' };
+const ONB_TIME_LEVELS=['Yearly','Monthly','Weekly','Daily','Hourly'];
 const ONB_TBL_COLORS=['#001DCA','#0E7C86','#8A4FD6','#B5531F','#1F7A45','#B0288C'];
 function onbShortTable(t){ const p=String(t).split('.'); return p[p.length-1]; }
 function onbTblIdx(t){ const idx=ONB_API_TABLES.fact.indexOf(t); return idx<0?0:idx; }
@@ -4375,7 +4527,8 @@ function onbNext(){
     if(onbStep<2){ onbStep++; renderONB(); window.scrollTo(0,0); }
     else { onb.phase='form'; renderONB(); window.scrollTo(0,0); f6Toast('Access request submitted (prototype).'); }
   } else {
-    if(onb.formStep<6){ onb.formStep++; renderONB(); window.scrollTo(0,0); }
+    if(onb.formStep===6 && onb.proc.status!=='done'){ f6Toast('Finish AI validation first — resolve any flagged items, then continue.'); return; }
+    if(onb.formStep<7){ onb.formStep++; renderONB(); window.scrollTo(0,0); onbProcAutoStart(); }
     else { f6Toast('Complete the heat-map, approval and publish steps below.'); }
   }
 }
@@ -4415,7 +4568,39 @@ function onbJoining(){
     </div>`;
   }).join('')}
   ${onbWeightCards()}
+  ${onbNewJoin()}
   ${onbFooter()}`;
+}
+/* ── Define new join (manual, when AI extraction misses one) ── */
+function onbFactKeyCols(t){ return [...new Set((ONB_TABLE_COLUMNS[t]||[]).concat(ONB_GRAIN_COLS))]; }
+function onbJoinTables(kind){ const s=onb.ts[kind].selected; return s.length?s:ONB_API_TABLES[kind]; }
+function onbNewJoinOpen(){ onb.newJoin={dim:'', factTable:onbJoinTables('fact')[0], factKey:'', dimTable:onbJoinTables('dim')[0], dimKey:'', joinType:'left', dimCols:[]}; renderONB(); }
+function onbNewJoinCancel(){ onb.newJoin=null; renderONB(); }
+function onbNewJoinSet(f,v,re){ const n=onb.newJoin; if(!n) return; n[f]=v; if(f==='factTable') n.factKey=''; if(f==='dimTable'){ n.dimKey=''; n.dimCols=[]; } if(re) renderONB(); }
+function onbNewJoinCol(i){ const n=onb.newJoin, c=(ONB_DIM_COLUMNS[n.dimTable]||[])[i], k=n.dimCols.indexOf(c); if(k>=0) n.dimCols.splice(k,1); else n.dimCols.push(c); renderONB(); }
+function onbNewJoinSave(){ const n=onb.newJoin; if(!n) return;
+  if(!n.dim.trim()){ f6Toast('Enter a dimension name for this join.'); return; }
+  if(!n.factKey||!n.dimKey){ f6Toast('Pick both join keys.'); return; }
+  if(!n.dimCols.length){ f6Toast('Pick at least one dimension column to bring in.'); return; }
+  ONB_JOINS.push({dim:n.dim.trim(), type:'Manual', factTable:n.factTable, factKey:n.factKey, logic:'', dimTable:n.dimTable, dimKey:n.dimKey, joinType:n.joinType, dimCols:'{'+n.dimCols.map(c=>`${c.toLowerCase()}: ${c}`).join(', ')+'}', val:'correct', open:false, manual:true});
+  onb.newJoin=null; renderONB(); f6Toast('Join added — it runs alongside the AI-extracted joins.'); }
+function onbNewJoin(){
+  const n=onb.newJoin;
+  if(!n) return `<div class="onb-jnew-cta"><div><div class="onb-jnew-t">Missing a join?</div><div class="onb-dssub" style="margin:2px 0 0">If AI extraction missed a relationship, define it manually — it runs alongside the joins above.</div></div><button class="onb-btn onb-addrow" onclick="onbNewJoinOpen()">＋ Define new join</button></div>`;
+  const fcols=onbFactKeyCols(n.factTable), dcols=ONB_DIM_COLUMNS[n.dimTable]||[];
+  return `<div class="onb-jcard onb-jnew">
+    <div class="onb-jhead"><div class="onb-jtitle"><span class="onb-jdim">Define new join</span><span class="onb-jtag">Manual</span></div></div>
+    <div class="onb-jgrid">
+      <div class="onb-jf"><label>Dimension name</label><input class="onb-input sm" placeholder="e.g. Channel" value="${onbEsc(n.dim)}" oninput="onbNewJoinSet('dim',this.value)"></div>
+      <div class="onb-jf"><label>Join type</label>${onbSel(ONB_JOIN_TYPES,n.joinType,"onbNewJoinSet('joinType',this.value)")}</div>
+      <div class="onb-jf"><label>Fact table</label>${onbSel(onbJoinTables('fact'),n.factTable,"onbNewJoinSet('factTable',this.value,1)")}</div>
+      <div class="onb-jf"><label>Fact join key</label>${onbSel(fcols,n.factKey,"onbNewJoinSet('factKey',this.value)",'Select column')}</div>
+      <div class="onb-jf"><label>Dim table</label>${onbSel(onbJoinTables('dim'),n.dimTable,"onbNewJoinSet('dimTable',this.value,1)")}</div>
+      <div class="onb-jf"><label>Dim join key</label>${onbSel(dcols,n.dimKey,"onbNewJoinSet('dimKey',this.value)",'Select column')}</div>
+      <div class="onb-jf onb-jf-wide"><label>Dim columns to bring in</label>${dcols.length?`<div class="nuc-chips">${dcols.map((c,i)=>{ const on=n.dimCols.includes(c); return `<span class="nuc-chip mono ${on?'on':''}" onclick="onbNewJoinCol(${i})">${on?'✓ ':''}${c}</span>`; }).join('')}</div>`:'<div class="onb-jval">No columns known for this table.</div>'}</div>
+    </div>
+    <div class="onb-jnew-foot"><button class="onb-btn" onclick="onbNewJoinCancel()">Cancel</button><button class="onb-btn primary" onclick="onbNewJoinSave()">Add join</button></div>
+  </div>`;
 }
 /* ── Metadata ── */
 function onbMetaVal(i,v){ ONB_META[i].val=v; if(v==='wrong') ONB_META[i].edit=true; if(v==='correct') ONB_META[i].edit=false; renderONB(); }
@@ -4423,19 +4608,36 @@ function onbMetaEditToggle(i){ ONB_META[i].edit=!ONB_META[i].edit; renderONB(); 
 function onbMetaEdit(i,f,v){ ONB_META[i][f]=(f==='conf')?v:v; }
 function onbMetaFlip(i){ ONB_META[i].correct=ONB_META[i].correct?0:1; renderONB(); }
 function onbMetaFlipPresent(i){ ONB_META[i].present=ONB_META[i].present?0:1; renderONB(); }
-function onbMetadata(){
-  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Metadata ${onbValProgress(ONB_META)}</h2><div class="onb-dssub">DS output for <span class="mono">${ONB_META_TABLE}</span> · edit any entry (column, definition), then validate each row.</div></div>
-  <div class="f5-table-wrap"><table id="onb-meta-table">
-    <thead><tr>
-      <th class="l">KPI / KDE column</th><th class="l">Definition</th><th>Edit</th><th>Validate</th>
-    </tr></thead>
-    <tbody>${ONB_META.map((m,i)=>{ const ed=!!m.edit; return `<tr class="${m.val==='correct'?'ok':''} ${m.val==='wrong'?'bad':''}">
-      <td class="l mono">${ed?`<input class="onb-input sm" value="${onbEsc(m.col)}" oninput="onbMetaEdit(${i},'col',this.value)">`:m.col}</td>
+function onbMetaTables(){ const order=ONB_API_TABLES.fact, set=new Set(ONB_META.map(m=>m.table)); onb.ts.fact.selected.forEach(t=>set.add(t)); const pos=t=>{ const k=order.indexOf(t); return k<0?99:k; }; return [...set].sort((a,b)=>pos(a)-pos(b)); }
+function onbMetaNewOpen(ti){ onb.metaNew={ti, col:'', def:''}; renderONB(); const el=document.getElementById('onbMetaNewCol'); if(el) el.focus(); }
+function onbMetaNewCancel(){ onb.metaNew=null; renderONB(); }
+function onbMetaNewSave(){ const n=onb.metaNew; if(!n) return; const col=n.col.trim(), def=n.def.trim(), t=onbMetaTables()[n.ti];
+  if(!col||!def){ f6Toast('Enter a KDE name and its definition.'); return; }
+  if(ONB_META.some(m=>m.table===t && m.col.toLowerCase()===col.toLowerCase())){ f6Toast('That KDE already exists for this table.'); return; }
+  ONB_META.push({col, def, table:t, present:0, correct:1, conf:1, val:'correct', added:true}); onb.metaNew=null; renderONB(); f6Toast(`KDE ${col} added to ${onbShortTable(t)}.`); }
+function onbMetaRow(m,i){ const ed=!!m.edit; return `<tr class="${m.val==='correct'?'ok':''} ${m.val==='wrong'?'bad':''}">
+      <td class="l mono">${ed?`<input class="onb-input sm" value="${onbEsc(m.col)}" oninput="onbMetaEdit(${i},'col',this.value)">`:onbEsc(m.col)}${m.added&&!ed?' <span class="onb-jtag" style="margin-left:6px">Added</span>':''}</td>
       <td class="l onb-def">${ed?`<input class="onb-input sm onb-def-input" value="${onbEsc(m.def)}" oninput="onbMetaEdit(${i},'def',this.value)">`:onbEsc(m.def)}</td>
       <td>${onbEditBtn(ed,`onbMetaEditToggle(${i})`)}</td>
       <td><div class="onb-vrow tight"><button class="onb-vbtn xs ${m.val==='correct'?'on-correct':''}" onclick="onbMetaVal(${i},'correct')">✓</button><button class="onb-vbtn xs ${m.val==='wrong'?'on-wrong':''}" onclick="onbMetaVal(${i},'wrong')">✕</button></div></td>
-    </tr>`; }).join('')}</tbody>
-  </table></div>
+    </tr>`; }
+function onbMetadata(){
+  const tables=onbMetaTables();
+  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Metadata ${onbValProgress(ONB_META)}</h2><div class="onb-dssub">DS output grouped by source table · edit any entry (column, definition), validate each row, and add any KDE the AI didn't identify.</div></div>
+  ${tables.map((t,ti)=>{ const rows=ONB_META.map((m,i)=>({m,i})).filter(x=>x.m.table===t), nw=(onb.metaNew&&onb.metaNew.ti===ti)?onb.metaNew:null;
+    return `<div class="onb-sec onb-msec">
+      <div class="onb-msec-h">${ONB_API_TABLES.fact.includes(t)?onbTblBadge(t):''}<span class="mono onb-msec-t">${t}</span>${rows.length?onbValProgress(rows.map(x=>x.m)):'<span class="onb-valprog">No KDEs yet</span>'}</div>
+      ${rows.length?`<div class="f5-table-wrap"><table class="onb-meta-table">
+        <thead><tr><th class="l">KPI / KDE column</th><th class="l">Definition</th><th>Edit</th><th>Validate</th></tr></thead>
+        <tbody>${rows.map(x=>onbMetaRow(x.m,x.i)).join('')}</tbody>
+      </table></div>`:''}
+      ${nw?`<div class="onb-mnew">
+        <input id="onbMetaNewCol" class="onb-input sm" placeholder="KDE name, e.g. DELV_BLOCK_CD" value="${onbEsc(nw.col)}" oninput="onb.metaNew.col=this.value">
+        <input class="onb-input sm" style="font-family:inherit" placeholder="Definition" value="${onbEsc(nw.def)}" oninput="onb.metaNew.def=this.value" onkeydown="if(event.key==='Enter')onbMetaNewSave()">
+        <button class="onb-vbtn on-correct" onclick="onbMetaNewSave()">Add KDE</button>
+        <button class="onb-vbtn" onclick="onbMetaNewCancel()">Cancel</button>
+      </div>`:`<button class="onb-btn onb-addrow onb-mnew-btn" onclick="onbMetaNewOpen(${ti})">＋ Add new KDE</button>`}
+    </div>`; }).join('')}
   ${onbFooter()}`;
 }
 /* ── Use-case domain + description (Table selection top) ── */
@@ -4445,8 +4647,10 @@ function onbDescribeCard(){
   const funcs=Object.keys(NUC_HIER);
   return `<div class="onb-sec">
     <div class="onb-sec-h">Use case</div>
-    <div class="onb-sec-note">Pick the domain(s) this use case belongs to and add a short description.</div>
-    <label class="onb-flabel">Domain</label>
+    <div class="onb-sec-note">Name the use case, pick the domain(s) it belongs to and add a short description.</div>
+    <label class="onb-flabel">Use case name</label>
+    <input class="onb-input" placeholder="e.g. OTIF — On-time in-full" value="${onbEsc(onb.ucName)}" oninput="onbSetUcName(this.value)">
+    <label class="onb-flabel" style="margin-top:16px">Domain</label>
     <div class="nuc-chips">${funcs.map(f=>{ const c=nucDomColor(f), on=onb.domains.includes(f); return `<span class="nuc-chip ${on?'on':''}" ${on?`style="background:${c};border-color:${c};color:#fff"`:''} onclick="onbSetDomain('${f.replace(/'/g,"\\'")}')"><span class="nuc-cdot" style="background:${on?'#fff':c}"></span>${f}</span>`; }).join('')}</div>
     <div class="onb-sec-note" style="margin:8px 0 0">Pick one or more domains — each has its own colour.</div>
     <label class="onb-flabel" style="margin-top:16px">Description</label>
@@ -4479,23 +4683,26 @@ function onbGrainEdit(i,f,v){ ONB_GRAIN[i][f]=v; renderONB(); }
 function onbGrainSet(i,f,v){ ONB_GRAIN[i][f]=v; }
 function onbGrainGSet(ci,gi,f,v){ ONB_GRAIN[ci].grains[gi][f]=v; }
 function onbGrainRemove(ci,gi){ const g=ONB_GRAIN[ci].grains; if(g.length<=2){ f6Toast('At least 2 grains are required.'); return; } g.splice(gi,1); renderONB(); }
-function onbGrainAddOpen(ci){ onb.grainPopup={ci, label:'', col:ONB_GRAIN_COLS[0], level:''}; renderONB(); }
+function onbGrainTypes(){ return [...new Set(Object.keys(ONB_GRAIN_BASE_LEVELS).concat(ONB_HIERS.map(h=>h.dim)))]; }
+function onbGrainLevels(type){ const s=new Set(ONB_GRAIN_BASE_LEVELS[type]||[]); ONB_HIERS.filter(h=>h.dim===type).forEach(h=>h.types.forEach(t=>t.levels.forEach(l=>s.add(l)))); return [...s]; }
+function onbGrainAddOpen(ci){ onb.grainPopup={ci, gtype:'', col:'', level:''}; renderONB(); }
+function onbGrainAddType(v){ const p=onb.grainPopup; if(!p) return; p.gtype=v; p.level=''; if(ONB_GRAIN_DEFAULT_COL[v]) p.col=ONB_GRAIN_DEFAULT_COL[v]; renderONB(); }
 function onbGrainAddCancel(){ onb.grainPopup=null; renderONB(); }
 function onbGrainAddField(f,v){ if(onb.grainPopup) onb.grainPopup[f]=v; }
-function onbGrainAddConfirm(){ const p=onb.grainPopup; if(!p) return; if(!p.label.trim()||!p.level.trim()){ f6Toast('Enter a grain name and grain level.'); return; } ONB_GRAIN[p.ci].grains.push({label:p.label.trim(), col:p.col, level:p.level.trim()}); onb.grainPopup=null; renderONB(); f6Toast('Grain added.'); }
+function onbGrainAddConfirm(){ const p=onb.grainPopup; if(!p) return; if(!p.gtype||!p.col||!p.level){ f6Toast('Select a grain type, column and grain level.'); return; } ONB_GRAIN[p.ci].grains.push({label:`Min ${p.gtype} grain`, col:p.col, level:p.level}); onb.grainPopup=null; renderONB(); f6Toast('Grain added.'); }
 function onbGrainPopupHtml(){
   const p=onb.grainPopup; if(!p) return '';
-  const cols=ONB_GRAIN_COLS.includes(p.col)?ONB_GRAIN_COLS:[p.col,...ONB_GRAIN_COLS];
+  const cols=(!p.col||ONB_GRAIN_COLS.includes(p.col))?ONB_GRAIN_COLS:[p.col,...ONB_GRAIN_COLS];
   return `<div class="onb-modal-back" onclick="onbGrainAddCancel()">
     <div class="onb-modal" onclick="event.stopPropagation()">
       <div class="onb-modal-h">Add new grain</div>
       <div class="onb-modal-body">
-        <label class="onb-flabel">Grain name</label>
-        <input class="onb-input" placeholder="e.g. Min product grain" value="${onbEsc(p.label)}" oninput="onbGrainAddField('label',this.value)">
-        <label class="onb-flabel" style="margin-top:13px">Column</label>
-        <span class="onb-select-wrap"><select class="onb-select" onchange="onbGrainAddField('col',this.value)">${cols.map(c=>`<option ${c===p.col?'selected':''}>${c}</option>`).join('')}</select></span>
+        <label class="onb-flabel">Grain type</label>
+        ${onbSel(onbGrainTypes(),p.gtype,'onbGrainAddType(this.value)','Select grain type','')}
+        <label class="onb-flabel" style="margin-top:13px">Select column</label>
+        ${onbSel(cols,p.col,"onbGrainAddField('col',this.value)",'Select column','')}
         <label class="onb-flabel" style="margin-top:13px">Grain level</label>
-        <input class="onb-input" placeholder="e.g. SKU" value="${onbEsc(p.level)}" oninput="onbGrainAddField('level',this.value)">
+        ${p.gtype?onbSel(onbGrainLevels(p.gtype),p.level,"onbGrainAddField('level',this.value)",'Select grain level',''):'<span class="onb-select-wrap"><select class="onb-select" disabled><option>Select a grain type first</option></select></span>'}
       </div>
       <div class="onb-modal-foot">
         <button class="onb-btn" onclick="onbGrainAddCancel()">Cancel</button>
@@ -4524,16 +4731,175 @@ function onbGrain(){
   </div>`; }).join('')}
   ${onbFooter()}`;
 }
-/* ── Expected grain ── */
-function onbExpSet(dim,v){ onb.expGrain[dim]=v; }
+/* ── Expected grain (per table · hierarchy type + target grain) ── */
+const ONB_EXP_STD_DIMS=['Product','Customer','Geography','Time'];
+function onbExpTables(){ return [...new Set(ONB_GRAIN.map(g=>g.table))]; }
+function onbExpDims(){ const d=ONB_EXP_STD_DIMS.slice(); onb.hiers.forEach(n=>{ const h=ONB_HIERS[onbHierIdx(n)]; if(h && !d.includes(h.dim)) d.push(h.dim); }); return d; }
+function onbExpTypes(dim){ const hs=ONB_HIERS.filter(h=>h.dim===dim); if(!hs.length) return [{id:'Standard', hier:null, name:'Standard', levels:ONB_EXP_LEVELS[dim]||[]}];
+  const out=[]; hs.forEach(h=>h.types.forEach(t=>out.push({id:hs.length>1?`${h.name} · ${t.name}`:t.name, hier:h.name, name:t.name, levels:t.levels}))); return out; }
+function onbExpDefault(dim,levels){ const pref={Product:['SKU','EAN'], Customer:['Banner Name','GCC Banner Name','Banner','Ship-to'], Geography:['Country'], Time:['Daily']}[dim]||[]; return pref.find(p=>levels.includes(p))||levels[levels.length-1]||''; }
+function onbExpCell(t,dim){ const T=onb.expByTable[t]||(onb.expByTable[t]={});
+  if(!T[dim]){ const types=onbExpTypes(dim); let ty=types[0];
+    const h=ONB_HIERS.find(x=>x.dim===dim && onb.hierType[x.name]); if(h){ const f=types.find(x=>x.hier===h.name && x.name===onb.hierType[h.name]); if(f) ty=f; }
+    T[dim]={htype:ty.id, grain:ty.levels.includes(onb.expGrain[dim])?onb.expGrain[dim]:onbExpDefault(dim,ty.levels)}; }
+  return T[dim]; }
+function onbExpSetType(ti,di,v){ const t=onbExpTables()[ti], dim=onbExpDims()[di], c=onbExpCell(t,dim), ty=onbExpTypes(dim).find(x=>x.id===v); if(!ty) return; c.htype=v; if(!ty.levels.includes(c.grain)) c.grain=onbExpDefault(dim,ty.levels); renderONB(); }
+function onbExpSetGrain(ti,di,v){ const t=onbExpTables()[ti], dim=onbExpDims()[di]; onbExpCell(t,dim).grain=v; onb.expGrain[dim]=v; renderONB(); }
+function onbExpCopyAll(ti){ const ts=onbExpTables(), src=onb.expByTable[ts[ti]]||{}; ts.forEach((t,i)=>{ if(i!==ti) onb.expByTable[t]=JSON.parse(JSON.stringify(src)); }); renderONB(); f6Toast(`Applied ${onbShortTable(ts[ti])} settings to all tables.`); }
 function onbExpGrain(){
-  const dims=[['Product','Min product grain across the selected KDEs'],['Customer','Min customer grain across the selected KDEs'],['Geography','Min geography grain'],['Time','Min time grain']];
-  return `<h2 class="onb-h">Expected grain for the whole use case</h2>
-  <div class="onb-dssub" style="margin-bottom:18px">Set the target grain each dimension must meet for this use case. Defaults are rolled up from the validated grain above.</div>
-  <div class="onb-exp">${dims.map(([d,note])=>`<div class="onb-exp-row">
-    <div class="onb-exp-dim">${d}<span class="onb-exp-note">${note}</span></div>
-    <span class="onb-select-wrap"><select class="onb-select" onchange="onbExpSet('${d}',this.value)">${ONB_EXP_LEVELS[d].map(l=>`<option ${l===onb.expGrain[d]?'selected':''}>${l}</option>`).join('')}</select></span>
-  </div>`).join('')}</div>
+  const tables=onbExpTables(), dims=onbExpDims();
+  return `<h2 class="onb-h">Expected grain per table</h2>
+  <div class="onb-dssub" style="margin-bottom:18px">For each source table, pick the hierarchy type and the target grain each dimension must meet. Defaults come from the hierarchy types chosen on Table selection and the validated grain.</div>
+  ${tables.map((t,ti)=>`<div class="onb-sec onb-msec">
+    <div class="onb-msec-h">${onbTblBadge(t)}<span class="mono onb-msec-t">${t}</span>${tables.length>1?`<button class="onb-editbtn" style="margin-left:auto" onclick="onbExpCopyAll(${ti})">Apply to all tables</button>`:''}</div>
+    <div class="onb-exp2-head"><span>Dimension</span><span>Hierarchy type</span><span>Expected grain</span><span>Hierarchy levels</span></div>
+    ${dims.map((d,di)=>{ const c=onbExpCell(t,d), types=onbExpTypes(d), ty=types.find(x=>x.id===c.htype)||types[0]; return `<div class="onb-exp2-row">
+      <div class="onb-exp-dim">${onbEsc(d)}</div>
+      ${onbSel(types.map(x=>x.id),ty.id,`onbExpSetType(${ti},${di},this.value)`)}
+      ${onbSel(ty.levels,c.grain,`onbExpSetGrain(${ti},${di},this.value)`)}
+      <div class="onb-exp2-chain">${onbChain(ty.levels,c.grain)}</div>
+    </div>`; }).join('')}
+  </div>`).join('')}
+  ${onbFooter()}`;
+}
+/* ── AI validation / processing (human-in-the-loop) ── */
+let onbProcTimer=null;
+const ONB_PROC_STAGES=[
+  {t:'Resolving tables & access', d:'Fact and dimension tables, catalogue access'},
+  {t:'Executing dimension joins', d:'Runs every AI-extracted and manual join'},
+  {t:'Applying hierarchies', d:'Maps hierarchy levels onto dimension columns'},
+  {t:'Profiling metadata & KDEs', d:'Checks KDE presence and definitions per table'},
+  {t:'Checking grain consistency', d:'Compares detected grain with the hierarchies'},
+  {t:'Validating expected grain', d:'Confirms each table can reach its target grain'},
+  {t:'Building sufficiency pipeline', d:'Writes the pipeline that scores the heat map'}
+];
+function onbProcLog(msg,kind){ onb.proc.log.push({t:new Date().toTimeString().slice(0,8), msg, kind:kind||'info'}); }
+function onbProcBuildIssues(){
+  const out=[], seen=onb.proc.seen||[];
+  if(!onb.ucName.trim()) out.push({id:'ucname', stage:0, sev:'warning', kind:'Missing information', title:'Use case name is missing',
+    msg:'No use case name was provided on Table selection. The pipeline and heat map are registered under this name.', ai:'Enter a short, recognisable name — e.g. the KPI plus the business area.'});
+  const jb=ONB_JOINS.findIndex(j=>j.dim==='Brand'), ji=jb>=0?jb:0, j=ONB_JOINS[ji];
+  if(j) out.push({id:'join', stage:1, sev:'error', kind:'Join error', ji, title:`Join issue · ${onbEsc(j.dim)}`,
+    msg:`We encountered an issue with this join. Only <b>62%</b> of rows in <span class="mono">${onbShortTable(j.factTable)}</span> matched <span class="mono">${onbShortTable(j.dimTable)}</span> — the key values look formatted differently on each side. Please confirm whether the following join is correct or correct it.`,
+    ai:`<span class="mono">${onbEsc(j.factKey)}</span> carries a source-system prefix (e.g. “AP…”, “US…”) that <span class="mono">${onbEsc(j.dimKey)}</span> doesn't. Check the key pair, or pick different key columns and retry.`});
+  onb.hiers.forEach(n=>{ if(!onb.hierType[n]) out.push({id:'hier:'+n, stage:2, sev:'warning', kind:'Missing information', hier:n, title:`No hierarchy type selected · ${onbEsc(n)}`,
+    msg:`${onbEsc(n)} is selected but no hierarchy type was chosen, so its levels can't be mapped onto columns.`, ai:'Pick the type whose levels match your source data.'}); });
+  let mi=-1; ONB_META.forEach((m,i)=>{ if(!m.added && m.val!=='correct' && (mi<0||m.conf<ONB_META[mi].conf)) mi=i; });
+  if(mi>=0 && ONB_META[mi].conf<0.5){ const m=ONB_META[mi]; out.push({id:'meta', stage:3, sev:'warning', kind:'Possible hallucination', mi, title:`Possible hallucination · ${onbEsc(m.col)}`,
+    msg:`The AI-generated definition for <span class="mono">${onbEsc(m.col)}</span> in <span class="mono">${onbShortTable(m.table)}</span> has low confidence (<b>${Math.round(m.conf*100)}%</b>) and no matching entry was found in the source catalogue. Please confirm or correct it.`,
+    ai:'Compare against the data dictionary before confirming — low-confidence definitions are often inferred from the column name alone.'}); }
+  const ch=ONB_HIERS.find(h=>h.name==='Customer Hierarchy'), ct=ch&&(ch.types.find(t=>t.name===onb.hierType[ch.name])||ch.types[0]);
+  if(ct){ const gi=ONB_GRAIN.findIndex(g=>g.grains.some(x=>/customer/i.test(x.label) && !ct.levels.includes(x.level)));
+    if(gi>=0){ const gr=ONB_GRAIN[gi].grains.find(x=>/customer/i.test(x.label) && !ct.levels.includes(x.level)), sug=ct.levels[ct.levels.length-1];
+      out.push({id:'grain', stage:4, sev:'warning', kind:'Inconsistency', title:'Grain doesn’t match the customer hierarchy', from:gr.level, map:sug, levels:ct.levels,
+        msg:`The Grain step reports Customer grain <b>“${onbEsc(gr.level)}”</b> (<span class="mono">${onbEsc(gr.col)}</span>) for <span class="mono">${onbShortTable(ONB_GRAIN[gi].table)}</span>, but Customer Hierarchy · ${onbEsc(ct.name)} has no “${onbEsc(gr.level)}” level. Map it to a hierarchy level so grain can roll up.`,
+        ai:`Closest level by column profile: <b>${onbEsc(sug)}</b>.`}); } }
+  onbExpTables().forEach(t=>{ const c=onb.expByTable[t]&&onb.expByTable[t].Time, g=ONB_GRAIN.find(x=>x.table===t), tg=g&&g.grains.find(x=>/time/i.test(x.label));
+    if(c && tg && ONB_TIME_LEVELS.indexOf(tg.level)>=0 && ONB_TIME_LEVELS.indexOf(c.grain)>ONB_TIME_LEVELS.indexOf(tg.level))
+      out.push({id:'exp:'+t, stage:5, sev:'warning', kind:'Inconsistency', table:t, avail:tg.level, sug:tg.level, title:`Expected time grain is finer than the data · ${onbShortTable(t)}`,
+        msg:`Expected time grain is <b>“${onbEsc(c.grain)}”</b> but <span class="mono">${onbShortTable(t)}</span> is only available at <b>“${onbEsc(tg.level)}”</b>. Sufficiency for this dimension would score 0.`,
+        ai:`Set the expected time grain to <b>${onbEsc(tg.level)}</b>, or keep it if a finer feed is planned.`}); });
+  return out.filter(x=>!seen.includes(x.id)).map(x=>Object.assign({resolved:false, outcome:null}, x));
+}
+function onbProcStart(){ clearInterval(onbProcTimer);
+  onbExpTables().forEach(t=>onbExpDims().forEach(d=>onbExpCell(t,d)));
+  const seen=(onb.proc.seen||[]); onb.proc={status:'running', stage:0, prog:0, issues:[], log:[], seen};
+  onb.proc.issues=onbProcBuildIssues();
+  onbProcLog(`Started processing “${onb.ucName.trim()||'Untitled use case'}” with ${onb.ts.fact.selected.length} fact tables, ${ONB_JOINS.length} joins and ${ONB_META.length} KDEs`);
+  onbProcRun(); renderONB(); }
+function onbProcAutoStart(){ if(onb.phase==='form' && onb.formStep===6 && onb.proc.status==='idle') onbProcStart(); }
+function onbProcRun(){ clearInterval(onbProcTimer); onbProcTimer=setInterval(onbProcTick,150); }
+function onbProcStageMsg(i){
+  const man=ONB_JOINS.filter(j=>j.manual).length, add=ONB_META.filter(m=>m.added).length, g=ONB_GRAIN.reduce((n,x)=>n+x.grains.length,0);
+  return [`${onb.ts.fact.selected.length||ONB_API_TABLES.fact.length} fact · ${onb.ts.dim.selected.length||ONB_API_TABLES.dim.length} dimension tables resolved`,
+    `${ONB_JOINS.length+ONB_WJOINS.length} joins executed${man?` (${man} manual)`:''}`,
+    onb.hiers.length?`${onb.hiers.length} hierarch${onb.hiers.length===1?'y':'ies'} applied`:'No hierarchies selected — using default levels',
+    `${ONB_META.length} KDEs profiled${add?` (${add} added by you)`:''}`,
+    `${g} grains checked across ${ONB_GRAIN.length} tables`,
+    `Expected grain confirmed for ${onbExpTables().length} tables`,
+    'Sufficiency pipeline built — ready for heat map'][i]; }
+function onbProcTick(){ const p=onb.proc; if(p.status!=='running'){ clearInterval(onbProcTimer); return; }
+  p.prog=Math.min(1,p.prog+0.12);
+  if(p.prog>=1){ const open=p.issues.filter(x=>x.stage===p.stage && !x.resolved);
+    if(open.length){ p.status='paused'; clearInterval(onbProcTimer); onbProcLog(`${ONB_PROC_STAGES[p.stage].t} — paused: ${open.length} item${open.length>1?'s':''} need${open.length>1?'':'s'} your review`,'warn'); }
+    else { onbProcLog(onbProcStageMsg(p.stage),'ok'); if(p.stage>=ONB_PROC_STAGES.length-1){ p.status='done'; clearInterval(onbProcTimer); f6Toast('AI validation complete.'); } else { p.stage++; p.prog=0; } } }
+  if(onb.phase==='form' && onb.formStep===6) renderONB(); }
+function onbProcContinue(){ const p=onb.proc; if(p.issues.some(x=>x.stage===p.stage && !x.resolved)){ f6Toast('Confirm or correct the flagged items first.'); return; }
+  onbProcLog(`Retrying “${ONB_PROC_STAGES[p.stage].t}” with your input`); p.status='running'; p.prog=0; onbProcRun(); renderONB(); }
+function onbProcResolve(k,outcome,retry){ const p=onb.proc, x=p.issues[k]; if(!x||x.resolved) return;
+  if(x.id==='ucname' && !onb.ucName.trim()){ f6Toast('Enter a use case name first.'); return; }
+  if(x.id.startsWith('hier:') && !onb.hierType[x.hier]){ f6Toast('Select a hierarchy type first.'); return; }
+  if(x.id==='join'){ ONB_JOINS[x.ji].val='correct'; ONB_JOINS[x.ji].edit=false; }
+  if(x.id==='meta'){ const m=ONB_META[x.mi]; if(!m.def.trim()){ f6Toast('Enter a definition first.'); return; } m.val='correct'; m.edit=false; }
+  if(x.id==='grain' && outcome==='corrected') ONB_GRAIN.forEach(g=>g.grains.forEach(gr=>{ if(/customer/i.test(gr.label) && gr.level===x.from) gr.level=x.map; }));
+  if(x.id.startsWith('exp:') && outcome==='corrected'){ onb.expByTable[x.table].Time.grain=x.sug; }
+  x.resolved=true; x.outcome=outcome; p.seen.push(x.id);
+  onbProcLog(`${x.title.replace(/<[^>]+>/g,'').replace(/&amp;/g,'&')} — ${outcome==='corrected'?'corrected':'confirmed'} by you`,'ok');
+  if(retry && !p.issues.some(y=>y.stage===p.stage && !y.resolved)) onbProcContinue(); else renderONB(); }
+function onbIssueFields(x,k){
+  if(x.id==='ucname') return `<div class="onb-issue-f onb-jf"><label>Use case name</label><input class="onb-input sm" style="font-family:inherit" placeholder="e.g. OTIF — On-time in-full" value="${onbEsc(onb.ucName)}" oninput="onb.ucName=this.value"></div>`;
+  if(x.id==='join'){ const j=ONB_JOINS[x.ji], fc=onbFactKeyCols(j.factTable), dc=ONB_DIM_COLUMNS[j.dimTable]||[];
+    const fcols=fc.includes(j.factKey)?fc:[j.factKey,...fc], dcols=dc.includes(j.dimKey)?dc:[j.dimKey,...dc];
+    return `<div class="onb-issue-f onb-jgrid">
+      ${onbJfield('Fact table', j.factTable, false, '')}
+      ${onbJfield('Dim table', j.dimTable, false, '')}
+      <div class="onb-jf"><label>Fact join key</label>${onbSel(fcols,j.factKey,`ONB_JOINS[${x.ji}].factKey=this.value`)}</div>
+      <div class="onb-jf"><label>Dim join key</label>${onbSel(dcols,j.dimKey,`ONB_JOINS[${x.ji}].dimKey=this.value`)}</div>
+      <div class="onb-jf"><label>Join type</label>${onbSel(ONB_JOIN_TYPES,j.joinType,`ONB_JOINS[${x.ji}].joinType=this.value`)}</div>
+      <div class="onb-jf"><label>Match rate</label><div class="onb-issue-rate"><span class="onb-issue-bar"><i style="width:62%"></i></span>62% of fact rows matched</div></div>
+    </div>`; }
+  if(x.id.startsWith('hier:')){ const i=onbHierIdx(x.hier); return i<0?'':`<div class="onb-issue-f">${onbHierTypeOpts(i)}</div>`; }
+  if(x.id==='meta'){ const m=ONB_META[x.mi]; return `<div class="onb-issue-f onb-jf"><label>Definition · ${onbEsc(m.col)}</label><textarea class="nuc-textarea onb-issue-ta" oninput="ONB_META[${x.mi}].def=this.value">${onbEsc(m.def)}</textarea></div>`; }
+  if(x.id==='grain') return `<div class="onb-issue-f onb-jgrid"><div class="onb-jf"><label>Detected grain</label><div class="onb-jval">${onbEsc(x.from)}</div></div><div class="onb-jf"><label>Map to hierarchy level</label>${onbSel(x.levels,x.map,`onb.proc.issues[${k}].map=this.value`)}</div></div>`;
+  if(x.id.startsWith('exp:')) return `<div class="onb-issue-f onb-jgrid"><div class="onb-jf"><label>Available time grain</label><div class="onb-jval">${onbEsc(x.avail)}</div></div><div class="onb-jf"><label>Set expected grain to</label>${onbSel(ONB_TIME_LEVELS,x.sug,`onb.proc.issues[${k}].sug=this.value`)}</div></div>`;
+  return ''; }
+function onbIssueActs(x,k){
+  const b=(lbl,out,pri)=>`<button class="onb-btn onb-issue-btn ${pri?'primary':''}" onclick="onbProcResolve(${k},'${out}',${pri?1:0})">${lbl}</button>`;
+  if(x.id==='ucname'||x.id.startsWith('hier:')) return b('Save &amp; retry','corrected',1);
+  if(x.id==='join') return b('✓ Join is correct','confirmed')+b('Save correction &amp; retry','corrected',1);
+  if(x.id==='meta') return b('✓ Definition is correct','confirmed')+b('Save correction &amp; retry','corrected',1);
+  if(x.id==='grain') return b(`Keep “${onbEsc(x.from)}”`,'confirmed')+b('Apply mapping &amp; retry','corrected',1);
+  if(x.id.startsWith('exp:')) return b('Keep expected grain','confirmed')+b('Update &amp; retry','corrected',1);
+  return ''; }
+function onbIssueCard(x,k){ const st=ONB_PROC_STAGES[x.stage].t;
+  if(x.resolved) return `<div class="onb-issue resolved"><span class="onb-issue-sev ok">✓ ${x.outcome==='corrected'?'Corrected':'Confirmed'}</span><span class="onb-issue-rt">${x.title}</span><span class="onb-issue-stage">${st}</span></div>`;
+  return `<div class="onb-issue ${x.sev}">
+    <div class="onb-issue-h"><span class="onb-issue-sev ${x.sev}">${x.sev==='error'?'Error':'Warning'} · ${x.kind}</span><span class="onb-issue-stage">${st}</span></div>
+    <div class="onb-issue-t">${x.title}</div>
+    <div class="onb-issue-m">${x.msg}</div>
+    <div class="onb-issue-ai"><span class="onb-issue-ai-k">✦ AI</span><span>${x.ai}</span></div>
+    ${onbIssueFields(x,k)}
+    <div class="onb-issue-acts">${onbIssueActs(x,k)}</div>
+  </div>`; }
+function onbProcInputs(){
+  const man=ONB_JOINS.filter(j=>j.manual).length, add=ONB_META.filter(m=>m.added).length, g=ONB_GRAIN.reduce((n,x)=>n+x.grains.length,0);
+  const items=[['Use case',onb.ucName.trim()||'—'],['Fact tables',onb.ts.fact.selected.length],['Dim tables',onb.ts.dim.selected.length],['Dimensions',onb.dims.length],['Hierarchies',onb.hiers.length],['Joins',`${ONB_JOINS.length+ONB_WJOINS.length}${man?` · ${man} manual`:''}`],['KDEs',`${ONB_META.length}${add?` · ${add} added`:''}`],['Grains',g],['Expected grain',`${onbExpTables().length} tables`]];
+  return `<div class="onb-proc-inputs">${items.map(([k,v])=>`<div class="onb-proc-in" title="${onbEsc(String(v))}"><span>${k}</span><b>${onbEsc(String(v))}</b></div>`).join('')}</div>`; }
+function onbProcess(){
+  const p=onb.proc, N=ONB_PROC_STAGES.length, st=ONB_PROC_STAGES[Math.min(p.stage,N-1)];
+  const pct=p.status==='done'?100:p.status==='idle'?0:Math.round(((p.stage+p.prog)/N)*100);
+  const shown=p.issues.map((x,k)=>({x,k})).filter(({x})=>p.status==='done'||x.stage<p.stage||(x.stage===p.stage&&(p.status==='paused'||x.resolved)));
+  const open=shown.filter(s=>!s.x.resolved), done=shown.filter(s=>s.x.resolved), reviewed=p.issues.filter(x=>x.resolved).length;
+  let head;
+  if(p.status==='idle') head=`<div class="onb-proc-status"><div><div class="onb-appr-t">Ready to process</div><div class="onb-appr-s">AI runs the joins and pipelines using everything captured in the previous steps, and stops to ask you whenever something looks off.</div></div><button class="onb-btn primary" onclick="onbProcStart()">Run AI processing</button></div>`;
+  else if(p.status==='running') head=`<div class="onb-proc-status running"><span class="onb-proc-spin"></span><div class="onb-proc-grow"><div class="onb-appr-t">Processing · ${st.t}</div><div class="onb-appr-s">${st.d}</div></div><span class="onb-proc-pct">${pct}%</span></div>`;
+  else if(p.status==='paused') head=`<div class="onb-proc-status paused"><div><div class="onb-appr-t">⚠ Needs your review</div><div class="onb-appr-s">${open.length?`${open.length} item${open.length>1?'s':''} flagged during “${st.t}”. Confirm or correct ${open.length>1?'them':'it'} below, then retry.`:'All flagged items resolved — retry to continue processing.'}</div></div><span class="onb-proc-pct" style="color:#8A5300">${pct}%</span><button class="onb-btn ${open.length?'':'primary'}" ${open.length?'disabled':''} onclick="onbProcContinue()">Retry &amp; continue</button></div>`;
+  else head=`<div class="onb-proc-status done"><div><div class="onb-appr-t">✓ Processing complete</div><div class="onb-appr-s">All joins and pipelines ran successfully${reviewed?` · ${reviewed} item${reviewed>1?'s':''} reviewed by you`:''}. The heat map will use these results.</div></div><button class="onb-btn" onclick="onbProcStart()">Re-run</button><button class="onb-btn primary" onclick="onbGoStep(7)">Continue to heat map</button></div>`;
+  const stages=`<ul class="nuc-calc-steps">${ONB_PROC_STAGES.map((s,i)=>{ const cls=(p.status==='done'||i<p.stage)?'done':(i===p.stage&&p.status==='running')?'active':(i===p.stage&&p.status==='paused')?'warn':''; return `<li class="nuc-calc-step ${cls}"><span class="nuc-calc-ic"></span><span>${s.t}<span class="onb-proc-sd">${s.d}</span></span></li>`; }).join('')}</ul>`;
+  const empty=p.status==='idle'?'Run AI processing to execute the joins and pipelines.':p.status==='done'?'No issues were found — everything validated cleanly.':'No issues so far — AI is checking each stage and will stop here if it needs you.';
+  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">AI validation &amp; processing</h2><div class="onb-dssub">AI executes the joins and pipelines in the background using the information from the previous steps. If it finds missing information, a join error, an inconsistency or a possible hallucination, it pauses and asks you to confirm or correct it.</div></div>
+  ${onbProcInputs()}
+  ${head}
+  <div class="onb-proc-bar ${p.status}"><i style="width:${pct}%"></i></div>
+  <div class="onb-proc-grid">
+    <div class="onb-proc-stages">${stages}</div>
+    <div class="onb-proc-main">
+      ${open.map(({x,k})=>onbIssueCard(x,k)).join('')}
+      ${!open.length&&!done.length?`<div class="onb-proc-empty">${empty}</div>`:''}
+      ${done.length?`<div class="onb-proc-sub">Reviewed by you</div>${done.map(({x,k})=>onbIssueCard(x,k)).join('')}`:''}
+      ${p.log.length?`<div class="onb-proc-log"><div class="onb-proc-log-h">Activity log</div>${p.log.slice().reverse().map(l=>`<div class="onb-proc-log-r ${l.kind}"><span class="mono">${l.t}</span><span>${onbEsc(l.msg)}</span></div>`).join('')}</div>`:''}
+    </div>
+  </div>
   ${onbFooter()}`;
 }
 /* ── Heat map + approval + publish ── */
@@ -4548,7 +4914,10 @@ function onbUcSummary(){
   const chips = hasD ? `<div class="onb-ucsum-chips">${onb.domains.map(f=>{ const c=nucDomColor(f); return `<span class="onb-ucsum-chip" style="background:${c}1A;border-color:${c}66;color:${c}"><span class="nuc-cdot" style="background:${c}"></span>${f}</span>`; }).join('')}</div>` : '<span class="onb-ucsum-empty">No domain selected on Table selection</span>';
   return `<div class="onb-ucsum">
     <div class="onb-ucsum-k">Use case</div>
+    <div class="onb-ucsum-row"><span class="onb-ucsum-lbl">Name</span><span class="onb-ucsum-desc${onb.ucName.trim()?'':' empty'}">${onb.ucName.trim()?onbEsc(onb.ucName):'No name provided on Table selection.'}</span></div>
     <div class="onb-ucsum-row"><span class="onb-ucsum-lbl">${dLabel}</span>${chips}</div>
+    ${onb.dims.length?`<div class="onb-ucsum-row"><span class="onb-ucsum-lbl">Dimensions</span><span class="onb-ucsum-desc">${onb.dims.map(onbEsc).join(', ')}</span></div>`:''}
+    ${onb.hiers.length?`<div class="onb-ucsum-row"><span class="onb-ucsum-lbl">Hierarchies</span><span class="onb-ucsum-desc">${onb.hiers.map(n=>onbEsc(n)+(onb.hierType[n]?` · ${onbEsc(onb.hierType[n])}`:'')).join(', ')}</span></div>`:''}
     <div class="onb-ucsum-row"><span class="onb-ucsum-lbl">Description</span><span class="onb-ucsum-desc${hasDesc?'':' empty'}">${hasDesc?onbEsc(onb.desc):'No description provided on Table selection.'}</span></div>
   </div>`;
 }
@@ -4592,6 +4961,89 @@ function onbHeatStep(){
   ${nucHmView==='summary'?nucHmSummary():nucHmDetail()}
   ${onbFooter()}`;
 }
+/* ── Dimensions & hierarchies (Table selection) ── */
+function onbSetUcName(v){ onb.ucName=v; }
+function onbDimOpts(){ return ONB_DIM_OPTS.concat(onb.dimCustom); }
+function onbToggleDim(i){ const d=onbDimOpts()[i], a=onb.dims, k=a.indexOf(d); if(k>=0) a.splice(k,1); else a.push(d); renderONB(); }
+function onbDimAddOpen(){ onb.dimAdding=true; onb.dimNew=''; renderONB(); const el=document.getElementById('onbDimNew'); if(el) el.focus(); }
+function onbDimAddCancel(){ onb.dimAdding=false; renderONB(); }
+function onbDimAddConfirm(){ const v=(onb.dimNew||'').trim(); if(!v){ f6Toast('Enter a dimension name.'); return; } if(onbDimOpts().some(d=>d.toLowerCase()===v.toLowerCase())){ f6Toast('That dimension already exists.'); return; } onb.dimCustom.push(v); onb.dims.push(v); onb.dimAdding=false; renderONB(); f6Toast(`Dimension “${v}” added.`); }
+function onbHierIdx(n){ return ONB_HIERS.findIndex(h=>h.name===n); }
+function onbToggleHier(i){ const h=ONB_HIERS[i], a=onb.hiers, k=a.indexOf(h.name); if(k>=0) a.splice(k,1); else { a.push(h.name); if(h.types.length===1 && !onb.hierType[h.name]) onb.hierType[h.name]=h.types[0].name; } renderONB(); }
+function onbSetHierType(i,ti){ const h=ONB_HIERS[i]; onb.hierType[h.name]=h.types[ti].name; renderONB(); }
+function onbChain(levels,hi){ return `<span class="onb-chain">${levels.map(l=>`<span class="onb-chain-l${l===hi?' hi':''}">${onbEsc(l)}</span>`).join('<span class="onb-chain-arr">→</span>')}</span>`; }
+function onbHierTypeOpts(i){ const h=ONB_HIERS[i], sel=onb.hierType[h.name];
+  return `<div class="onb-htypes">${h.types.map((t,ti)=>`<div class="onb-htype ${sel===t.name?'on':''}" role="radio" aria-checked="${sel===t.name}" onclick="onbSetHierType(${i},${ti})"><span class="onb-radio"></span><span class="onb-htype-n">${onbEsc(t.name)}</span>${onbChain(t.levels)}</div>`).join('')}</div>`; }
+function onbHierCard(n){ const i=onbHierIdx(n); if(i<0) return ''; const h=ONB_HIERS[i], sel=onb.hierType[n];
+  return `<div class="onb-hcard ${sel?'ok':''}">
+    <div class="onb-hcard-h">
+      <div class="onb-jtitle"><span class="onb-jdim">${onbEsc(n)}</span>${h.custom?'<span class="onb-jtag">Custom</span>':''}${sel?`<span class="onb-sec-ok">✓ ${onbEsc(sel)}</span>`:'<span class="onb-hcard-need">Select a hierarchy type</span>'}</div>
+      <button class="onb-editbtn" onclick="onbHierModalOpen(${i})">＋ Add type</button>
+    </div>
+    ${onbHierTypeOpts(i)}
+  </div>`; }
+function onbDimsHierSection(){
+  const dims=onbDimOpts();
+  return `<div class="onb-sec">
+    <div class="onb-sec-h">Dimensions &amp; hierarchies</div>
+    <div class="onb-sec-note">Choose the dimensions this use case is cut by and the hierarchies used to roll grain up, then pick a hierarchy type for each selected hierarchy.</div>
+    <label class="onb-flabel">Dimensions</label>
+    <div class="nuc-chips">${dims.map((d,i)=>{ const on=onb.dims.includes(d); return `<span class="nuc-chip ${on?'on':''}" onclick="onbToggleDim(${i})">${on?'✓ ':''}${onbEsc(d)}</span>`; }).join('')}${onb.dimAdding
+      ?`<span class="onb-chip-form"><input id="onbDimNew" class="onb-input sm" placeholder="New dimension name" value="${onbEsc(onb.dimNew)}" oninput="onb.dimNew=this.value" onkeydown="if(event.key==='Enter')onbDimAddConfirm();if(event.key==='Escape')onbDimAddCancel()"><button class="onb-vbtn on-correct" onclick="onbDimAddConfirm()">Add</button><button class="onb-vbtn" onclick="onbDimAddCancel()">Cancel</button></span>`
+      :`<span class="nuc-chip onb-chip-add" onclick="onbDimAddOpen()">＋ Add new dimension</span>`}</div>
+    <label class="onb-flabel" style="margin-top:18px">Hierarchies</label>
+    <div class="nuc-chips">${ONB_HIERS.map((h,i)=>{ const on=onb.hiers.includes(h.name); return `<span class="nuc-chip ${on?'on':''}" onclick="onbToggleHier(${i})">${on?'✓ ':''}${onbEsc(h.name)}</span>`; }).join('')}<span class="nuc-chip onb-chip-add" onclick="onbHierModalOpen()">＋ Add new hierarchy</span></div>
+    ${onb.hiers.length?`<div class="onb-hier-list">${onb.hiers.map(onbHierCard).join('')}</div>`:''}
+  </div>`;
+}
+/* ── Add new hierarchy / add type (modal) ── */
+function onbHierColOpts(){ const s=new Set(); onbAllColsFor(ONB_API_TABLES.fact).forEach(c=>s.add(c)); ONB_GRAIN_COLS.forEach(c=>s.add(c)); Object.values(ONB_DIM_COLUMNS).forEach(a=>a.forEach(c=>s.add(c))); return [...s]; }
+function onbHierModalOpen(i){ const ex=(typeof i==='number')?i:null, h=ex!==null?ONB_HIERS[ex]:null;
+  onb.hierModal={ex, name:h?h.name:'', typeName:h?`Type ${h.types.length+1}`:'Type 1', levels:[{name:'',col:''},{name:'',col:''},{name:'',col:''}]}; renderONB(); }
+function onbHierModalCancel(){ onb.hierModal=null; renderONB(); }
+function onbHierModalSet(f,v){ if(onb.hierModal) onb.hierModal[f]=v; }
+function onbHierLvlSet(li,f,v){ if(onb.hierModal) onb.hierModal.levels[li][f]=v; }
+function onbHierLvlAdd(){ onb.hierModal.levels.push({name:'',col:''}); renderONB(); }
+function onbHierLvlDel(li){ const L=onb.hierModal.levels; if(L.length<=2){ f6Toast('A hierarchy needs at least 2 levels.'); return; } L.splice(li,1); renderONB(); }
+function onbHierLvlMove(li,d){ const L=onb.hierModal.levels, j=li+d; if(j<0||j>=L.length) return; [L[li],L[j]]=[L[j],L[li]]; renderONB(); }
+function onbHierModalSave(){ const m=onb.hierModal; if(!m) return; const name=m.name.trim(), tn=m.typeName.trim(), lv=m.levels.filter(l=>l.name.trim());
+  if(!name){ f6Toast('Enter a hierarchy name.'); return; }
+  if(!tn){ f6Toast('Enter a hierarchy type.'); return; }
+  if(lv.length<2){ f6Toast('Define at least 2 levels.'); return; }
+  if(lv.some(l=>!l.col)){ f6Toast('Map every level to a column.'); return; }
+  const type={name:tn, levels:lv.map(l=>l.name.trim()), cols:lv.map(l=>l.col)};
+  if(m.ex!==null){ const h=ONB_HIERS[m.ex]; if(h.types.some(t=>t.name.toLowerCase()===tn.toLowerCase())){ f6Toast('That type already exists for this hierarchy.'); return; } h.types.push(type); if(!onb.hiers.includes(h.name)) onb.hiers.push(h.name); onb.hierType[h.name]=tn; }
+  else { if(ONB_HIERS.some(h=>h.name.toLowerCase()===name.toLowerCase())){ f6Toast('A hierarchy with that name already exists.'); return; } ONB_HIERS.push({name, dim:name.replace(/\s*hierarchy\s*$/i,'').trim()||name, custom:true, types:[type]}); onb.hiers.push(name); onb.hierType[name]=tn; }
+  onb.hierModal=null; renderONB(); f6Toast(`${name} · ${tn} saved.`); }
+function onbHierModalHtml(){ const m=onb.hierModal; if(!m) return ''; const ex=m.ex!==null, cols=onbHierColOpts();
+  return `<div class="onb-modal-back" onclick="onbHierModalCancel()">
+    <div class="onb-modal onb-modal-wide" role="dialog" aria-label="${ex?'Add hierarchy type':'Add new hierarchy'}" onclick="event.stopPropagation()">
+      <div class="onb-modal-h">${ex?`Add type to ${onbEsc(m.name)}`:'Add new hierarchy'}</div>
+      <div class="onb-modal-sub">Define the levels from top (broadest) to bottom (finest) and map each level to its source column.</div>
+      <div class="onb-modal-body">
+        <div class="onb-grid onb-grid-2" style="gap:14px">
+          <div><label class="onb-flabel">Hierarchy name</label><input class="onb-input" placeholder="e.g. Geography Hierarchy" value="${onbEsc(m.name)}" ${ex?'disabled':''} oninput="onbHierModalSet('name',this.value)"></div>
+          <div><label class="onb-flabel">Hierarchy type</label><input class="onb-input" placeholder="e.g. Type 1" value="${onbEsc(m.typeName)}" oninput="onbHierModalSet('typeName',this.value)"></div>
+        </div>
+        <label class="onb-flabel" style="margin-top:16px">Levels &amp; columns</label>
+        <div class="onb-hlv-head"><span></span><span>Level name</span><span>Column</span><span></span></div>
+        ${m.levels.map((l,li)=>`<div class="onb-hlv-row">
+          <span class="onb-hlv-n">${li+1}</span>
+          <input class="onb-input sm" style="font-family:inherit" placeholder="e.g. Country" value="${onbEsc(l.name)}" oninput="onbHierLvlSet(${li},'name',this.value)">
+          ${onbSel(cols,l.col,`onbHierLvlSet(${li},'col',this.value)`,'Select column')}
+          <span class="onb-hlv-acts"><button class="onb-hlv-btn" title="Move up" onclick="onbHierLvlMove(${li},-1)" ${li===0?'disabled':''}>↑</button><button class="onb-hlv-btn" title="Move down" onclick="onbHierLvlMove(${li},1)" ${li===m.levels.length-1?'disabled':''}>↓</button><button class="onb-tsrow-del" title="Remove level" onclick="onbHierLvlDel(${li})">${ONB_TRASH}</button></span>
+        </div>`).join('')}
+        <button class="onb-btn onb-addrow" style="margin-top:10px;padding:8px 16px" onclick="onbHierLvlAdd()">＋ Add level</button>
+      </div>
+      <div class="onb-modal-foot">
+        <button class="onb-btn" onclick="onbHierModalCancel()">Cancel</button>
+        <button class="onb-btn primary" onclick="onbHierModalSave()">${ex?'Add type':'Save hierarchy'}</button>
+      </div>
+    </div>
+  </div>`; }
+/* Generic select helper (matches .onb-select styling) */
+function onbSel(opts,val,handler,ph,cls){ const c=cls===undefined?'sm':cls;
+  return `<span class="onb-select-wrap"><select class="onb-select ${c}" onchange="${handler}">${ph?`<option value="" ${val?'':'selected'}>${ph}</option>`:''}${opts.map(o=>`<option value="${onbEsc(o)}" ${o===val?'selected':''}>${onbEsc(o)}</option>`).join('')}</select></span>`; }
 /* ── Table selection (fact / dim / weights) ── */
 function onbTsSet(kind,si,f,v){ onb.ts[kind].sources[si][f]=v; }
 function onbAddSource(kind){ onb.ts[kind].sources.push({cat:'',schema:''}); renderONB(); }
@@ -4604,9 +5056,9 @@ function onbTsToggle(kind,t){ const s=onb.ts[kind], a=s.selected, i=a.indexOf(t)
 function onbShowCols(){ onb.ts.fact.colsShown=true; renderONB(); }
 function onbKpiToggle(c){ const a=onb.ts.fact.kpis, i=a.indexOf(c); if(i>=0)a.splice(i,1); else a.push(c); renderONB(); }
 function onbValidate(kind,v){ onb.ts[kind].validated=v; renderONB(); f6Toast(v==='correct'?'Selection marked correct.':'Marked for edit — adjust the selection above.'); }
-function onbGoStep(n){ if(onb.phase!=='form') onb.phase='form'; onb.formStep=n; renderONB(); window.scrollTo(0,0); }
+function onbGoStep(n){ if(onb.phase!=='form') onb.phase='form'; onb.formStep=n; renderONB(); window.scrollTo(0,0); onbProcAutoStart(); }
 function onbFormStepper(){
-  const steps=['Table selection','Grain','Joining','Metadata','Expected grain','Heat map'];
+  const steps=['Table selection','Joining','Metadata','Grain','Expected grain','AI validation','Heat map'];
   return `<div class="onb-steps onb-fsteps">${steps.map((s,idx)=>{ const n=idx+1;
     return `${idx?`<div class="onb-sline ${n<=onb.formStep?'on':''}"></div>`:''}<div class="onb-s clickable ${n===onb.formStep?'current':''} ${n<=onb.formStep?'active':''}" onclick="onbGoStep(${n})" title="Go to ${s}"><span class="onb-sd">${n<onb.formStep?'✓':n}</span><span class="onb-sl">${s}</span></div>`;
   }).join('')}</div>`;
@@ -4670,17 +5122,18 @@ function onbFormTableSelect(){
   <div class="onb-warn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> <span>Please provide access to <b>all the notebooks</b> before you continue — missing access will lead to a failure during processing.</span></div>
   ${onbTsSection('fact','Fact tables','Enter catalogue + schema, fetch tables, select fact tables, then mark which columns are KPIs.')}
   ${onbTsSection('dim','Dimension tables','Enter catalogue + schema, fetch tables, then select dimension tables.')}
-  ${onbTsSection('weights','Weights table','Enter catalogue + schema, fetch tables, then select the weights table.')}
+  ${onbDimsHierSection()}
   ${onbFooter()}`;
 }
 function onbFormBody(){
   switch(onb.formStep){
     case 1: return onbFormTableSelect();
-    case 2: return onbGrain();
-    case 3: return onbJoining();
-    case 4: return onbMetadata();
+    case 2: return onbJoining();
+    case 3: return onbMetadata();
+    case 4: return onbGrain();
     case 5: return onbExpGrain();
-    case 6: return onbHeatStep();
+    case 6: return onbProcess();
+    case 7: return onbHeatStep();
     default: return onbFormTableSelect();
   }
 }
@@ -4696,7 +5149,7 @@ function onbFooter(){
     <button class="onb-btn" onclick="onbPrev()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> Previous</button>
     <div class="onb-footer-right">
       <button class="onb-btn" onclick="onbSaveDraft()">Save as Draft</button>
-      <button class="onb-btn primary" onclick="onbNext()">${onb.phase==='prereq'&&onbStep===2?'Submit request':'Next'}</button>
+      <button class="onb-btn primary" onclick="onbNext()">${onb.phase==='prereq'&&onbStep===2?'Submit request':(onb.phase==='form'&&onb.formStep===6?'Continue to heat map':'Next')}</button>
     </div>
   </div>`;
 }
@@ -4752,7 +5205,7 @@ function renderONB(){
   const inner = onb.phase==='prereq'
     ? `<div class="onb-prereq-back" onclick="onbClosePrereq()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> Back to onboarding</div>` + onbStepper() + (onbStep===1?onbStepAdGroup():onbStepServiceNow())
     : onbFormStepper() + onbFormBody();
-  document.getElementById('tab-onb').innerHTML = `<div class="onb-shell">${inner}</div>${onbGrainPopupHtml()}`;
+  document.getElementById('tab-onb').innerHTML = `<div class="onb-shell">${inner}</div>${onbGrainPopupHtml()}${onbHierModalHtml()}`;
 }
 
 // init

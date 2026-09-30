@@ -5113,14 +5113,13 @@ function onbHierModalSave(){ const m=onb.hierModal; if(!m) return; const h=ONB_H
   if(!tn){ f6Toast('Give this type a name.'); return; }
   if(h.types.some(t=>t.name.toLowerCase()===tn.toLowerCase())){ f6Toast(`${h.name} already has a “${tn}”.`); return; }
   if(named.length<2){ f6Toast('Define at least 2 levels.'); return; }
-  if(named.some(l=>!l.col)){ f6Toast('Pick a source column for every level.'); return; }
   const names=named.map(l=>l.name.trim()); if(new Set(names.map(x=>x.toLowerCase())).size!==names.length){ f6Toast('Level names must be unique.'); return; }
   const lowest=names.includes(m.lowest)?m.lowest:names[names.length-1];
   h.types.push({name:tn, levels:names, cols:named.map(l=>l.col), lowest,
     detail:{diff:m.diff.trim(), levels:named.map(l=>({name:l.name.trim(), col:l.col, def:l.def.trim(), examples:l.examples.map(x=>x.trim()).filter(Boolean), format:l.format.trim()})), looks:m.looks.filter(x=>names.includes(x)), lookHow:m.lookHow.trim(), summary:m.summary.trim()}});
   if(!onb.hiers.includes(h.name)) onb.hiers.push(h.name);
   onb.hierType[h.name]=tn; onb.hierModal=null; renderONB(); f6Toast(`${tn} added to ${h.name} and selected.`); }
-function onbHierModalHtml(){ const m=onb.hierModal; if(!m) return ''; const cols=onbHierColOpts(), named=onbHmNamed(), lvOpts=onbGrainLevels(m.vertical);
+function onbHierModalHtml(){ const m=onb.hierModal; if(!m) return ''; const named=onbHmNamed(), lvOpts=onbGrainLevels(m.vertical);
   const verts=[...new Set(['Customer','Product','Geography','Time'].concat(ONB_HIERS.map(h=>h.dim)))];
   const lvl=m.levels, cur=lvl[m.info]||lvl[0], ci=lvl.indexOf(cur);
   const nameCtl=(l,li)=> l.custom
@@ -5149,7 +5148,6 @@ function onbHierModalHtml(){ const m=onb.hierModal; if(!m) return ''; const cols
           <div class="onb-hm2-lvh"><span>Level ${li+1}</span><span class="onb-hlv-acts"><button class="onb-hlv-btn" title="Move up (coarser)" onclick="onbHmLvMove(${li},-1)" ${li===0?'disabled':''}>↑</button><button class="onb-hlv-btn" title="Move down (finer)" onclick="onbHmLvMove(${li},1)" ${li===lvl.length-1?'disabled':''}>↓</button><button class="onb-tsrow-del" title="Remove level" onclick="onbHmLvDel(${li})">${ONB_TRASH}</button></span></div>
           <div class="onb-hm2-box">
             <div class="onb-hm2-row"><label>Level Name</label>${nameCtl(l,li)}</div>
-            <div class="onb-hm2-row"><label>Source Column</label>${onbSel(cols,l.col,`onbHmLv(${li},'col',this.value)`,'Select column')}</div>
           </div>`).join('')}
         <div class="onb-hm2-sec"><button class="onb-btn onb-addrow" style="margin-top:12px;padding:8px 16px" onclick="onbHmLvAdd()">＋ Add another level</button></div>
         <div class="onb-hm2-arrow">↓</div>

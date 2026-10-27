@@ -4625,7 +4625,6 @@ function onbDelAd(i){ onb.adGroups.splice(i,1); if(!onb.adGroups.length) onb.adG
 function onbGetStatus(i){ onb.adGroups[i].status='Requested'; renderONB(); f6Toast('AD group status requested (prototype).'); }
 function onbAddCatalog(){ onb.catalog.push({appOwner:'Yes', dbx:'', adAvail:'Yes', env:'DEV', adDetails:'', extLoc:'', perm:''}); renderONB(); }
 function onbDelCatalog(i){ onb.catalog.splice(i,1); if(!onb.catalog.length) onbAddCatalog(); else renderONB(); }
-function onbSaveDraft(){ f6Toast('Draft saved (prototype).'); }
 function onbOpenPrereq(){ onb.phase='prereq'; onbStep=1; renderONB(); window.scrollTo(0,0); }
 function onbClosePrereq(){ onb.phase='form'; renderONB(); window.scrollTo(0,0); }
 function onbPrev(){
@@ -5352,7 +5351,6 @@ function onbFooter(){
   return `<div class="onb-footer">
     <button class="onb-btn" onclick="onbPrev()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> Previous</button>
     <div class="onb-footer-right">
-      <button class="onb-btn" onclick="onbSaveDraft()">Save as Draft</button>
       <button class="onb-btn primary" onclick="onbNext()">${onb.phase==='prereq'&&onbStep===2?'Submit request':(onb.phase==='form'&&onb.formStep===6?'Continue to heat map':'Next')}</button>
     </div>
   </div>`;

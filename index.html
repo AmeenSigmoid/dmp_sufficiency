@@ -1383,6 +1383,19 @@ td.grand-cell .val-num { font-weight: 800; }
 .adm-defrow { display: grid; grid-template-columns: 1fr 2fr 42px; gap: 12px; align-items: end; margin-bottom: 10px; }
 .adm-jtab { margin-top: 8px; }
 @media (max-width: 760px) { .adm-join.adm-join5, .adm-defrow { grid-template-columns: 1fr; } }
+.adm-addnew { margin: 0 0 14px; }
+.adm-group-h { margin: 18px 0 10px; }
+.adm-entry.adm-new { border-color: #9DB1F5; background: #FBFCFF; }
+.adm-maps { margin-top: 14px; border-top: 1px dashed #E7E9EE; padding-top: 12px; }
+.adm-maprow { display: grid; grid-template-columns: 1.6fr 1fr 42px; gap: 12px; align-items: end; margin-bottom: 10px; }
+.adm-guide { display: flex; flex-direction: column; gap: 3px; margin: 6px 0 2px; }
+.adm-guide-inline { display: inline-flex; flex-direction: row; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 0 6px; vertical-align: middle; }
+.adm-rule { display: flex; align-items: baseline; gap: 7px; font-size: 11.5px; color: #667085; line-height: 1.4; }
+.adm-rule-k { flex: none; font-size: 9.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; border-radius: 4px; padding: 1px 6px; }
+.adm-rule-k.req { background: #FBE3E1; color: #B4362F; }
+.adm-rule-k.rec { background: #EAF0FE; color: #001DCA; }
+.adm-demo { font-size: 12px; color: #475467; background: #F7F8FA; border: 1px solid #EEF0F4; border-radius: 10px; padding: 9px 14px; margin: -8px 0 18px; }
+@media (max-width: 760px) { .adm-maprow { grid-template-columns: 1fr; } }
 /* Heat map generation + approval */
 .onb-gen { border: 1px dashed #C6CDDA; border-radius: 16px; padding: 40px 24px; text-align: center; }
 .onb-gen-ico { width: 64px; height: 64px; border-radius: 16px; background: #EAF0FE; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
@@ -5220,7 +5233,7 @@ function onbHierModalCancel(){ onb.hierModal=null; renderONB(); }
 function onbHmSet(f,v,re){ const m=onb.hierModal; if(!m) return; m[f]=v; if(re) renderONB(); }
 function onbHmNamed(){ return onb.hierModal.levels.filter(l=>l.name.trim()); }
 function onbHmLvName(li,v){ const L=onb.hierModal.levels[li]; if(v==='__custom'){ L.custom=true; L.name=''; renderONB(); const el=document.getElementById('hm2lv'+li); if(el) el.focus(); return; } L.name=v; renderONB(); }
-function onbHmLvType(li,v){ onb.hierModal.levels[li].name=v; onbHmChainPaint(); }
+function onbHmLvType(li,v){ onb.hierModal.levels[li].name=v; }
 function onbHmLvList(li){ const L=onb.hierModal.levels[li]; L.custom=false; L.name=''; renderONB(); }
 function onbHmLv(li,f,v){ onb.hierModal.levels[li][f]=v; }
 function onbHmLvAdd(){ onb.hierModal.levels.push(onbHmLevel()); renderONB(); }
@@ -5228,13 +5241,7 @@ function onbHmLvDel(li){ const m=onb.hierModal, L=m.levels; if(L.length<=2){ f6T
 function onbHmLvMove(li,d){ const m=onb.hierModal, L=m.levels, j=li+d; if(j<0||j>=L.length) return; [L[li],L[j]]=[L[j],L[li]]; if(m.info===li) m.info=j; else if(m.info===j) m.info=li; renderONB(); }
 function onbHmEx(li,k,v){ onb.hierModal.levels[li].examples[k]=v; }
 function onbHmExAdd(li){ const a=onb.hierModal.levels[li].examples; if(a.length>=10){ f6Toast('Up to 10 example values per level.'); return; } a.push(''); renderONB(); const el=document.getElementById(`hm2ex${li}-${a.length-1}`); if(el) el.focus(); }
-function onbHmLook(n){ const a=onb.hierModal.looks, k=a.indexOf(n); if(k>=0) a.splice(k,1); else a.push(n); renderONB(); }
-function onbHmChain(){ const m=onb.hierModal, n=onbHmNamed().map(l=>l.name.trim()); return n.length?onbChain(n,m.lowest):'<span class="onb-hf-meta muted">Name the levels above to preview the hierarchy.</span>'; }
-function onbHmChainPaint(){ const el=document.getElementById('hm2Chain'); if(el) el.innerHTML=onbHmChain(); }
-function onbHmGen(){ const m=onb.hierModal, n=onbHmNamed().map(l=>l.name.trim()); if(n.length<2){ f6Toast('Add at least 2 levels first.'); return; }
-  const fine=n.slice().reverse(), steps=fine.slice(0,-1).map((x,i)=>`${x} rolls up into ${fine[i+1]}`);
-  m.summary=`${m.name} · ${m.typeName.trim()||'new hierarchy'} describes the ${m.vertical||m.name.trim()} vertical from ${n[0]} (coarsest) down to ${n[n.length-1]} (finest). ${steps.join(', ')}.${m.lowest?` ${m.lowest} is the lowest usable grain for the Data Sufficiency heat map.`:''}`;
-  renderONB(); }
+
 function onbHierModalSave(){ const m=onb.hierModal; if(!m) return; if(m.adm){ admHierSave(m); return; } const isNew=m.ex===null, tn=m.typeName.trim(), named=onbHmNamed();
   let h=isNew?null:ONB_HIERS[m.ex], vname=m.name.trim(), hn='', dim='';
   if(isNew){
@@ -5284,6 +5291,10 @@ function onbHmBody(off){ const m=onb.hierModal, isNew=m.ex===null, named=onbHmNa
             <div class="onb-hm2-f"><label class="onb-flabel">Vertical Name</label><input class="onb-input sm" style="font-family:inherit" placeholder="e.g. Channel" value="${onbEsc(m.name)}" oninput="onbHmSet('name',this.value)"></div>
             <div class="onb-hm2-f"><label class="onb-flabel">Hierarchy name</label><input class="onb-input sm" style="font-family:inherit" value="${onbEsc(m.typeName)}" oninput="onbHmSet('typeName',this.value)"></div>
           </div>`
+            :m.adm?`<div class="onb-grid onb-grid-2" style="gap:12px">
+            <div class="onb-hm2-f"><label class="onb-flabel">Vertical Name</label><input class="onb-input sm" style="font-family:inherit" value="${onbEsc(m.name)}" disabled></div>
+            <div class="onb-hm2-f"><label class="onb-flabel">Hierarchy name</label><input class="onb-input sm" style="font-family:inherit" value="${onbEsc(m.typeName)}" oninput="onbHmSet('typeName',this.value)"></div>
+          </div>`
             :`<div class="onb-hm2-f"><label class="onb-flabel">Vertical Name</label><input class="onb-input sm" style="font-family:inherit" value="${onbEsc(m.name)}" disabled></div>
           <div class="onb-grid onb-grid-2" style="gap:12px">
             <div class="onb-hm2-f"><label class="onb-flabel">Vertical</label><span class="onb-select-wrap"><select class="onb-select sm" disabled>${verts.map(v=>`<option ${v===m.vertical?'selected':''}>${onbEsc(v)}</option>`).join('')}</select></span></div>
@@ -5295,6 +5306,7 @@ function onbHmBody(off){ const m=onb.hierModal, isNew=m.ex===null, named=onbHmNa
 
         <div class="onb-hm2-step">${q(2)}Define Hierarchy Levels</div>
         <div class="onb-hm2-note">Add levels from coarsest → finest</div>
+        ${m.adm?`<div class="onb-hm2-sec" style="margin-bottom:10px">${admGuide([['req','Hierarchy name'],['rec','At least 2 levels, each with a unique name']])}</div>`:''}
         ${lvl.map((l,li)=>`${li?'<div class="onb-hm2-arrow">↓</div>':''}
           <div class="onb-hm2-lvh"><span>Level ${li+1}</span><span class="onb-hlv-acts"><button class="onb-hlv-btn" title="Move up (coarser)" onclick="onbHmLvMove(${li},-1)" ${li===0?'disabled':''}>↑</button><button class="onb-hlv-btn" title="Move down (finer)" onclick="onbHmLvMove(${li},1)" ${li===lvl.length-1?'disabled':''}>↓</button><button class="onb-tsrow-del" title="Remove level" onclick="onbHmLvDel(${li})">${ONB_TRASH}</button></span></div>
           <div class="onb-hm2-box">
@@ -5312,21 +5324,6 @@ function onbHmBody(off){ const m=onb.hierModal, isNew=m.ex===null, named=onbHmNa
             <div class="onb-hm2-f"><label class="onb-flabel">Example Values</label><div class="onb-hm2-ex">${cur.examples.map((x,k)=>`<input id="hm2ex${ci}-${k}" class="onb-input sm" style="font-family:inherit" placeholder="Example ${k+1}" value="${onbEsc(x)}" oninput="onbHmEx(${ci},${k},this.value)">`).join('')}${cur.examples.length<10?`<button class="onb-btn onb-addrow" style="padding:6px 14px" onclick="onbHmExAdd(${ci})">＋ Add</button>`:''}</div></div>
             <div class="onb-hm2-f"><label class="onb-flabel">Value Format / Pattern</label><input class="onb-input sm" style="font-family:inherit" placeholder="e.g. alphanumeric / numeric / YYYY-MM-DD" value="${onbEsc(cur.format)}" oninput="onbHmLv(${ci},'format',this.value)"></div>
           </div>
-        </div>
-        <div class="onb-hm2-arrow">↓</div>
-
-        <div class="onb-hm2-step">${q(4)}Grain &amp; Collision Check</div>
-        <div class="onb-hm2-box">
-          <div class="onb-hm2-f"><label class="onb-flabel">Lowest usable grain</label>${onbSel(named.map(l=>l.name.trim()),m.lowest,"onbHmSet('lowest',this.value);onbHmChainPaint()",'Select level')}</div>
-          <div class="onb-hm2-f"><label class="onb-flabel">Lookalike / potentially conflicting levels</label>${named.length?`<div class="nuc-chips">${named.map(l=>{ const n=l.name.trim(), on=m.looks.includes(n); return `<span class="nuc-chip ${on?'on':''}" onclick="onbHmLook('${onbEsc(n).replace(/'/g,"\\'")}')">${on?'✓ ':''}${onbEsc(n)}</span>`; }).join('')}</div>`:'<div class="onb-hf-meta muted">Name the levels above first.</div>'}</div>
-          <div class="onb-hm2-f"><label class="onb-flabel">How can they be distinguished from other dimensions?</label><textarea class="nuc-textarea" style="min-height:70px" placeholder="Describe distinguishing attributes — e.g. store codes are 8-digit numeric, customer codes carry a region prefix" oninput="onbHmSet('lookHow',this.value)">${onbEsc(m.lookHow)}</textarea></div>
-        </div>
-        <div class="onb-hm2-arrow">↓</div>
-
-        <div class="onb-hm2-step">${q(5)}Hierarchy Summary</div>
-        <div class="onb-hm2-box">
-          <textarea class="nuc-textarea" style="min-height:80px" placeholder="Automatically generated / user-entered summary…" oninput="onbHmSet('summary',this.value)">${onbEsc(m.summary)}</textarea>
-          <div class="onb-hm2-sumbar"><div id="hm2Chain" class="onb-hm2-chain">${onbHmChain()}</div><button class="onb-editbtn" onclick="onbHmGen()">✦ Generate from levels</button></div>
         </div>`; }
 /* Generic select helper (matches .onb-select styling) */
 function onbSel(opts,val,handler,ph,cls){ const c=cls===undefined?'sm':cls;
@@ -5550,7 +5547,7 @@ function onbHfPage(){ const hf=onb.hf, n=hf.desc.trim().length, defs=onb.defs||[
    · persistence: domains and drafts are stored in this browser (localStorage) only
    · ADM_AI: AI validation service returning confidence scores — not connected, scores show as placeholders
    · ADM_PUBLISH: domain publishing API — not connected, so nothing is ever reported as published */
-const ADM_STORE='dmp-admin-domains-v2', ADM_STORE_OLD='dmp-admin-domains-v1';
+const ADM_STORE='dmp-admin-domains-v3', ADM_STORE_OLD=['dmp-admin-domains-v2','dmp-admin-domains-v1'];
 const ADM_AI=null;       // integration point: (domainData) => Promise<{[itemId]: confidence 0..1}>
 const ADM_PUBLISH=null;  // integration point: (domain) => Promise that resolves once the backend confirms the publish
 const ADM_LOW=0.86;      // confidence below this (i.e. 85% or less) is flagged as low and must be reviewed
@@ -5563,14 +5560,33 @@ function admId(){ return 'a'+Date.now().toString(36)+(++admSeq); }
 function admClone(o){ return JSON.parse(JSON.stringify(o)); }
 function admBlank(name){ return {info:{name:name||'', specMode:'text', specText:'', specFile:null, workspace:'', adGroups:[{name:'', purpose:''}], gitUrl:'', gitAd:'', catalogs:[]}, dims:[], verts:[], weights:[], kpis:[], metadata:[], validation:null, reviewed:{}, enrich:[], publish:null}; }
 /* older saved records may predate some fields */
-function admNorm(d){ const b=admBlank(''); Object.keys(b).forEach(k=>{ if(d[k]===undefined) d[k]=b[k]; }); d.weights.forEach(w=>{ if(w.col===undefined) w.col=''; w.joins.forEach(j=>{ if(j.dim===undefined) j.dim=''; }); }); return d; }
+function admNorm(d){ const b=admBlank(''); Object.keys(b).forEach(k=>{ if(d[k]===undefined) d[k]=b[k]; }); d.dims.forEach(x=>{ if(!Array.isArray(x.maps)) x.maps=[]; }); d.weights.forEach(w=>{ if(w.col===undefined) w.col=''; w.joins.forEach(j=>{ if(j.dim===undefined) j.dim=''; }); }); return d; }
 function admColor(name){ const known={'Supply Chain & Operations':'Operations'}; if(NUC_DOMAIN_COLORS[name]||known[name]) return nucDomColor(known[name]||name); const pal=['#001DCA','#C81E5A','#E5793A','#1E8E3E','#7B3FBF','#0E8FA8','#475569']; let h=0; for(const c of name) h=(h*31+c.charCodeAt(0))>>>0; return pal[h%pal.length]; }
 /* Seed: published sample domains. Commercial uses the sample supplied for the UI; the others follow the same shape
    (Supply Chain & Operations reuses this app's existing OTIF-D configuration). All values — including the
    confidence scores — are illustrative sample data, flagged with sample:true and labelled as such in the UI. */
+/* tables (and their columns) available for dimension mapping: this app's tables plus the sample domains' tables */
+const ADM_SAMPLE_TABLES={
+  'commercial_gold.dim_product':['product_id','category','subcategory','brand','sub_brand','sku','gmc_code'],
+  'commercial_gold.dim_customer':['customer_id','channel','customer_group','banner','retailer','store'],
+  'commercial_gold.dim_market':['market_id','country','region','state_province','city','territory'],
+  'commercial_gold.dim_period':['period_id','year','quarter','month','week','day'],
+  'commercial_gold.fact_commercial_weights':['product_id','customer_id','market_id','period_id','sales_weight'],
+  'marketing_gold.dim_campaign':['campaign_id','program','campaign','flight','placement','creative'],
+  'marketing_gold.dim_channel':['channel_id','channel_type','channel','publisher','placement_type'],
+  'marketing_gold.dim_audience':['audience_id','segment','segment_type'],
+  'marketing_gold.dim_period':['period_id','year','quarter','month','week','day'],
+  'marketing_gold.fact_media_weights':['campaign_id','channel_id','audience_id','period_id','spend_weight'],
+  'hr_gold.dim_org_unit':['org_unit_id','company','division','function','department','team'],
+  'hr_gold.dim_location':['location_id','region','country','site'],
+  'hr_gold.dim_employee':['employee_id','grade','contract_type','tenure_band'],
+  'hr_gold.dim_period':['period_id','year','quarter','month'],
+  'hr_gold.fact_headcount_weights':['org_unit_id','location_id','period_id','fte_weight']
+};
+function admTableCols(){ return Object.assign({}, ONB_TABLE_COLUMNS, ONB_DIM_COLUMNS, ADM_SAMPLE_TABLES); }
 function admSample(o){ const d=admBlank(o.name), i=d.info;
   Object.assign(i,{specMode:'file', specText:o.desc, specFile:{name:o.brd, size:0, sample:true}, adGroups:[{name:o.ad, purpose:''}], gitUrl:o.git, catalogs:o.cats});
-  d.dims=o.dims.map(([name,def,diff])=>({id:admId(), name, def, diff}));
+  d.dims=o.dims.map(([name,def,diff,maps])=>({id:admId(), name, def, diff, maps:(maps||[]).map(([table,col])=>({table, col}))}));
   d.verts=o.verts.map(([name,def,diff,hs])=>({id:admId(), name, def, diff, hiers:hs.map(([hn,levels,lowest])=>({name:hn, levels, lowest:lowest||levels[levels.length-1]}))}));
   d.weights=o.weights.map(w=>({id:admId(), table:w.table, col:w.col, colDef:w.def, joins:w.joins.map(([dim,hierTable,hierCol,weightCol])=>({id:admId(), dim, hierTable, hierCol, weightCol}))}));
   d.kpis=o.kpis.map(([name,def])=>({id:admId(), name, def}));
@@ -5585,10 +5601,10 @@ function admSeed(){
   const commercial=admSample({name:'Commercial', at:Date.UTC(2026,9,12,9,30),
     desc:'The Commercial domain contains sales, revenue, pricing, promotional performance, customer, product, and market data used to measure business performance and support commercial decision-making across markets.',
     brd:'Commercial_Data_Domain_BRD_v1.0.pdf', ad:'grp-databricks-commercial-users', git:'https://github.com/example-org/commercial-data-domain', cats:['commercial_bronze','commercial_silver','commercial_gold'],
-    dims:[['Product','Product-related attributes used to analyze sales and performance at category, brand, SKU, and product-code levels.','Identifies what is being sold, rather than who buys it or where it is sold.'],
-      ['Customer','Retailer, distributor, banner, and store attributes used to analyze customer-level performance.','Identifies the purchasing or selling entity and its organizational structure.'],
-      ['Geography','Country, region, sales territory, and other geographic attributes used to compare performance across locations.','Identifies where business activity takes place.'],
-      ['Time','Calendar and fiscal periods used to aggregate and compare commercial metrics.','Defines when business activity occurs and supports daily, weekly, monthly, and yearly analysis.']],
+    dims:[['Product','Product-related attributes used to analyze sales and performance at category, brand, SKU, and product-code levels.','Identifies what is being sold, rather than who buys it or where it is sold.',[['commercial_gold.dim_product','product_id']]],
+      ['Customer','Retailer, distributor, banner, and store attributes used to analyze customer-level performance.','Identifies the purchasing or selling entity and its organizational structure.',[['commercial_gold.dim_customer','customer_id']]],
+      ['Geography','Country, region, sales territory, and other geographic attributes used to compare performance across locations.','Identifies where business activity takes place.',[['commercial_gold.dim_market','market_id']]],
+      ['Time','Calendar and fiscal periods used to aggregate and compare commercial metrics.','Defines when business activity occurs and supports daily, weekly, monthly, and yearly analysis.',[['commercial_gold.dim_period','period_id']]]],
     verts:[['Product Vertical','Organizes products from broad categories down to individual sellable products or internal product codes.','',[['Hierarchy 1',['Category','Subcategory','Brand','Sub-brand','SKU / GMC Code']]]],
       ['Customer Vertical',"Organizes commercial customers from channel-level groupings down to individual stores. Adapt the levels to each market's actual customer structure.",'',[['Hierarchy 1',['Channel','INC / Customer Group','Banner','Customer / Retailer','Store']]]],
       ['Geography Vertical','Organizes locations from country down to sales territory for comparing performance across markets.','',[['Hierarchy 1',['Country','Region','State/Province','City','Territory']]]],
@@ -5603,10 +5619,10 @@ function admSeed(){
     desc:'The Supply Chain & Operations domain covers order fulfilment, delivery performance (OTIF), shipments, inventory and logistics data used to measure service levels and operational efficiency across markets.',
     brd:'SupplyChain_Operations_Data_Domain_BRD_v1.0.pdf', ad:'grp-databricks-supplychain-users', git:'https://github.com/example-org/supply-chain-data-domain',
     cats:[...new Set([].concat(ONB_API_TABLES.fact,ONB_API_TABLES.dim,ONB_API_TABLES.weights).map(t=>t.split('.')[0]))],
-    dims:[['Market','Country / market grouping of sold-to customers used to compare delivery performance across markets.','Identifies the market an order belongs to, rather than the individual customer.'],
-      ['Banner/Customer','Retail banner and sold-to customer attributes used to analyze service levels by customer.','Identifies who receives the delivery and their banner grouping.'],
-      ['Brand','Brand of the delivered product, from the global product master.','Groups products by brand rather than by category.'],
-      ['Category','Product category of the delivered product, from the global product master.','Groups products by category rather than by brand.']],
+    dims:[['Market','Country / market grouping of sold-to customers used to compare delivery performance across markets.','Identifies the market an order belongs to, rather than the individual customer.',[['uc_dmp_data_sufficiency_01_dev.dev.soldto_customer_master','AG_Code']]],
+      ['Banner/Customer','Retail banner and sold-to customer attributes used to analyze service levels by customer.','Identifies who receives the delivery and their banner grouping.',[['uc_dmp_data_sufficiency_01_dev.dev.soldto_customer_master','gcch_retail_banner_Code']]],
+      ['Brand','Brand of the delivered product, from the global product master.','Groups products by brand rather than by category.',[['uc_dmp_data_sufficiency_01_dev.dev.gmc_prod_master','B1_Brand_Code']]],
+      ['Category','Product category of the delivered product, from the global product master.','Groups products by category rather than by brand.',[['uc_dmp_data_sufficiency_01_dev.dev.gmc_prod_master','C4_Category_Code']]]],
     verts:ONB_HIERS.map(h=>[h.name, {Customer:'Organizes customers from channel down to individual stores for delivery-performance analysis.', Product:'Organizes products from category down to SKU / GMC code.', Time:'Organizes time from year down to hour for delivery timing analysis.'}[h.dim]||`${h.dim} levels used to roll up delivery performance.`, '', h.types.map(t=>[t.name, t.levels.slice(), t.lowest])]),
     weights:ONB_WJOINS.map(w=>({table:w.weightTable, col:'KDE_WT, KPI_WT', def:`Weight of each KDE within its KPI and of each KPI within the use case (${w.weightCols}).`, joins:[['',w.factTable,w.factKey,w.weightKey]]})),
     kpis:[['OTIF %','Share of order lines delivered on time and in full against the requested delivery date.'],['On-Time %','Share of order lines delivered by the requested delivery date.'],['In-Full %','Share of ordered units delivered in full.']],
@@ -5615,10 +5631,10 @@ function admSeed(){
   const mk=admSample({name:'Marketing', at:Date.UTC(2026,9,5,11,0),
     desc:'The Marketing domain covers media spend, campaign performance, audience reach and engagement, and consumer and HCP marketing data used to measure marketing effectiveness and return on investment.',
     brd:'Marketing_Data_Domain_BRD_v1.0.pdf', ad:'grp-databricks-marketing-users', git:'https://github.com/example-org/marketing-data-domain', cats:['marketing_bronze','marketing_silver','marketing_gold'],
-    dims:[['Campaign','Campaign and flight attributes used to analyze performance by marketing initiative.','Identifies which marketing initiative drove activity, rather than where it ran.'],
-      ['Media Channel','Channel and publisher attributes (TV, search, social, retail media) used to compare channel effectiveness.','Identifies where the media ran.'],
-      ['Audience','Consumer or HCP audience segments targeted by campaigns.','Identifies who the activity was aimed at.'],
-      ['Time','Calendar periods used to aggregate and compare marketing metrics.','Defines when the activity ran.']],
+    dims:[['Campaign','Campaign and flight attributes used to analyze performance by marketing initiative.','Identifies which marketing initiative drove activity, rather than where it ran.',[['marketing_gold.dim_campaign','campaign_id']]],
+      ['Media Channel','Channel and publisher attributes (TV, search, social, retail media) used to compare channel effectiveness.','Identifies where the media ran.',[['marketing_gold.dim_channel','channel_id']]],
+      ['Audience','Consumer or HCP audience segments targeted by campaigns.','Identifies who the activity was aimed at.',[['marketing_gold.dim_audience','audience_id']]],
+      ['Time','Calendar periods used to aggregate and compare marketing metrics.','Defines when the activity ran.',[['marketing_gold.dim_period','period_id']]]],
     verts:[['Campaign Vertical','Organizes marketing activity from programme down to individual creatives.','',[['Hierarchy 1',['Program','Campaign','Flight','Placement','Creative']]]],
       ['Media Channel Vertical','Organizes media from channel type down to individual placement types.','',[['Hierarchy 1',['Channel Type','Channel','Publisher','Placement Type']]]],
       ['Time Vertical','Organizes calendar periods from year down to day.','',[['Hierarchy 1',T[0],T[1]]]]],
@@ -5630,10 +5646,10 @@ function admSeed(){
   const hr=admSample({name:'HR', at:Date.UTC(2026,9,2,16,45),
     desc:'The HR domain covers workforce, headcount, talent acquisition, absence and contingent labour data used to track workforce composition, hiring performance and people costs across the organisation.',
     brd:'HR_Data_Domain_BRD_v1.0.pdf', ad:'grp-databricks-hr-users', git:'https://github.com/example-org/hr-data-domain', cats:['hr_bronze','hr_silver','hr_gold'],
-    dims:[['Organisation','Company, division, function and team attributes used to analyze workforce by organisational unit.','Identifies where in the organisation people sit, rather than where they work physically.'],
-      ['Location','Region, country and site attributes for where employees are based.','Identifies the physical work location.'],
-      ['Employee','Employee attributes such as grade, contract type and tenure band.','Describes the person rather than the unit or place.'],
-      ['Time','Calendar periods used to aggregate workforce metrics.','Defines when the workforce snapshot or event occurs.']],
+    dims:[['Organisation','Company, division, function and team attributes used to analyze workforce by organisational unit.','Identifies where in the organisation people sit, rather than where they work physically.',[['hr_gold.dim_org_unit','org_unit_id']]],
+      ['Location','Region, country and site attributes for where employees are based.','Identifies the physical work location.',[['hr_gold.dim_location','location_id']]],
+      ['Employee','Employee attributes such as grade, contract type and tenure band.','Describes the person rather than the unit or place.',[['hr_gold.dim_employee','employee_id']]],
+      ['Time','Calendar periods used to aggregate workforce metrics.','Defines when the workforce snapshot or event occurs.',[['hr_gold.dim_period','period_id']]]],
     verts:[['Organisation Vertical','Organizes the workforce from company down to individual teams.','',[['Hierarchy 1',['Company','Division','Function','Department','Team']]]],
       ['Location Vertical','Organizes work locations from region down to site.','',[['Hierarchy 1',['Region','Country','Site']]]],
       ['Time Vertical','Organizes calendar periods from year down to month.','',[['Hierarchy 1',['Year','Quarter','Month']]]]],
@@ -5646,8 +5662,9 @@ function admSeed(){
 function admLoad(){ try{ const raw=localStorage.getItem(ADM_STORE); if(!raw) return null; const v=JSON.parse(raw); return Array.isArray(v)&&v.length?v:null; }catch(e){ return null; } }
 /* first load of v2: start from the published samples and carry over any domains the admin created under v1 */
 function admInit(){ let v=admLoad(); if(v){ v.forEach(x=>admNorm(x.data)); return v; }
-  v=admSeed(); try{ const old=JSON.parse(localStorage.getItem(ADM_STORE_OLD)||'null'); if(Array.isArray(old)){ const seedNames=new Set(['commercial','supply chain & operations','marketing','hr']);
-    old.filter(x=>x&&x.name&&!seedNames.has(x.name.toLowerCase())).forEach(x=>{ admNorm(x.data); v.push(x); }); } }catch(e){}
+  v=admSeed(); const seedNames=new Set(['commercial','supply chain & operations','marketing','hr']), seen=new Set();
+  ADM_STORE_OLD.forEach(key=>{ try{ const old=JSON.parse(localStorage.getItem(key)||'null'); if(Array.isArray(old))
+    old.filter(x=>x&&x.name&&!seedNames.has(x.name.toLowerCase())&&!seen.has(x.name.toLowerCase())).forEach(x=>{ seen.add(x.name.toLowerCase()); admNorm(x.data); v.push(x); }); }catch(e){} });
   return v; }
 let ADM_DOMAINS=admInit();
 let adm={view:'list', id:null, step:1, max:1, draft:null, dirty:false, err:{}, busy:false, savedAt:null, saveFail:false, orig:{}, discardAsk:false};
@@ -5663,34 +5680,26 @@ function admPristine(){ return JSON.stringify(adm.draft)===JSON.stringify(admBla
 /* ── navigation ── */
 function admOpen(id){ adm.view='view'; adm.id=id; adm.discardAsk=false; renderONB(); window.scrollTo(0,0); }
 function admToList(){ adm.view='list'; adm.id=null; adm.draft=null; renderONB(); window.scrollTo(0,0); }
-function admNew(){ Object.assign(adm,{view:'edit', id:null, draft:admBlank(''), step:1, max:1, err:{}, dirty:false, savedAt:null, orig:{}, discardAsk:false}); renderONB(); window.scrollTo(0,0); }
+function admNew(){ Object.assign(adm,{view:'edit', mode:'new', id:null, draft:admBlank(''), step:1, max:1, err:{}, dirty:false, savedAt:null, orig:{}, discardAsk:false}); renderONB(); window.scrollTo(0,0); }
 function admEdit(step,mut){ const dom=admDom(); if(!dom) return; const d=admNorm(admClone(dom.data)); if(!d.info.name) d.info.name=dom.name;
-  Object.assign(adm,{view:'edit', draft:d, step:step||1, max:ADM_STEPS.length, err:{}, dirty:false, savedAt:null, orig:{}, discardAsk:false});
+  Object.assign(adm,{view:'edit', mode:'edit', draft:d, step:step||1, max:ADM_STEPS.length, err:{}, dirty:false, savedAt:null, orig:{}, discardAsk:false});
   if(mut){ mut(d); adm.dirty=true; } renderONB(); window.scrollTo(0,0); }
+/* demo mode: nothing blocks — leaving saves whatever was entered (an empty new domain is simply not created) */
 function admExit(){
-  if(adm.dirty || (!adm.id && !admPristine())){
-    if(!adm.draft.info.name.trim()){ adm.discardAsk=true; adm.err['info.name']='Domain name is required to save this draft.'; renderONB(); f6Toast('Enter a domain name to save this draft — or choose “Discard changes”.'); return; }
-    if(!admCommit()) return;
-    f6Toast('Draft saved in this browser.');
-  }
+  if(adm.dirty || (!adm.id && !admPristine())){ admCommit(); f6Toast('Draft saved in this browser.'); }
   if(adm.id) admOpen(adm.id); else admToList(); }
 function admDiscard(){ adm.draft=null; adm.dirty=false; if(adm.id) admOpen(adm.id); else admToList(); f6Toast('Unsaved changes discarded.'); }
-function admGo(n){ if(n===adm.step) return; if(n>adm.max){ if(n===adm.step+1) admNext(); return; }
-  if(n>adm.step){ const e=admCheck(adm.step); if(Object.keys(e).length){ adm.err=e; renderONB(); admFocusErr(); return; } }
-  admSoftCommit(); adm.step=n; adm.err={}; renderONB(); window.scrollTo(0,0); }
-function admNext(){ const e=admCheck(adm.step); adm.err=e;
-  if(Object.keys(e).length){ renderONB(); admFocusErr(); return; }
-  if(adm.step===5 && !admValFresh()){ f6Toast('Run validation before continuing.'); return; }
-  if(!admCommit()) return;
-  adm.step++; adm.max=Math.max(adm.max,adm.step); renderONB(); window.scrollTo(0,0); }
-function admBack(){ admSoftCommit(); adm.step--; adm.err={}; renderONB(); window.scrollTo(0,0); }
-function admFocusErr(){ const n=Object.keys(adm.err).length; f6Toast(`Fix ${n} field${n>1?'s':''} before continuing.`); setTimeout(()=>{ const el=document.querySelector('#tab-onb .adm-bad'); if(el){ el.scrollIntoView({block:'center'}); try{ el.focus(); }catch(e){} } },0); }
+function admGo(n){ if(n===adm.step) return; admSoftCommit(); adm.step=n; adm.max=Math.max(adm.max,n); renderONB(); window.scrollTo(0,0); }
+function admNext(){ admSoftCommit(); adm.step++; adm.max=Math.max(adm.max,adm.step); renderONB(); window.scrollTo(0,0); }
+function admBack(){ admSoftCommit(); adm.step--; renderONB(); window.scrollTo(0,0); }
+/* edit mode only (steps 1–4): save and jump straight to Validation */
+function admValidateGo(){ admSoftCommit(); adm.step=5; adm.max=Math.max(adm.max,5); renderONB(); window.scrollTo(0,0); }
 /* save: writes the working copy into the domain record and persists it in this browser */
-function admSoftCommit(){ const nm=adm.draft.info.name.trim(); if(nm && !ADM_DOMAINS.some(x=>x.id!==adm.id && x.name.toLowerCase()===nm.toLowerCase())) admCommit(); }
-function admCommit(){ const d=adm.draft, name=d.info.name.trim();
-  if(!name){ adm.err['info.name']='Domain name is required to save.'; renderONB(); f6Toast('Enter a domain name to save.'); return false; }
-  if(ADM_DOMAINS.some(x=>x.id!==adm.id && x.name.toLowerCase()===name.toLowerCase())){ adm.err['info.name']='A domain with this name already exists.'; renderONB(); f6Toast('A domain with this name already exists.'); return false; }
-  let dom=admDom();
+function admSoftCommit(){ if(adm.id || !admPristine()) admCommit(); }
+function admCommit(){ const d=adm.draft;
+  if(!d.info.name.trim()){ let n=1; const taken=nm=>ADM_DOMAINS.some(x=>x.id!==adm.id && x.name.toLowerCase()===nm.toLowerCase()); while(taken(n>1?`Untitled domain ${n}`:'Untitled domain')) n++; d.info.name=n>1?`Untitled domain ${n}`:'Untitled domain'; }
+  ['dims','verts','weights'].forEach(k=>d[k].forEach(x=>{ delete x._new; }));
+  const name=d.info.name.trim(); let dom=admDom();
   if(!dom){ dom={id:admId(), name, color:admColor(name), status:'draft', updatedAt:null, source:'', data:admBlank('')}; ADM_DOMAINS.push(dom); adm.id=dom.id; }
   const cfgChanged=admSig(dom.data)!==admSig(d);
   if(cfgChanged){ d.publish=null; admMarkChanged(dom); }
@@ -5699,7 +5708,7 @@ function admCommit(){ const d=adm.draft, name=d.info.name.trim();
   if(!admPersist()) f6Toast('Could not save in this browser — storage is unavailable. Changes are kept only until you leave the page.');
   admSavePaint(); return true; }
 function admMarkChanged(dom){ if(dom.status==='published') dom.pending='draft'; else dom.status='draft'; }
-function admSaveDraft(){ if(admCommit()) f6Toast('Draft saved in this browser.'); }
+function admSaveDraft(){ admCommit(); f6Toast('Draft saved in this browser.'); renderONB(); }
 function admSaveLabel(){ return adm.dirty?'Unsaved changes':adm.savedAt?`Draft saved in this browser · ${admWhen(adm.savedAt)}`:adm.id?'No unsaved changes':'Not saved yet'; }
 function admSavePaint(){ const el=document.getElementById('admSaveState'); if(el){ el.textContent=admSaveLabel(); el.className='adm-savestate'+(adm.dirty?' dirty':''); } }
 
@@ -5713,35 +5722,9 @@ function admField(path,label,o){ o=o||{}; const v=admGet(adm.draft,path), err=ad
   const log=o.log?` data-label="${onbEsc(o.log)}" onchange="admLog(this)"`:'';
   const ctl=o.area?`<textarea class="nuc-textarea adm-ta ${err?'adm-bad':''}" data-path="${path}" placeholder="${onbEsc(o.ph||'')}" oninput="admSet('${path}',this.value,this)"${log}>${onbEsc(val)}</textarea>`
     :`<input class="onb-input sm adm-in ${err?'adm-bad':''}" data-path="${path}" ${o.list?`list="${o.list}"`:''} placeholder="${onbEsc(o.ph||'')}" value="${onbEsc(val)}" oninput="admSet('${path}',this.value,this)"${log}>`;
-  return `<div class="adm-f ${o.wide?'onb-jf-wide':''}"><label class="onb-flabel">${label}${o.req?'<span class="adm-req">*</span>':''}${o.opt?'<span class="adm-opt">optional</span>':''}</label>${ctl}${err?`<div class="adm-err">${onbEsc(err)}</div>`:''}${o.help?`<div class="adm-help">${o.help}</div>`:''}</div>`; }
-function admErrBox(path){ const e=adm.err[path]; return e?`<div class="adm-err adm-err-box adm-bad" tabindex="-1">${onbEsc(e)}</div>`:''; }
-
-/* ── required-field validation per step ── */
-function admCheck(step){ const d=adm.draft, e={}, i=d.info;
-  if(step===1){
-    const nm=i.name.trim(); if(!nm) e['info.name']='Domain name is required.';
-    else if(ADM_DOMAINS.some(x=>x.id!==adm.id && x.name.toLowerCase()===nm.toLowerCase())) e['info.name']='A domain with this name already exists.';
-    if(i.specMode==='file'){ if(!i.specFile) e['info.spec']='Upload a BRD, or switch to describing the domain in text.'; }
-    else if(i.specText.trim().length<50) e['info.specText']='Describe the domain in at least 50 characters, or upload a BRD.';
-    if(!i.adGroups.some(g=>g.name.trim())) e['info.adGroups.0.name']='Add at least one Databricks AD group.';
-    i.adGroups.forEach((g,k)=>{ if(!g.name.trim() && g.purpose.trim()) e[`info.adGroups.${k}.name`]='AD group name is required.'; });
-    if(!i.gitUrl.trim()) e['info.gitUrl']='GitHub repository link is required.'; else if(!ADM_RX.git.test(i.gitUrl.trim())) e['info.gitUrl']='Use the form https://github.com/<owner>/<repo>.';
-    if(!i.catalogs.length) e['info.catalogs']='Add at least one Databricks catalogue.';
-  }
-  const entries=(arr,base,what)=>{ const seen={}; arr.forEach((x,k)=>{ const nm=x.name.trim();
-    if(!nm) e[`${base}.${k}.name`]=`${what} name is required.`; else if(seen[nm.toLowerCase()]) e[`${base}.${k}.name`]=`Duplicate ${what.toLowerCase()} name.`; seen[nm.toLowerCase()]=1;
-    if(x.def.trim().length<20) e[`${base}.${k}.def`]='Definition is required (at least 20 characters).'; }); };
-  if(step===2){ if(!d.dims.length) e['dims']='Add at least one dimension.'; entries(d.dims,'dims','Dimension'); }
-  if(step===3){ if(!d.verts.length) e['verts']='Add at least one vertical / hierarchy.'; entries(d.verts,'verts','Vertical'); }
-  if(step===4){ if(!d.weights.length) e['weights']='Add at least one weight table.';
-    d.weights.forEach((w,k)=>{ if(!w.table.trim()) e[`weights.${k}.table`]='Full table name is required.'; else if(!ADM_RX.table.test(w.table.trim())) e[`weights.${k}.table`]='Use catalog.schema.table (or catalog.table).';
-      if(!(w.col||'').trim()) e[`weights.${k}.col`]='Weight column is required.';
-      if(!w.colDef.trim()) e[`weights.${k}.colDef`]='Weight definition is required.';
-      if(!w.joins.length) e[`weights.${k}.joins`]='Add at least one join.';
-      w.joins.forEach((j,ji)=>{ const b=`weights.${k}.joins.${ji}`;
-        if(!j.hierTable.trim()) e[`${b}.hierTable`]='Required.'; else if(!ADM_RX.table.test(j.hierTable.trim())) e[`${b}.hierTable`]='Use catalog.schema.table (or catalog.table).';
-        if(!j.hierCol.trim()) e[`${b}.hierCol`]='Required.'; if(!j.weightCol.trim()) e[`${b}.weightCol`]='Required.'; }); }); }
-  return e; }
+  return `<div class="adm-f ${o.wide?'onb-jf-wide':''}"><label class="onb-flabel">${label}${o.req?'<span class="adm-req">*</span>':''}${o.opt?'<span class="adm-opt">optional</span>':''}</label>${ctl}${err?`<div class="adm-err">${onbEsc(err)}</div>`:''}${o.help?`<div class="adm-help">${o.help}</div>`:''}${o.guide?admGuide(o.guide):''}</div>`; }
+/* guidance shown under fields — "Required" marks a business rule to enforce later, "Recommended" a best practice; nothing is enforced in this demo */
+function admGuide(rules){ return `<div class="adm-guide">${rules.map(([k,t])=>`<div class="adm-rule"><span class="adm-rule-k ${k}">${k==='req'?'Required':'Recommended'}</span><span>${t}</span></div>`).join('')}</div>`; }
 
 /* ── Step 1 · Domain information ── */
 function admSpecMode(v){ adm.draft.info.specMode=v; adm.dirty=true; delete adm.err['info.spec']; delete adm.err['info.specText']; renderONB(); }
@@ -5751,7 +5734,6 @@ function admAdAdd(){ adm.draft.info.adGroups.push({name:'', purpose:''}); adm.di
 function admAdDel(k){ const a=adm.draft.info.adGroups; a.splice(k,1); if(!a.length) a.push({name:'', purpose:''}); adm.dirty=true; adm.err={}; renderONB(); }
 function admCatKey(e,el){ if(e.key==='Enter'||e.key===','){ e.preventDefault(); admCatAdd(el); } }
 function admCatAdd(el){ const v=el.value.trim().replace(/,$/,''); if(!v) return; const a=adm.draft.info.catalogs;
-  if(!ADM_RX.catalog.test(v)){ f6Toast('Catalogue names use letters, numbers, - and _ only.'); return; }
   if(a.some(x=>x.toLowerCase()===v.toLowerCase())){ f6Toast('That catalogue is already listed.'); el.value=''; return; }
   a.push(v); adm.dirty=true; delete adm.err['info.catalogs']; renderONB(); const i=document.getElementById('admCatIn'); if(i) i.focus(); }
 function admCatDel(k){ adm.draft.info.catalogs.splice(k,1); adm.dirty=true; renderONB(); }
@@ -5760,12 +5742,13 @@ function admStep1(){ const i=adm.draft.info, specErr=adm.err['info.spec'];
     <div class="onb-sec-h">Domain information</div>
     <div class="onb-sec-note">Identify the domain and where its data and code live.</div>
     <div class="onb-jgrid">
-      ${admField('info.name','Domain name',{req:1, ph:'e.g. Supply Chain & Operations'})}
+      ${admField('info.name','Domain name',{req:1, ph:'e.g. Supply Chain & Operations', guide:[['req','Minimum 3 characters'],['rec','Unique across domains']]})}
       ${admField('info.workspace','Databricks workspace',{opt:1, ph:'e.g. dmp-prod-workspace'})}
     </div>
     <label class="onb-flabel" style="margin-top:18px">Specification<span class="adm-req">*</span></label>
     <div class="onb-seg adm-seg"><button class="onb-seg-opt ${i.specMode==='text'?'on':''}" onclick="admSpecMode('text')"><span class="onb-radio"></span>Describe the domain</button><button class="onb-seg-opt ${i.specMode==='file'?'on':''}" onclick="admSpecMode('file')"><span class="onb-radio"></span>Upload BRD</button></div>
-    ${i.specMode==='text'?admField('info.specText','Domain description',{area:1, ph:'What the domain covers, its main business processes, data sources and consumers…', help:`${i.specText.trim().length} characters · minimum 50`})
+    ${admGuide([['req','A domain description or a BRD document'],['rec','Description of at least 50 characters']])}
+    ${i.specMode==='text'?admField('info.specText','Domain description',{area:1, ph:'What the domain covers, its main business processes, data sources and consumers…'})
       :`<div class="adm-f">${i.specFile?`<div class="adm-file"><span class="mono">${onbEsc(i.specFile.name)}</span><span class="adm-help" style="margin:0">${Math.max(1,Math.round(i.specFile.size/1024))} KB</span><button class="onb-editbtn" onclick="admSpecClear()">Remove</button></div>`
         :`<label class="onb-btn adm-upload ${specErr?'adm-bad':''}" tabindex="0">Choose BRD file<input type="file" accept=".pdf,.doc,.docx,.txt,.md" onchange="admSpecPick(this)" hidden></label>`}${specErr?`<div class="adm-err">${onbEsc(specErr)}</div>`:''}
         <div class="adm-help">PDF, Word, text or Markdown. Only the file name is kept with this draft — the document upload service is not connected yet.</div></div>`}
@@ -5773,13 +5756,14 @@ function admStep1(){ const i=adm.draft.info, specErr=adm.err['info.spec'];
   <div class="onb-sec">
     <div class="onb-sec-h">Databricks AD groups<span class="adm-req">*</span></div>
     <div class="onb-sec-note">Groups that need access to this domain's Databricks catalogues.</div>
+    ${admGuide([['req','At least one Databricks AD group']])}
     ${i.adGroups.map((g,k)=>`<div class="adm-row3">${admField(`info.adGroups.${k}.name`,`AD group ${k+1}`,{ph:'e.g. AAD-DMP-SupplyChain-Readers'})}${admField(`info.adGroups.${k}.purpose`,'Access / purpose',{opt:1, ph:'e.g. Read access for analysts'})}<button class="onb-tsrow-del adm-del" title="Remove AD group" onclick="admAdDel(${k})">${ONB_TRASH}</button></div>`).join('')}
     <button class="onb-btn onb-addrow adm-add" onclick="admAdAdd()">＋ Add AD group</button>
   </div>
   <div class="onb-sec">
     <div class="onb-sec-h">GitHub</div>
     <div class="onb-jgrid">
-      ${admField('info.gitUrl','Repository link',{req:1, ph:'https://github.com/<owner>/<repo>'})}
+      ${admField('info.gitUrl','Repository link',{req:1, ph:'https://github.com/<owner>/<repo>', guide:[['req','Format https://github.com/&lt;owner&gt;/&lt;repo&gt;']]})}
       ${admField('info.gitAd','Repository AD group details',{opt:1, ph:'e.g. GH-DMP-SupplyChain-Maintainers'})}
     </div>
   </div>
@@ -5787,40 +5771,56 @@ function admStep1(){ const i=adm.draft.info, specErr=adm.err['info.spec'];
     <div class="onb-sec-h">Databricks catalogues<span class="adm-req">*</span></div>
     <div class="onb-sec-note">Catalogues that hold this domain's tables. Press Enter or comma to add each one.</div>
     <div class="onb-hf-chipin ${adm.err['info.catalogs']?'adm-bad':''}" data-path="info.catalogs" onclick="if(event.target===this)this.querySelector('input').focus()">${i.catalogs.map((c,k)=>`<span class="onb-hf-chip mono">${onbEsc(c)}<button type="button" aria-label="Remove ${onbEsc(c)}" onclick="admCatDel(${k})">✕</button></span>`).join('')}<input id="admCatIn" placeholder="e.g. uc_dc_prd" onkeydown="admCatKey(event,this)" onblur="admCatAdd(this)"></div>
-    ${adm.err['info.catalogs']?`<div class="adm-err">${adm.err['info.catalogs']}</div>`:''}
+    ${admGuide([['req','At least one catalogue'],['rec','Letters, numbers, - and _ only']])}
   </div>`; }
 
-/* ── Step 2 · Dimensions (repeatable) ── */
-function admDimAdd(){ adm.draft.dims.push({id:admId(), name:'', def:'', diff:''}); adm.dirty=true; delete adm.err['dims']; renderONB(); }
-function admDimDel(k){ adm.draft.dims.splice(k,1); adm.dirty=true; adm.err={}; renderONB(); }
-function admEntry(base,k,what,del,extra){ return `<div class="onb-jcard adm-entry">
-    <div class="onb-jhead"><div class="onb-jtitle"><span class="onb-jdim">${what} ${k+1}</span></div><button class="onb-tsrow-del" title="Remove ${what.toLowerCase()}" onclick="${del}(${k})">${ONB_TRASH}</button></div>
+/* ── Step 2 · Dimensions (repeatable; Add new at the top, existing entries below) ── */
+function admDimAdd(){ adm.draft.dims.unshift({id:admId(), name:'', def:'', diff:'', maps:[{table:'', col:''}], _new:true}); adm.dirty=true; renderONB(); }
+function admDimDel(k){ adm.draft.dims.splice(k,1); adm.dirty=true; renderONB(); }
+/* new entries first, then a labelled group of the saved ones */
+function admGrouped(arr,render,what){ const nw=arr.map((x,k)=>({x,k})).filter(o=>o.x._new), old=arr.map((x,k)=>({x,k})).filter(o=>!o.x._new);
+  return `${nw.map(o=>render(o.x,o.k)).join('')}${old.length?`<div class="onb-proc-sub adm-group-h">Existing ${what} · ${old.length}</div>${old.map(o=>render(o.x,o.k)).join('')}`:(nw.length?'':`<div class="onb-proc-empty">No ${what} yet — use “Add new” above.</div>`)}`; }
+function admEntry(base,k,what,del,extra){ const x=adm.draft[base][k], isDim=what==='Dimension';
+  return `<div class="onb-jcard adm-entry ${x._new?'adm-new':''}">
+    <div class="onb-jhead"><div class="onb-jtitle"><span class="onb-jdim">${onbEsc(x.name.trim()||`New ${what.toLowerCase()}`)}</span>${x._new?'<span class="onb-jtag">New</span>':''}</div><button class="onb-tsrow-del" title="Remove ${what.toLowerCase()}" onclick="${del}(${k})">${ONB_TRASH}</button></div>
     <div class="onb-jgrid">
-      ${admField(`${base}.${k}.name`,'Name',{req:1, ph:what==='Dimension'?'e.g. Market':'e.g. Customer Vertical'})}
-      ${admField(`${base}.${k}.diff`,`How it differs from other ${what==='Dimension'?'dimensions':'verticals / hierarchies'}`,{opt:1, ph:'One line'})}
-      ${admField(`${base}.${k}.def`,'Definition',{req:1, area:1, wide:1, ph:`What this ${what.toLowerCase()} represents and how its values are assigned (at least 20 characters)…`})}
+      ${admField(`${base}.${k}.name`,`${what} name`,{req:1, ph:isDim?'e.g. Market':'e.g. Customer Vertical', guide:[['req',`${what} name`]]})}
+      ${admField(`${base}.${k}.diff`,`How it differs from other ${isDim?'dimensions':'verticals / hierarchies'}`,{opt:1, ph:'One line'})}
+      ${admField(`${base}.${k}.def`,'Definition',{req:1, area:1, wide:1, ph:`What this ${what.toLowerCase()} represents and how its values are assigned…`, guide:[['rec','Minimum 20 characters']]})}
     </div>${extra||''}
   </div>`; }
+/* dimension → table / column mapping (one dimension can map to several tables) */
+function admMapTables(cur){ const all=admTableCols(), cats=new Set(adm.draft.info.catalogs.map(c=>c.toLowerCase()));
+  let list=Object.keys(all).filter(t=>cats.has(t.split('.')[0].toLowerCase())); if(!list.length) list=Object.keys(all);
+  if(cur&&!list.includes(cur)) list=[cur].concat(list); return list; }
+function admMapSet(k,mi,f,v){ const mp=adm.draft.dims[k].maps[mi]; mp[f]=v; if(f==='table') mp.col=''; adm.dirty=true; admSavePaint(); if(f==='table') renderONB(); }
+function admMapAdd(k){ adm.draft.dims[k].maps.push({table:'', col:''}); adm.dirty=true; renderONB(); }
+function admMapDel(k,mi){ adm.draft.dims[k].maps.splice(mi,1); adm.dirty=true; renderONB(); }
+function admDimMaps(k){ const maps=adm.draft.dims[k].maps, all=admTableCols();
+  return `<div class="adm-maps"><label class="onb-flabel">Table &amp; column mapping</label>
+    ${admGuide([['req','At least one table and column mapping'],['req','Select a table before selecting a column']])}
+    ${maps.map((mp,mi)=>{ const cols=(all[mp.table]||[]).concat(mp.col&&!(all[mp.table]||[]).includes(mp.col)?[mp.col]:[]);
+      return `<div class="adm-maprow">
+        <div class="adm-f"><label class="onb-flabel">Table</label>${onbSel(admMapTables(mp.table),mp.table,`admMapSet(${k},${mi},'table',this.value)`,'Select table')}</div>
+        <div class="adm-f"><label class="onb-flabel">Column</label>${mp.table?onbSel(cols,mp.col,`admMapSet(${k},${mi},'col',this.value)`,'Select column'):'<span class="onb-select-wrap"><select class="onb-select sm" disabled><option>Select a table first</option></select></span>'}</div>
+        <button class="onb-tsrow-del adm-del" title="Remove mapping" onclick="admMapDel(${k},${mi})">${ONB_TRASH}</button></div>`; }).join('')}
+    <button class="onb-btn onb-addrow adm-add" onclick="admMapAdd(${k})">＋ Add table</button></div>`; }
+function admAddNew(label,fn){ return `<div class="adm-addnew"><button class="onb-btn primary adm-add" onclick="${fn}()">＋ Add new ${label}</button></div>`; }
 function admStep2(){ const d=adm.draft;
-  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Dimensions</h2><div class="onb-dssub">The attributes this domain is cut by. Each dimension needs a name and a definition.</div></div>
-  ${admErrBox('dims')}
-  ${d.dims.map((x,k)=>admEntry('dims',k,'Dimension','admDimDel')).join('')}
-  <button class="onb-btn onb-addrow adm-add" onclick="admDimAdd()">＋ Add dimension</button>`; }
+  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Dimensions</h2><div class="onb-dssub">The attributes this domain is cut by — each with a definition and the table columns it maps to.</div></div>
+  ${admAddNew('dimension','admDimAdd')}
+  ${admGrouped(d.dims,(x,k)=>admEntry('dims',k,'Dimension','admDimDel',admDimMaps(k)),'dimensions')}`; }
 
 /* ── Step 3 · Verticals / hierarchies (repeatable; hierarchies use the Add New Hierarchy form) ── */
-function admVertAdd(){ adm.draft.verts.push({id:admId(), name:'', def:'', diff:'', hiers:[]}); adm.dirty=true; delete adm.err['verts']; renderONB(); }
-function admVertDel(k){ adm.draft.verts.splice(k,1); adm.dirty=true; adm.err={}; renderONB(); }
+function admVertAdd(){ adm.draft.verts.unshift({id:admId(), name:'', def:'', diff:'', hiers:[], _new:true}); adm.dirty=true; renderONB(); }
+function admVertDel(k){ adm.draft.verts.splice(k,1); adm.dirty=true; renderONB(); }
 function admHierOpen(vi,hi){ const v=admData().verts[vi]; if(!v) return;
-  if(!v.name.trim()){ f6Toast('Name this vertical before adding a hierarchy.'); return; }
   const ex=hi!=null?v.hiers[hi]:null, det=(ex&&ex.detail)||{};
   const lv=ex?ex.levels.map((n,k)=>Object.assign(onbHmLevel(1),{name:n},(det.levels&&det.levels[k])?{def:det.levels[k].def||'', examples:(det.levels[k].examples||[]).concat(['','','']).slice(0,Math.max(3,(det.levels[k].examples||[]).length)), format:det.levels[k].format||''}:{})):[onbHmLevel(1),onbHmLevel(1),onbHmLevel(1)];
-  onb.hierModal={ex:-1, adm:{vi, hi:hi==null?null:hi}, name:v.name, vertical:v.name, typeName:ex?ex.name:`Hierarchy ${v.hiers.length+1}`, diff:det.diff||'', levels:lv, info:0, lowest:ex?ex.lowest||'':'', looks:(det.looks||[]).slice(), lookHow:det.lookHow||'', summary:det.summary||''};
+  onb.hierModal={ex:-1, adm:{vi, hi:hi==null?null:hi}, name:v.name.trim()||'New vertical', vertical:v.name.trim()||'New vertical', typeName:ex?ex.name:`Hierarchy ${v.hiers.length+1}`, diff:det.diff||'', levels:lv, info:0, lowest:ex?ex.lowest||'':'', looks:(det.looks||[]).slice(), lookHow:det.lookHow||'', summary:det.summary||''};
   renderONB(); }
-function admHierSave(m){ const d=admData(), v=d.verts[m.adm.vi], tn=m.typeName.trim(), named=onbHmNamed();
-  if(!tn){ f6Toast('Give this hierarchy a name.'); return; }
-  if(v.hiers.some((h,k)=>k!==m.adm.hi && h.name.toLowerCase()===tn.toLowerCase())){ f6Toast(`${v.name} already has a “${tn}”.`); return; }
-  if(named.length<2){ f6Toast('Define at least 2 levels.'); return; }
-  const names=named.map(l=>l.name.trim()); if(new Set(names.map(x=>x.toLowerCase())).size!==names.length){ f6Toast('Level names must be unique.'); return; }
+function admHierSave(m){ const d=admData(), v=d.verts[m.adm.vi], named=onbHmNamed(), tn=m.typeName.trim()||`Hierarchy ${v.hiers.length+(m.adm.hi!=null?0:1)}`;
+  const names=named.map(l=>l.name.trim());
   const h={name:tn, levels:names, lowest:names.includes(m.lowest)?m.lowest:names[names.length-1],
     detail:{diff:m.diff.trim(), levels:named.map(l=>({name:l.name.trim(), def:l.def.trim(), examples:l.examples.map(x=>x.trim()).filter(Boolean), format:l.format.trim()})), looks:m.looks.filter(x=>names.includes(x)), lookHow:m.lookHow.trim(), summary:m.summary.trim()}};
   const edit=m.adm.hi!=null, before=edit?v.hiers[m.adm.hi].levels.join(' → '):'';
@@ -5828,43 +5828,42 @@ function admHierSave(m){ const d=admData(), v=d.verts[m.adm.vi], tn=m.typeName.t
   onb.hierModal=null;
   if(adm.view==='edit'){ adm.dirty=true; if(adm.step===6) d.enrich.push({path:`verts.${m.adm.vi}.hiers.${tn}`, label:`${v.name} · ${tn}`, from:edit?before:'(new hierarchy)', to:names.join(' → '), at:Date.now()}); }
   else { const dom=admDom(); dom.updatedAt=Date.now(); admMarkChanged(dom); dom.data.publish=null; if(!admPersist()) f6Toast('Could not save in this browser.'); }
-  renderONB(); f6Toast(`${tn} ${edit?'updated':'added to '+v.name}.`); }
+  renderONB(); f6Toast(`${tn} ${edit?'updated':'added to '+(v.name.trim()||'the new vertical')}.`); }
 function admHierDel(vi,hi){ const d=admData(), v=d.verts[vi], h=v.hiers[hi]; v.hiers.splice(hi,1);
   if(adm.view==='edit'){ adm.dirty=true; if(adm.step===6) d.enrich.push({path:`verts.${vi}.hiers.${h.name}`, label:`${v.name} · ${h.name}`, from:h.levels.join(' → '), to:'(removed)', at:Date.now()}); }
   else { const dom=admDom(); dom.updatedAt=Date.now(); admMarkChanged(dom); dom.data.publish=null; admPersist(); }
   renderONB(); }
-function admHierList(v,vi,canEdit){ return `<div class="adm-hiers"><label class="onb-flabel">Hierarchies</label>
+function admHierList(v,vi,canEdit){ return `<div class="adm-hiers"><label class="onb-flabel">Hierarchies</label>${canEdit&&adm.view==='edit'?admGuide([['req','A vertical must have at least one hierarchy']]):''}
     ${v.hiers.length?v.hiers.map((h,hi)=>`<div class="adm-hier"><span class="onb-htype-n">${onbEsc(h.name)}</span>${onbChain(h.levels,h.lowest)}${canEdit?`<span class="adm-hier-acts"><button class="onb-editbtn" onclick="admHierOpen(${vi},${hi})">Edit</button><button class="onb-tsrow-del" title="Remove hierarchy" onclick="admHierDel(${vi},${hi})">${ONB_TRASH}</button></span>`:''}</div>`).join(''):'<div class="adm-help">No hierarchies yet.</div>'}
     ${canEdit?`<button class="onb-btn onb-addrow adm-add" onclick="admHierOpen(${vi})">＋ Add hierarchy</button>`:''}</div>`; }
 function admStep3(){ const d=adm.draft;
-  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Verticals / hierarchies</h2><div class="onb-dssub">Onboarded separately from dimensions. Each vertical needs a name and a definition; add its hierarchies (levels from coarsest to finest) with the hierarchy form.</div></div>
-  ${admErrBox('verts')}
-  ${d.verts.map((v,k)=>admEntry('verts',k,'Vertical','admVertDel',admHierList(v,k,true))).join('')}
-  <button class="onb-btn onb-addrow adm-add" onclick="admVertAdd()">＋ Add vertical</button>`; }
+  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Verticals / hierarchies</h2><div class="onb-dssub">Onboarded separately from dimensions. Each vertical has a name, a definition and at least one hierarchy (levels from coarsest to finest).</div></div>
+  ${admAddNew('vertical','admVertAdd')}
+  ${admGrouped(d.verts,(v,k)=>admEntry('verts',k,'Vertical','admVertDel',admHierList(v,k,true)),'verticals')}`; }
 
 /* ── Step 4 · Weight table (repeatable tables + joins) ── */
-function admWAdd(){ adm.draft.weights.push({id:admId(), table:'', col:'', colDef:'', joins:[{id:admId(), dim:'', hierTable:'', hierCol:'', weightCol:''}]}); adm.dirty=true; delete adm.err['weights']; renderONB(); }
-function admWDel(k){ adm.draft.weights.splice(k,1); adm.dirty=true; adm.err={}; renderONB(); }
-function admJAdd(k){ adm.draft.weights[k].joins.push({id:admId(), dim:'', hierTable:'', hierCol:'', weightCol:''}); adm.dirty=true; delete adm.err[`weights.${k}.joins`]; renderONB(); }
-function admJDel(k,ji){ adm.draft.weights[k].joins.splice(ji,1); adm.dirty=true; adm.err={}; renderONB(); }
+function admWAdd(){ adm.draft.weights.unshift({id:admId(), table:'', col:'', colDef:'', joins:[{id:admId(), dim:'', hierTable:'', hierCol:'', weightCol:''}], _new:true}); adm.dirty=true; renderONB(); }
+function admWDel(k){ adm.draft.weights.splice(k,1); adm.dirty=true; renderONB(); }
+function admJAdd(k){ adm.draft.weights[k].joins.push({id:admId(), dim:'', hierTable:'', hierCol:'', weightCol:''}); adm.dirty=true; renderONB(); }
+function admJDel(k,ji){ adm.draft.weights[k].joins.splice(ji,1); adm.dirty=true; renderONB(); }
 function admKnownTables(){ return [...new Set([].concat(ONB_API_TABLES.fact,ONB_API_TABLES.dim,ONB_API_TABLES.weights))]; }
 function admStep4(){ const d=adm.draft;
   return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Weight table information</h2><div class="onb-dssub">The weight table(s) used to score sufficiency, and how hierarchy tables join to the dimension columns in each weight table.</div></div>
   <datalist id="admTables">${admKnownTables().map(t=>`<option value="${t}">`).join('')}</datalist>
-  ${admErrBox('weights')}
-  ${d.weights.map((w,k)=>`<div class="onb-jcard adm-entry">
-    <div class="onb-jhead"><div class="onb-jtitle"><span class="onb-jdim">Weight table ${k+1}</span></div><button class="onb-tsrow-del" title="Remove weight table" onclick="admWDel(${k})">${ONB_TRASH}</button></div>
+  ${admAddNew('weight table','admWAdd')}
+  ${admGrouped(d.weights,(w,k)=>`<div class="onb-jcard adm-entry ${w._new?'adm-new':''}">
+    <div class="onb-jhead"><div class="onb-jtitle"><span class="onb-jdim ${w.table.trim()?'mono':''}">${onbEsc(w.table.trim()||'New weight table')}</span>${w._new?'<span class="onb-jtag">New</span>':''}</div><button class="onb-tsrow-del" title="Remove weight table" onclick="admWDel(${k})">${ONB_TRASH}</button></div>
+    ${admGuide([['req','Table name, weight column and at least one join mapping']])}
     <div class="onb-jgrid">
-      ${admField(`weights.${k}.table`,'Full table name',{req:1, list:'admTables', ph:'catalog.schema.table'})}
-      ${admField(`weights.${k}.col`,'Weight column',{req:1, ph:'e.g. sales_weight'})}
-      ${admField(`weights.${k}.colDef`,'Weight definition',{req:1, area:1, wide:1, ph:'e.g. The proportion of total sales represented by a given market, customer, product and time combination (0–1)…'})}
+      ${admField(`weights.${k}.table`,'Full table name',{req:1, list:'admTables', ph:'catalog.schema.table', guide:[['req','catalog.schema.table or catalog.table']]})}
+      ${admField(`weights.${k}.col`,'Weight column',{req:1, ph:'e.g. sales_weight', guide:[['req','Weight column name']]})}
+      ${admField(`weights.${k}.colDef`,'Weight definition',{req:1, area:1, wide:1, ph:'e.g. The proportion of total sales represented by a given market, customer, product and time combination (0–1)…', guide:[['rec','Describe how the weight is calculated and its range']]})}
     </div>
     <label class="onb-flabel" style="margin-top:14px">Joins · hierarchy table → weight table</label>
-    ${admErrBox(`weights.${k}.joins`)}
+    ${admGuide([['req','Hierarchy table, hierarchy column and weight column for each join']])}
     ${w.joins.map((j,ji)=>`<div class="adm-join adm-join5"><div class="adm-f"><label class="onb-flabel">Dimension<span class="adm-opt">optional</span></label>${onbSel(d.dims.map(x=>x.name).filter(Boolean).concat(j.dim&&!d.dims.some(x=>x.name===j.dim)?[j.dim]:[]),j.dim,`admSet('weights.${k}.joins.${ji}.dim',this.value,this)`,'Select dimension')}</div>${admField(`weights.${k}.joins.${ji}.hierTable`,'Hierarchy table',{list:'admTables', ph:'catalog.schema.table'})}${admField(`weights.${k}.joins.${ji}.hierCol`,'Hierarchy column',{ph:'e.g. GMC_SKU_Code'})}<span class="adm-join-arr">→</span>${admField(`weights.${k}.joins.${ji}.weightCol`,'Weight table dimension column',{ph:'e.g. SKU_CODE'})}<button class="onb-tsrow-del adm-del" title="Remove join" onclick="admJDel(${k},${ji})">${ONB_TRASH}</button></div>`).join('')}
     <button class="onb-btn onb-addrow adm-add" onclick="admJAdd(${k})">＋ Add join</button>
-  </div>`).join('')}
-  <button class="onb-btn onb-addrow adm-add" onclick="admWAdd()">＋ Add weight table</button>`; }
+  </div>`,'weight tables')}`; }
 
 /* ── Validation engine: real structural checks run locally; AI confidence comes only from ADM_AI ── */
 function admValidate(d){ const cats=[], decl=new Set(d.info.catalogs.map(c=>c.toLowerCase()));
@@ -5872,7 +5871,7 @@ function admValidate(d){ const cats=[], decl=new Set(d.info.catalogs.map(c=>c.to
   const dupe=arr=>{ const c={}; arr.forEach(x=>{ const k=x.name.trim().toLowerCase(); if(k) c[k]=(c[k]||0)+1; }); return x=>c[x.name.trim().toLowerCase()]>1; };
   const cat=(x=>x.split('.')[0].toLowerCase());
   let isD=dupe(d.dims);
-  cats.push({key:'dims', label:'Dimensions', items:d.dims.length?d.dims.map((x,i)=>it('dim:'+x.id, x.name||`Dimension ${i+1}`, [!x.name.trim()&&'Name is missing', x.def.trim().length<20&&'Definition missing or under 20 characters', isD(x)&&'Duplicate name'].filter(Boolean), 2, {t:'dim',i}, 'Name and definition provided')):[it('dims:none','Dimensions',['No dimensions defined'],2,null)]});
+  cats.push({key:'dims', label:'Dimensions', items:d.dims.length?d.dims.map((x,i)=>it('dim:'+x.id, x.name||`Dimension ${i+1}`, [!x.name.trim()&&'Name is missing', x.def.trim().length<20&&'Definition missing or under 20 characters', isD(x)&&'Duplicate name', !(x.maps||[]).some(mp=>mp.table&&mp.col)&&'No table / column mapping', (x.maps||[]).some(mp=>mp.table&&!mp.col)&&'A mapped table has no column selected'].filter(Boolean), 2, {t:'dim',i}, `Name, definition and ${(x.maps||[]).filter(mp=>mp.table&&mp.col).length} table mapping(s) provided`)):[it('dims:none','Dimensions',['No dimensions defined'],2,null)]});
   let isV=dupe(d.verts);
   cats.push({key:'verts', label:'Verticals', items:d.verts.length?d.verts.map((x,i)=>it('vert:'+x.id, x.name||`Vertical ${i+1}`, [!x.name.trim()&&'Name is missing', x.def.trim().length<20&&'Definition missing or under 20 characters', isV(x)&&'Duplicate name', !x.hiers.length&&'No hierarchy defined'].filter(Boolean), 3, {t:'vert',i}, 'Name, definition and hierarchy provided')):[it('verts:none','Verticals',['No verticals defined'],3,null)]});
   const hi=[]; d.verts.forEach((v,vi)=>v.hiers.forEach((h,k)=>{ const lv=h.levels.map(l=>l.toLowerCase());
@@ -5921,7 +5920,7 @@ function admStep5(){ const d=adm.draft, v=d.validation;
 /* ── Step 6 · Enrichment: edit flagged items in place, then re-run validation ── */
 function admFixEditor(x){ const r=x.ref; if(!r) return `<button class="onb-editbtn" onclick="admGo(${x.step})">Go to ${ADM_STEPS[x.step-1]}</button>`;
   const lg=t=>({log:t});
-  if(r.t==='dim') return `<div class="onb-jgrid">${admField(`dims.${r.i}.name`,'Name',lg(`Dimension ${r.i+1} · name`))}${admField(`dims.${r.i}.def`,'Definition',Object.assign({area:1},lg(`Dimension ${r.i+1} · definition`)))}</div>`;
+  if(r.t==='dim') return `<div class="onb-jgrid">${admField(`dims.${r.i}.name`,'Name',lg(`Dimension ${r.i+1} · name`))}${admField(`dims.${r.i}.def`,'Definition',Object.assign({area:1},lg(`Dimension ${r.i+1} · definition`)))}</div>${admDimMaps(r.i)}`;
   if(r.t==='vert') return `<div class="onb-jgrid">${admField(`verts.${r.i}.name`,'Name',lg(`Vertical ${r.i+1} · name`))}${admField(`verts.${r.i}.def`,'Definition',Object.assign({area:1},lg(`Vertical ${r.i+1} · definition`)))}</div>${admHierList(adm.draft.verts[r.i],r.i,true)}`;
   if(r.t==='hier') return `<button class="onb-editbtn" onclick="admHierOpen(${r.vi},${r.hi})">Edit hierarchy</button>`;
   if(r.t==='w') return `<div class="onb-jgrid">${admField(`weights.${r.i}.table`,'Full table name',Object.assign({list:'admTables'},lg(`Weight table ${r.i+1} · table`)))}${admField(`weights.${r.i}.col`,'Weight column',lg(`Weight table ${r.i+1} · weight column`))}${admField(`weights.${r.i}.colDef`,'Weight definition',Object.assign({area:1, wide:1},lg(`Weight table ${r.i+1} · weight definition`)))}</div>`;
@@ -5960,7 +5959,7 @@ function admGate(d){ const why=[]; if(!d.validation) why.push('Validation has no
   const c=admCounts(d.validation); if(c.failed) why.push(`${c.failed} validation check${c.failed>1?'s':''} failed.`);
   const un=[]; d.validation.cats.forEach(k=>k.items.forEach(x=>{ if(admNeedsReview(x)&&!d.reviewed[x.id]) un.push(x.label); })); if(un.length) why.push(`Review required: ${un.join(', ')}.`); }
   return why; }
-function admPublish(){ const d=adm.draft, why=admGate(d); if(why.length){ f6Toast(why[0]); return; } if(!admCommit()) return; const dom=admDom();
+function admPublish(){ const d=adm.draft; admCommit(); const dom=admDom();
   if(typeof ADM_PUBLISH!=='function'){ d.publish={state:'not_connected', at:Date.now()}; dom.data.publish=admClone(d.publish); if(dom.status==='published') dom.pending='ready'; else dom.status='ready'; admPersist(); renderONB(); f6Toast('Not published — no publishing service is connected. Marked Ready to publish.'); return; }
   adm.busy=true; renderONB();
   Promise.resolve(ADM_PUBLISH(admClone(dom))).then(()=>{ d.publish={state:'published', at:Date.now()}; dom.data.publish=admClone(d.publish); dom.status='published'; dom.pending=null; admPersist(); adm.busy=false; renderONB(); f6Toast('Domain published.'); })
@@ -5969,13 +5968,13 @@ function admPublishCard(d){ const p=d.publish, why=admGate(d);
   const wasPub=(admDom()||{}).status==='published';
   if(p&&p.state==='published') return `<div class="onb-appr approved"><div><div class="onb-appr-t">✓ Published</div><div class="onb-appr-s">${p.sample?'Sample domain shown as published':'Confirmed by the publishing service'} · ${admWhen(p.at)}. Edit any section to make changes — they stay unpublished until you publish again.</div></div></div>`;
   if(p&&p.state==='not_connected') return `<div class="onb-appr pending"><div><div class="onb-appr-t">${wasPub?'Changes not published · Ready to publish':'Not published · Ready to publish'}</div><div class="onb-appr-s">No publishing service is connected to this app, so ${wasPub?'these changes have not been published — the previously published version is unchanged':'this domain has not been published'}. Saved in this browser and marked Ready to publish (${admWhen(p.at)}).</div></div><button class="onb-btn" onclick="admPublish()">Try again</button></div>`;
-  return `<div class="onb-appr ${p&&p.state==='failed'?'pending':''}"><div><div class="onb-appr-t">${p&&p.state==='failed'?'Publishing failed':wasPub?'Publish changes':'Publish domain'}</div><div class="onb-appr-s">${p&&p.state==='failed'?onbEsc(p.error||''):why.length?why.map(onbEsc).join(' '):'All checks passed and reviewed. Publishing needs a connected publishing service.'}</div></div><button class="onb-btn primary" ${why.length||adm.busy?'disabled':''} onclick="admPublish()">${adm.busy?'Publishing…':'Publish'}</button></div>`; }
+  return `<div class="onb-appr ${p&&p.state==='failed'?'pending':''}"><div><div class="onb-appr-t">${p&&p.state==='failed'?'Publishing failed':wasPub?'Publish changes':'Publish domain'}</div><div class="onb-appr-s">${p&&p.state==='failed'?onbEsc(p.error||''):'Publishing needs a connected publishing service.'}</div>${why.length?admGuide(why.map(w=>['rec',onbEsc(w)])):''}</div><button class="onb-btn primary" ${adm.busy?'disabled':''} onclick="admPublish()">${adm.busy?'Publishing…':'Publish'}</button></div>`; }
 function admSummary(d,mode){ const edit=n=>mode==='view'?`admEdit(${n})`:`admGo(${n})`, i=d.info, canH=true;
   const sec=(n,title,body)=>`<div class="onb-sec adm-sum"><div class="adm-sum-h"><span class="onb-sec-h" style="margin:0">${title}</span><button class="onb-editbtn" onclick="${edit(n)}">Edit</button></div>${body}</div>`;
   const kv=(k,v)=>`<div class="adm-kv"><span>${k}</span><div>${v||'<span class="adm-help" style="margin:0">Not provided</span>'}</div></div>`;
   const v=d.validation, c=admCounts(v);
   return sec(1,'Domain information', kv('Domain name',onbEsc(i.name))+kv('Description', onbEsc(i.specText))+kv('Specification document (BRD)', i.specFile?`<span class="mono">${onbEsc(i.specFile.name)}</span>${i.specFile.sample?' <span class="adm-ph">sample filename</span>':''}`:'')+kv('Databricks workspace',onbEsc(i.workspace))+kv('Databricks AD groups', i.adGroups.filter(g=>g.name.trim()).map(g=>`<span class="mono">${onbEsc(g.name)}</span>${g.purpose?` — ${onbEsc(g.purpose)}`:''}`).join('<br>'))+kv('GitHub', i.gitUrl?`<span class="mono">${onbEsc(i.gitUrl)}</span>${i.gitAd?` · AD group <span class="mono">${onbEsc(i.gitAd)}</span>`:''}`:'')+kv('Catalogues', i.catalogs.length?`<div class="nuc-chips">${i.catalogs.map(x=>`<span class="onb-hf-chip mono">${onbEsc(x)}</span>`).join('')}</div>`:''))
-   +sec(2,`Dimensions · ${d.dims.length}`, d.dims.length?d.dims.map(x=>`<div class="adm-item"><b>${onbEsc(x.name||'(unnamed)')}</b><div class="${x.def?'':'adm-help'}">${x.def?onbEsc(x.def):'No definition yet'}</div>${x.diff?`<div class="adm-help">Differs: ${onbEsc(x.diff)}</div>`:''}</div>`).join(''):'<div class="adm-help">No dimensions yet.</div>')
+   +sec(2,`Dimensions · ${d.dims.length}`, d.dims.length?d.dims.map(x=>`<div class="adm-item"><b>${onbEsc(x.name||'(unnamed)')}</b><div class="${x.def?'':'adm-help'}">${x.def?onbEsc(x.def):'No definition yet'}</div>${x.diff?`<div class="adm-help">Differs: ${onbEsc(x.diff)}</div>`:''}${(x.maps||[]).filter(mp=>mp.table).length?`<div class="adm-help">Mapped to: ${(x.maps||[]).filter(mp=>mp.table).map(mp=>`<span class="mono">${onbEsc(mp.table)}.${onbEsc(mp.col||'?')}</span>`).join(', ')}</div>`:''}</div>`).join(''):'<div class="adm-help">No dimensions yet.</div>')
    +sec(3,`Verticals / hierarchies · ${d.verts.length}`, d.verts.length?d.verts.map((x,vi)=>`<div class="adm-item"><b>${onbEsc(x.name||'(unnamed)')}</b><div class="${x.def?'':'adm-help'}">${x.def?onbEsc(x.def):'No definition yet'}</div>${x.diff?`<div class="adm-help">Differs: ${onbEsc(x.diff)}</div>`:''}${admHierList(x,vi,canH)}</div>`).join(''):'<div class="adm-help">No verticals yet.</div>')
    +sec(4,`Weight tables · ${d.weights.length}`, d.weights.length?d.weights.map(w=>`<div class="adm-item"><b class="mono">${onbEsc(w.table||'(no table)')}</b>${w.col?` · weight column <span class="mono">${onbEsc(w.col)}</span>`:''}<div>${onbEsc(w.colDef)||'<span class="adm-help">No weight definition</span>'}</div>${w.joins.length?`<table class="adm-vtab adm-jtab"><thead><tr><th>Dimension</th><th>Hierarchy table · column</th><th>Weight table column</th></tr></thead><tbody>${w.joins.map(j=>`<tr><td>${onbEsc(j.dim||'—')}</td><td class="mono">${onbEsc(j.hierTable)}.${onbEsc(j.hierCol)}</td><td class="mono">${onbEsc(j.weightCol)}</td></tr>`).join('')}</tbody></table>`:''}</div>`).join(''):'<div class="adm-help">No weight tables yet.</div>')
    +sec(6,`KPI &amp; metadata definitions · ${d.kpis.length+d.metadata.length}`, (d.kpis.length?`<label class="onb-flabel">KPIs</label>${d.kpis.map(x=>`<div class="adm-item"><b>${onbEsc(x.name)}</b><div>${onbEsc(x.def)}</div></div>`).join('')}`:'<div class="adm-help">No KPI definitions yet.</div>')+(d.metadata.length?`<label class="onb-flabel" style="margin-top:12px">Metadata</label>${d.metadata.map(x=>`<div class="adm-item"><b class="mono">${onbEsc(x.name)}</b><div>${onbEsc(x.def)}</div></div>`).join('')}`:''))
@@ -6002,7 +6001,7 @@ function admList(){
 function admDetail(){ const dm=admDom(); if(!dm) return admList(); const d=dm.data, st=ADM_STATUS[dm.status]||ADM_STATUS.draft, empty=dm.status==='not_onboarded'&&!d.dims.length&&!d.verts.length&&!d.weights.length;
   return `<div class="onb-prereq-back" onclick="admToList()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> All domains</div>
   <div class="adm-whead"><div><h2 class="onb-h" style="margin:0">${onbEsc(dm.name)} <span class="adm-status ${st[1]}">${st[0]}</span>${dm.sample?' <span class="adm-status muted">Sample data</span>':''}</h2><div class="onb-dssub">${dm.updatedAt?`Updated ${admWhen(dm.updatedAt)}`:'No onboarding details saved yet'}</div></div>
-    ${empty?'':`<div class="adm-wactions"><button class="onb-btn" onclick="admEdit(2,d=>d.dims.push({id:admId(),name:'',def:'',diff:''}))">＋ Add dimension</button><button class="onb-btn" onclick="admEdit(3,d=>d.verts.push({id:admId(),name:'',def:'',diff:'',hiers:[]}))">＋ Add vertical</button><button class="onb-btn primary" onclick="admEdit(1)">Edit domain</button></div>`}</div>
+    ${empty?'':`<div class="adm-wactions"><button class="onb-btn" onclick="admEdit(2,d=>d.dims.unshift({id:admId(),name:'',def:'',diff:'',maps:[{table:'',col:''}],_new:true}))">＋ Add dimension</button><button class="onb-btn" onclick="admEdit(3,d=>d.verts.unshift({id:admId(),name:'',def:'',diff:'',hiers:[],_new:true}))">＋ Add vertical</button><button class="onb-btn primary" onclick="admEdit(1)">Edit domain</button></div>`}</div>
   ${empty?`<div class="nuc-empty"><div class="nuc-empty-h">${onbEsc(dm.name)} hasn't been onboarded yet</div><div class="nuc-empty-p">Add its domain information, dimensions, verticals and weight tables, then validate and publish.</div><button class="onb-btn primary nuc-empty-cta" onclick="admEdit(1)">Start onboarding</button></div>`
     :`${dm.pending?`<div class="onb-warn"><span><b>${dm.pending==='ready'?'Changes ready to publish — not yet published.':'Unpublished changes.'}</b> The published version is unchanged${dm.pending==='ready'?'; no publishing service is connected to this app':'; open Review &amp; publish to validate and publish them'}.</span></div>`:d.publish&&d.publish.state==='not_connected'?'<div class="onb-warn"><span><b>Not published.</b> Marked Ready to publish, but no publishing service is connected to this app.</span></div>':''}
       ${dm.status==='published'&&d.publish&&d.publish.state==='published'?`<div class="onb-appr approved" style="margin-bottom:14px"><div><div class="onb-appr-t">✓ Published ${admWhen(d.publish.at)}</div><div class="onb-appr-s">${d.publish.sample?'Sample domain shown as published. ':''}Edit any section to update it, then send it to publish again.</div></div><button class="onb-btn" onclick="admEdit(7)">Review &amp; publish</button></div>`:''}
@@ -6010,12 +6009,13 @@ function admDetail(){ const dm=admDom(); if(!dm) return admList(); const d=dm.da
 function admWizard(){ const d=adm.draft, body=[admStep1,admStep2,admStep3,admStep4,admStep5,admStep6,admStep7][adm.step-1]();
   return `<div class="onb-prereq-back" onclick="admExit()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> ${adm.id?'Save &amp; back to domain':'Save &amp; back to domains'}</div>
   <div class="adm-whead"><div><h2 class="onb-h" style="margin:0">${adm.id?`Edit · ${onbEsc(admDom()?admDom().name:d.info.name)}`:'Add new domain'}</h2><div class="adm-savestate ${adm.dirty?'dirty':''}" id="admSaveState">${admSaveLabel()}</div></div>
-    <div class="adm-wactions">${adm.discardAsk||adm.dirty?`<button class="onb-btn" onclick="admDiscard()">Discard changes</button>`:''}<button class="onb-btn" onclick="admSaveDraft()">Save draft</button></div></div>
+    <div class="adm-wactions">${adm.discardAsk||adm.dirty?`<button class="onb-btn" onclick="admDiscard()">Discard changes</button>`:''}${adm.mode==='edit'&&adm.step<=4?`<button class="onb-btn primary" onclick="admValidateGo()">Validate</button>`:`<button class="onb-btn" onclick="admSaveDraft()">Save draft</button>`}</div></div>
   ${admStepper()}<div class="adm-progress">Step ${adm.step} of ${ADM_STEPS.length} · ${ADM_STEPS[adm.step-1]}</div>
+  ${adm.step<=4?`<div class="adm-demo"><b>Demo mode:</b> every field is optional and you can move between steps freely. ${admGuide([['req','business rule to enforce later'],['rec','best practice']]).replace('adm-guide','adm-guide adm-guide-inline')}</div>`:''}
   ${body}
   <div class="onb-footer"><button class="onb-btn" onclick="${adm.step>1?'admBack()':'admExit()'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> ${adm.step>1?'Back':'Cancel'}</button>
     <div class="onb-footer-right">${adm.step<ADM_STEPS.length?`<button class="onb-btn primary" onclick="admNext()">${adm.step===6?'Review &amp; publish':'Next'}</button>`:''}</div></div>`; }
-function admStepper(){ return `<div class="onb-steps onb-fsteps adm-steps">${ADM_STEPS.map((s,idx)=>{ const n=idx+1, can=n<=adm.max;
+function admStepper(){ return `<div class="onb-steps onb-fsteps adm-steps">${ADM_STEPS.map((s,idx)=>{ const n=idx+1, can=true;
   return `${idx?`<div class="onb-sline ${n<=adm.step?'on':''}"></div>`:''}<div class="onb-s ${can?'clickable':''} ${n===adm.step?'current':''} ${n<=adm.step?'active':''}" ${can?`onclick="admGo(${n})"`:''} title="${s}"><span class="onb-sd">${n<adm.step?'✓':n}</span><span class="onb-sl">${s}</span></div>`; }).join('')}</div>`; }
 function admRender(){ return adm.view==='edit'&&adm.draft?admWizard():adm.view==='view'?admDetail():admList(); }
 function onbTopBar(){ return `<div class="onb-topbar">${onbRoleToggle()}</div>`; }

@@ -1396,6 +1396,16 @@ td.grand-cell .val-num { font-weight: 800; }
 .adm-rule-k.rec { background: #EAF0FE; color: #001DCA; }
 .adm-demo { font-size: 12px; color: #475467; background: #F7F8FA; border: 1px solid #EEF0F4; border-radius: 10px; padding: 9px 14px; margin: -8px 0 18px; }
 @media (max-width: 760px) { .adm-maprow { grid-template-columns: 1fr; } }
+.adm-trow { padding: 14px 16px; }
+.adm-trow-g { display: grid; grid-template-columns: 1fr 1fr auto 42px; gap: 12px; align-items: end; }
+.adm-tfetch { padding: 8px 18px; height: 36px; }
+.adm-ms { position: relative; }
+.adm-ms-btn { text-align: left; }
+.adm-ms-panel { margin-top: 6px; border: 1px solid #D9DDE3; border-radius: 10px; background: #fff; padding: 8px; max-height: 280px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 8px 24px rgba(16,24,40,.08); }
+.adm-run { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 22px 0 8px; }
+.adm-run .onb-btn { padding: 11px 34px; }
+.adm-tval { margin-top: 18px; border-top: 1px dashed #D0D5DD; padding-top: 18px; }
+@media (max-width: 760px) { .adm-trow-g { grid-template-columns: 1fr; } }
 /* Heat map generation + approval */
 .onb-gen { border: 1px dashed #C6CDDA; border-radius: 16px; padding: 40px 24px; text-align: center; }
 .onb-gen-ico { width: 64px; height: 64px; border-radius: 16px; background: #EAF0FE; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
@@ -5551,14 +5561,14 @@ const ADM_STORE='dmp-admin-domains-v3', ADM_STORE_OLD=['dmp-admin-domains-v2','d
 const ADM_AI=null;       // integration point: (domainData) => Promise<{[itemId]: confidence 0..1}>
 const ADM_PUBLISH=null;  // integration point: (domain) => Promise that resolves once the backend confirms the publish
 const ADM_LOW=0.86;      // confidence below this (i.e. 85% or less) is flagged as low and must be reviewed
-const ADM_STEPS=['Domain information','Dimensions','Verticals / hierarchies','Weight table','Validation','Enrichment','Publish'];
+const ADM_STEPS=['Domain information','Dimensions','Verticals / hierarchies','Weight table','Validation','Publish'];
 const ADM_STATUS={ not_onboarded:['Not onboarded','muted'], draft:['Draft','warn'], ready:['Ready to publish','info'], published:['Published','ok'] };
 const ADM_STATE={ failed:'Failed', low:'Low confidence', pending:'Pending · not validated', passed:'Checks passed · AI confidence pending', success:'Validated' };
 const ADM_RX={ table:/^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+(\.[A-Za-z0-9_-]+)?$/, git:/^https:\/\/(www\.)?github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+\/?$/, catalog:/^[A-Za-z0-9_-]+$/ };
 let admSeq=0;
 function admId(){ return 'a'+Date.now().toString(36)+(++admSeq); }
 function admClone(o){ return JSON.parse(JSON.stringify(o)); }
-function admBlank(name){ return {info:{name:name||'', specMode:'text', specText:'', specFile:null, workspace:'', adGroups:[{name:'', purpose:''}], gitUrl:'', gitAd:'', catalogs:[]}, dims:[], verts:[], weights:[], kpis:[], metadata:[], validation:null, reviewed:{}, enrich:[], publish:null}; }
+function admBlank(name){ return {tables:[], info:{name:name||'', specMode:'text', specText:'', specFile:null, workspace:'', adGroups:[{name:'', purpose:''}], gitUrl:'', gitAd:'', catalogs:[]}, dims:[], verts:[], weights:[], kpis:[], metadata:[], validation:null, reviewed:{}, enrich:[], publish:null}; }
 /* older saved records may predate some fields */
 function admNorm(d){ const b=admBlank(''); Object.keys(b).forEach(k=>{ if(d[k]===undefined) d[k]=b[k]; }); d.dims.forEach(x=>{ if(!Array.isArray(x.maps)) x.maps=[]; }); d.weights.forEach(w=>{ if(w.col===undefined) w.col=''; w.joins.forEach(j=>{ if(j.dim===undefined) j.dim=''; }); }); return d; }
 function admColor(name){ const known={'Supply Chain & Operations':'Operations'}; if(NUC_DOMAIN_COLORS[name]||known[name]) return nucDomColor(known[name]||name); const pal=['#001DCA','#C81E5A','#E5793A','#1E8E3E','#7B3FBF','#0E8FA8','#475569']; let h=0; for(const c of name) h=(h*31+c.charCodeAt(0))>>>0; return pal[h%pal.length]; }
@@ -5693,6 +5703,8 @@ function admGo(n){ if(n===adm.step) return; admSoftCommit(); adm.step=n; adm.max
 function admNext(){ admSoftCommit(); adm.step++; adm.max=Math.max(adm.max,adm.step); renderONB(); window.scrollTo(0,0); }
 function admBack(){ admSoftCommit(); adm.step--; renderONB(); window.scrollTo(0,0); }
 /* edit mode only (steps 1–4): save and jump straight to Validation */
+/* open the step that owns a failed validation item (from the wizard, or from the Add tables page) */
+function admFix(n){ if(adm.view==='edit'){ admGo(n); return; } if(adm.dirty) admTablesSave(); admEdit(n); }
 function admValidateGo(){ admSoftCommit(); adm.step=5; adm.max=Math.max(adm.max,5); renderONB(); window.scrollTo(0,0); }
 /* save: writes the working copy into the domain record and persists it in this browser */
 function admSoftCommit(){ if(adm.id || !admPristine()) admCommit(); }
@@ -5713,15 +5725,12 @@ function admSaveLabel(){ return adm.dirty?'Unsaved changes':adm.savedAt?`Draft s
 function admSavePaint(){ const el=document.getElementById('admSaveState'); if(el){ el.textContent=admSaveLabel(); el.className='adm-savestate'+(adm.dirty?' dirty':''); } }
 
 /* ── field binding ── */
-function admSet(path,v,el){ const d=adm.draft; if(adm.step===6 && !(path in adm.orig)) adm.orig[path]=admGet(d,path); admPut(d,path,v); adm.dirty=true;
+function admSet(path,v,el){ const d=adm.draft; admPut(d,path,v); adm.dirty=true;
   if(adm.err[path]){ delete adm.err[path]; if(el){ el.classList.remove('adm-bad'); const m=el.closest('.adm-f'); const n=m&&m.querySelector('.adm-err'); if(n) n.remove(); } }
   admSavePaint(); }
-function admLog(el){ const path=el.dataset.path, label=el.dataset.label, d=adm.draft; if(!(path in adm.orig)) return; const from=adm.orig[path], to=admGet(d,path);
-  d.enrich=d.enrich.filter(x=>x.path!==path); if(String(from)!==String(to)) d.enrich.push({path, label, from:from==null?'':String(from), to:String(to), at:Date.now()}); }
 function admField(path,label,o){ o=o||{}; const v=admGet(adm.draft,path), err=adm.err[path], val=v==null?'':v;
-  const log=o.log?` data-label="${onbEsc(o.log)}" onchange="admLog(this)"`:'';
-  const ctl=o.area?`<textarea class="nuc-textarea adm-ta ${err?'adm-bad':''}" data-path="${path}" placeholder="${onbEsc(o.ph||'')}" oninput="admSet('${path}',this.value,this)"${log}>${onbEsc(val)}</textarea>`
-    :`<input class="onb-input sm adm-in ${err?'adm-bad':''}" data-path="${path}" ${o.list?`list="${o.list}"`:''} placeholder="${onbEsc(o.ph||'')}" value="${onbEsc(val)}" oninput="admSet('${path}',this.value,this)"${log}>`;
+  const ctl=o.area?`<textarea class="nuc-textarea adm-ta ${err?'adm-bad':''}" data-path="${path}" placeholder="${onbEsc(o.ph||'')}" oninput="admSet('${path}',this.value,this)">${onbEsc(val)}</textarea>`
+    :`<input class="onb-input sm adm-in ${err?'adm-bad':''}" data-path="${path}" ${o.list?`list="${o.list}"`:''} placeholder="${onbEsc(o.ph||'')}" value="${onbEsc(val)}" oninput="admSet('${path}',this.value,this)">`;
   return `<div class="adm-f ${o.wide?'onb-jf-wide':''}"><label class="onb-flabel">${label}${o.req?'<span class="adm-req">*</span>':''}${o.opt?'<span class="adm-opt">optional</span>':''}</label>${ctl}${err?`<div class="adm-err">${onbEsc(err)}</div>`:''}${o.help?`<div class="adm-help">${o.help}</div>`:''}${o.guide?admGuide(o.guide):''}</div>`; }
 /* guidance shown under fields — "Required" marks a business rule to enforce later, "Recommended" a best practice; nothing is enforced in this demo */
 function admGuide(rules){ return `<div class="adm-guide">${rules.map(([k,t])=>`<div class="adm-rule"><span class="adm-rule-k ${k}">${k==='req'?'Required':'Recommended'}</span><span>${t}</span></div>`).join('')}</div>`; }
@@ -5823,18 +5832,18 @@ function admHierSave(m){ const d=admData(), v=d.verts[m.adm.vi], named=onbHmName
   const names=named.map(l=>l.name.trim());
   const h={name:tn, levels:names, lowest:names.includes(m.lowest)?m.lowest:names[names.length-1],
     detail:{diff:m.diff.trim(), levels:named.map(l=>({name:l.name.trim(), def:l.def.trim(), examples:l.examples.map(x=>x.trim()).filter(Boolean), format:l.format.trim()})), looks:m.looks.filter(x=>names.includes(x)), lookHow:m.lookHow.trim(), summary:m.summary.trim()}};
-  const edit=m.adm.hi!=null, before=edit?v.hiers[m.adm.hi].levels.join(' → '):'';
+  const edit=m.adm.hi!=null;
   if(edit) v.hiers[m.adm.hi]=h; else v.hiers.push(h);
   onb.hierModal=null;
-  if(adm.view==='edit'){ adm.dirty=true; if(adm.step===6) d.enrich.push({path:`verts.${m.adm.vi}.hiers.${tn}`, label:`${v.name} · ${tn}`, from:edit?before:'(new hierarchy)', to:names.join(' → '), at:Date.now()}); }
+  if(adm.view==='edit'){ adm.dirty=true; }
   else { const dom=admDom(); dom.updatedAt=Date.now(); admMarkChanged(dom); dom.data.publish=null; if(!admPersist()) f6Toast('Could not save in this browser.'); }
   renderONB(); f6Toast(`${tn} ${edit?'updated':'added to '+(v.name.trim()||'the new vertical')}.`); }
 function admHierDel(vi,hi){ const d=admData(), v=d.verts[vi], h=v.hiers[hi]; v.hiers.splice(hi,1);
-  if(adm.view==='edit'){ adm.dirty=true; if(adm.step===6) d.enrich.push({path:`verts.${vi}.hiers.${h.name}`, label:`${v.name} · ${h.name}`, from:h.levels.join(' → '), to:'(removed)', at:Date.now()}); }
+  if(adm.view==='edit'){ adm.dirty=true; }
   else { const dom=admDom(); dom.updatedAt=Date.now(); admMarkChanged(dom); dom.data.publish=null; admPersist(); }
   renderONB(); }
-function admHierList(v,vi,canEdit){ return `<div class="adm-hiers"><label class="onb-flabel">Hierarchies</label>${canEdit&&adm.view==='edit'?admGuide([['req','A vertical must have at least one hierarchy']]):''}
-    ${v.hiers.length?v.hiers.map((h,hi)=>`<div class="adm-hier"><span class="onb-htype-n">${onbEsc(h.name)}</span>${onbChain(h.levels,h.lowest)}${canEdit?`<span class="adm-hier-acts"><button class="onb-editbtn" onclick="admHierOpen(${vi},${hi})">Edit</button><button class="onb-tsrow-del" title="Remove hierarchy" onclick="admHierDel(${vi},${hi})">${ONB_TRASH}</button></span>`:''}</div>`).join(''):'<div class="adm-help">No hierarchies yet.</div>'}
+function admHierList(v,vi,canEdit){ const full=canEdit===true; return `<div class="adm-hiers"><label class="onb-flabel">Hierarchies</label>${full&&adm.view==='edit'?admGuide([['req','A vertical must have at least one hierarchy']]):''}
+    ${v.hiers.length?v.hiers.map((h,hi)=>`<div class="adm-hier"><span class="onb-htype-n">${onbEsc(h.name)}</span>${onbChain(h.levels,h.lowest)}${full?`<span class="adm-hier-acts"><button class="onb-editbtn" onclick="admHierOpen(${vi},${hi})">Edit</button><button class="onb-tsrow-del" title="Remove hierarchy" onclick="admHierDel(${vi},${hi})">${ONB_TRASH}</button></span>`:''}</div>`).join(''):'<div class="adm-help">No hierarchies yet.</div>'}
     ${canEdit?`<button class="onb-btn onb-addrow adm-add" onclick="admHierOpen(${vi})">＋ Add hierarchy</button>`:''}</div>`; }
 function admStep3(){ const d=adm.draft;
   return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Verticals / hierarchies</h2><div class="onb-dssub">Onboarded separately from dimensions. Each vertical has a name, a definition and at least one hierarchy (levels from coarsest to finest).</div></div>
@@ -5882,8 +5891,8 @@ function admValidate(d){ const cats=[], decl=new Set(d.info.catalogs.map(c=>c.to
     w.joins.forEach((j,ji)=>jn.push(it('j:'+j.id, `${j.dim?j.dim+' · ':''}${j.hierTable||'?'}.${j.hierCol||'?'} → ${onbShortTable(w.table||'weight table')}.${j.weightCol||'?'}`, [!ADM_RX.table.test(j.hierTable.trim())&&'Hierarchy table is not catalog.schema.table or catalog.table', ADM_RX.table.test(j.hierTable.trim())&&!decl.has(cat(j.hierTable.trim()))&&`Catalogue “${j.hierTable.trim().split('.')[0]}” is not declared in Domain information`, !j.hierCol.trim()&&'Hierarchy column missing', !j.weightCol.trim()&&'Weight column missing'].filter(Boolean), 4, {t:'j',i,ji}, 'Join keys provided — column existence not verified'))); });
   cats.push({key:'joins', label:'Joins', items:jn.length?jn:[it('joins:none','Joins',['No joins defined'],4,null)]});
   cats.push({key:'weights', label:'Weight table mappings', items:wm.length?wm:[it('weights:none','Weight table mappings',['No weight tables defined'],4,null)]});
-  const none=(id,label,what)=>({id, label, check:'none', msg:`Not validated — no ${what} have been added yet (add them in Enrichment).`, step:6, ref:null, conf:null});
-  const defs=(arr,pre,what,t)=>arr.length?arr.map((x,i)=>it(`${pre}:${x.id}`, x.name||`${what} ${i+1}`, [!x.name.trim()&&'Name is missing', x.def.trim().length<10&&'Definition missing or under 10 characters'].filter(Boolean), 6, {t,i}, 'Name and definition provided')):null;
+  const none=(id,label,what)=>({id, label, check:'none', msg:`Not validated — no ${what} have been captured for this domain.`, step:null, ref:null, conf:null});
+  const defs=(arr,pre,what,t)=>arr.length?arr.map((x,i)=>it(`${pre}:${x.id}`, x.name||`${what} ${i+1}`, [!x.name.trim()&&'Name is missing', x.def.trim().length<10&&'Definition missing or under 10 characters'].filter(Boolean), null, {t,i}, 'Name and definition provided')):null;
   cats.push({key:'kpis', label:'KPI definitions', items:defs(d.kpis,'kpi','KPI','kpi')||[none('kpis','KPI definitions','KPI definitions')]});
   cats.push({key:'meta', label:'Metadata definitions', items:defs(d.metadata,'meta','Column','meta')||[none('meta','Metadata definitions','metadata definitions')]});
   return {ranAt:Date.now(), sig:admSig(d), cats}; }
@@ -5909,50 +5918,13 @@ function admValHead(){ const d=adm.draft, v=d.validation, fresh=admValFresh(), c
     <button class="onb-btn ${!v||!fresh?'primary':''}" ${adm.busy?'disabled':''} onclick="admRunValidation()">${v?'Re-run validation':'Run validation'}</button>
   </div>`; }
 function admStep5(){ const d=adm.draft, v=d.validation;
-  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Validation</h2><div class="onb-dssub">Validate the configuration before enrichment and publishing. Items that are low-confidence or not validated need your review.</div></div>
+  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Validation</h2><div class="onb-dssub">Validate the configuration before publishing. Items that are low-confidence or not validated need your review.</div></div>
   ${admGapNote()}${admValHead()}
   ${v?v.cats.map(k=>{ const sts=k.items.map(admState), roll=sts.includes('failed')?'failed':sts.includes('low')?'low':sts.includes('pending')?'pending':sts.includes('passed')?'passed':'success';
     return `<div class="onb-sec adm-vcat"><div class="adm-vcat-h"><span class="onb-sec-h" style="margin:0">${k.label}</span>${admStateChip(roll)}</div>
       <table class="adm-vtab"><thead><tr><th>Item</th><th>Status</th><th>Details</th><th>Confidence</th><th>Review</th></tr></thead><tbody>
-      ${k.items.map(x=>{ const st=admState(x); return `<tr class="${st}"><td class="adm-vi">${onbEsc(x.label)}</td><td>${admStateChip(st)}</td><td class="adm-vmsg">${onbEsc(x.msg)}${x.step&&st==='failed'?` <a class="adm-link" onclick="admGo(6)">Fix in Enrichment</a>`:''}</td><td>${admConf(x)}</td><td>${admNeedsReview(x)?`<label class="adm-rev ${d.reviewed[x.id]?'on':''}"><input type="checkbox" ${d.reviewed[x.id]?'checked':''} onchange="admReview('${x.id}',this.checked);this.parentElement.classList.toggle('on',this.checked)"> Reviewed</label>`:'—'}</td></tr>`; }).join('')}
+      ${k.items.map(x=>{ const st=admState(x); return `<tr class="${st}"><td class="adm-vi">${onbEsc(x.label)}</td><td>${admStateChip(st)}</td><td class="adm-vmsg">${onbEsc(x.msg)}${x.step&&st==='failed'?` <a class="adm-link" onclick="admFix(${x.step})">Fix in ${ADM_STEPS[x.step-1]}</a>`:''}</td><td>${admConf(x)}</td><td>${admNeedsReview(x)?`<label class="adm-rev ${d.reviewed[x.id]?'on':''}"><input type="checkbox" ${d.reviewed[x.id]?'checked':''} onchange="admReview('${x.id}',this.checked);this.parentElement.classList.toggle('on',this.checked)"> Reviewed</label>`:'—'}</td></tr>`; }).join('')}
       </tbody></table></div>`; }).join(''):''}`; }
-
-/* ── Step 6 · Enrichment: edit flagged items in place, then re-run validation ── */
-function admFixEditor(x){ const r=x.ref; if(!r) return `<button class="onb-editbtn" onclick="admGo(${x.step})">Go to ${ADM_STEPS[x.step-1]}</button>`;
-  const lg=t=>({log:t});
-  if(r.t==='dim') return `<div class="onb-jgrid">${admField(`dims.${r.i}.name`,'Name',lg(`Dimension ${r.i+1} · name`))}${admField(`dims.${r.i}.def`,'Definition',Object.assign({area:1},lg(`Dimension ${r.i+1} · definition`)))}</div>${admDimMaps(r.i)}`;
-  if(r.t==='vert') return `<div class="onb-jgrid">${admField(`verts.${r.i}.name`,'Name',lg(`Vertical ${r.i+1} · name`))}${admField(`verts.${r.i}.def`,'Definition',Object.assign({area:1},lg(`Vertical ${r.i+1} · definition`)))}</div>${admHierList(adm.draft.verts[r.i],r.i,true)}`;
-  if(r.t==='hier') return `<button class="onb-editbtn" onclick="admHierOpen(${r.vi},${r.hi})">Edit hierarchy</button>`;
-  if(r.t==='w') return `<div class="onb-jgrid">${admField(`weights.${r.i}.table`,'Full table name',Object.assign({list:'admTables'},lg(`Weight table ${r.i+1} · table`)))}${admField(`weights.${r.i}.col`,'Weight column',lg(`Weight table ${r.i+1} · weight column`))}${admField(`weights.${r.i}.colDef`,'Weight definition',Object.assign({area:1, wide:1},lg(`Weight table ${r.i+1} · weight definition`)))}</div>`;
-  if(r.t==='kpi') return `<div class="onb-jgrid">${admField(`kpis.${r.i}.name`,'KPI name',lg(`KPI ${r.i+1} · name`))}${admField(`kpis.${r.i}.def`,'Definition',Object.assign({area:1},lg(`KPI ${r.i+1} · definition`)))}</div>`;
-  if(r.t==='meta') return `<div class="onb-jgrid">${admField(`metadata.${r.i}.name`,'Column',lg(`Metadata ${r.i+1} · column`))}${admField(`metadata.${r.i}.def`,'Definition',Object.assign({area:1},lg(`Metadata ${r.i+1} · definition`)))}</div>`;
-  if(r.t==='j') return `<div class="adm-join">${admField(`weights.${r.i}.joins.${r.ji}.hierTable`,'Hierarchy table',Object.assign({list:'admTables'},lg(`Join ${r.ji+1} (weight table ${r.i+1}) · hierarchy table`)))}${admField(`weights.${r.i}.joins.${r.ji}.hierCol`,'Hierarchy column',lg(`Join ${r.ji+1} (weight table ${r.i+1}) · hierarchy column`))}<span class="adm-join-arr">→</span>${admField(`weights.${r.i}.joins.${r.ji}.weightCol`,'Weight column',lg(`Join ${r.ji+1} (weight table ${r.i+1}) · weight column`))}</div><div class="adm-help">Undeclared catalogue? Add it in <a class="adm-link" onclick="admGo(1)">Domain information</a>.</div>`;
-  return ''; }
-function admStep6(){ const d=adm.draft, v=d.validation;
-  if(!v) return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Enrichment</h2></div><div class="onb-proc-empty">Run validation first — enrichment works on the validation results. <a class="adm-link" onclick="admGo(5)">Go to Validation</a></div>`;
-  const items=[]; v.cats.forEach(k=>k.items.forEach(x=>items.push({k,x,st:admState(x)})));
-  const flag=items.filter(o=>o.st!=='success'&&o.st!=='passed'), ok=items.filter(o=>o.st==='success'||o.st==='passed');
-  return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Enrichment</h2><div class="onb-dssub">Correct or enrich anything flagged by validation, then re-run validation to refresh the results. You can also go back to any earlier step.</div></div>
-  <datalist id="admTables">${admKnownTables().map(t=>`<option value="${t}">`).join('')}</datalist>
-  ${admValHead()}
-  ${flag.length?`<div class="onb-proc-sub" style="margin:16px 0 8px">Needs attention · ${flag.length}</div>${flag.map(({k,x,st})=>`<div class="onb-issue ${st==='failed'?'error':'warning'} adm-fix">
-    <div class="onb-issue-h"><span>${admStateChip(st)} <span class="onb-issue-stage">${k.label}</span></span><span class="onb-issue-stage">Confidence: ${admConf(x)}</span></div>
-    <div class="onb-issue-t">${onbEsc(x.label)}</div><div class="onb-issue-m">${onbEsc(x.msg)}</div>
-    ${st==='failed'?`<div class="onb-issue-f">${admFixEditor(x)}</div>`:''}
-    ${admNeedsReview(x)?`<label class="adm-rev ${d.reviewed[x.id]?'on':''}" style="margin-top:10px"><input type="checkbox" ${d.reviewed[x.id]?'checked':''} onchange="admReview('${x.id}',this.checked);this.parentElement.classList.toggle('on',this.checked)"> I've reviewed this</label>`:''}
-  </div>`).join('')}`:'<div class="onb-proc-empty" style="margin-top:14px">Nothing flagged — all checks passed.</div>'}
-  ${ok.length?`<div class="onb-proc-sub" style="margin:18px 0 8px">Checks passed · ${ok.length}</div><div class="adm-oklist">${ok.map(({k,x,st})=>`<div class="adm-okrow">${admStateChip(st)}<span><b>${onbEsc(x.label)}</b> <span class="onb-issue-stage">${k.label}</span></span><a class="adm-link" onclick="admGo(${x.step})">Edit</a></div>`).join('')}</div>`:''}
-  ${admDefsEditor('kpis','KPI definitions','KPI','e.g. Units Sold','e.g. Number of product units sold during a period.')}
-  ${admDefsEditor('metadata','Metadata definitions','Column','e.g. sales_weight','e.g. Proportion of total sales for a market, customer, product and time combination.')}
-  <div class="onb-sec" style="margin-top:18px"><div class="onb-sec-h">Enrichment changes</div>${admEnrichList(d)}</div>`; }
-/* repeatable name + definition rows for KPI and metadata definitions (validated in Step 5) */
-function admDefAdd(key){ adm.draft[key].push({id:admId(), name:'', def:''}); adm.dirty=true; adm.draft.enrich.push({path:`${key}.add`, label:key==='kpis'?'KPI definition':'Metadata definition', from:'', to:'(added)', at:Date.now()}); renderONB(); }
-function admDefDel(key,k){ const x=adm.draft[key][k]; adm.draft[key].splice(k,1); adm.dirty=true; adm.draft.enrich.push({path:`${key}.del`, label:`${key==='kpis'?'KPI':'Metadata'} · ${x.name||'(unnamed)'}`, from:x.name||'', to:'(removed)', at:Date.now()}); adm.err={}; renderONB(); }
-function admDefsEditor(key,title,what,phN,phD){ const arr=adm.draft[key];
-  return `<div class="onb-sec" style="margin-top:18px"><div class="onb-sec-h">${title}</div><div class="onb-sec-note">Changes here are validated the next time you re-run validation.</div>
-    ${arr.map((x,k)=>`<div class="adm-defrow">${admField(`${key}.${k}.name`,what,{ph:phN, log:`${what} ${k+1} · name`})}${admField(`${key}.${k}.def`,'Definition',{ph:phD, log:`${what} ${k+1} · definition`})}<button class="onb-tsrow-del adm-del" title="Remove" onclick="admDefDel('${key}',${k})">${ONB_TRASH}</button></div>`).join('')||'<div class="adm-help">None yet.</div>'}
-    <button class="onb-btn onb-addrow adm-add" onclick="admDefAdd('${key}')">＋ Add ${what==='KPI'?'KPI':'column definition'}</button></div>`; }
-function admEnrichList(d){ return d.enrich.length?`<div class="adm-chg">${d.enrich.map(c=>`<div class="adm-chg-r"><b>${onbEsc(c.label)}</b><span class="adm-chg-from">${onbEsc(c.from||'(empty)')}</span><span class="adm-chg-arr">→</span><span class="adm-chg-to">${onbEsc(c.to||'(empty)')}</span></div>`).join('')}</div>`:'<div class="adm-help">No enrichment changes yet.</div>'; }
 
 /* ── Step 7 · Publish (summary + gate) ── */
 function admGate(d){ const why=[]; if(!d.validation) why.push('Validation has not been run.'); else { if(!admValFresh(d)) why.push('Validation is out of date — re-run it after your latest changes.');
@@ -5969,17 +5941,16 @@ function admPublishCard(d){ const p=d.publish, why=admGate(d);
   if(p&&p.state==='published') return `<div class="onb-appr approved"><div><div class="onb-appr-t">✓ Published</div><div class="onb-appr-s">${p.sample?'Sample domain shown as published':'Confirmed by the publishing service'} · ${admWhen(p.at)}. Edit any section to make changes — they stay unpublished until you publish again.</div></div></div>`;
   if(p&&p.state==='not_connected') return `<div class="onb-appr pending"><div><div class="onb-appr-t">${wasPub?'Changes not published · Ready to publish':'Not published · Ready to publish'}</div><div class="onb-appr-s">No publishing service is connected to this app, so ${wasPub?'these changes have not been published — the previously published version is unchanged':'this domain has not been published'}. Saved in this browser and marked Ready to publish (${admWhen(p.at)}).</div></div><button class="onb-btn" onclick="admPublish()">Try again</button></div>`;
   return `<div class="onb-appr ${p&&p.state==='failed'?'pending':''}"><div><div class="onb-appr-t">${p&&p.state==='failed'?'Publishing failed':wasPub?'Publish changes':'Publish domain'}</div><div class="onb-appr-s">${p&&p.state==='failed'?onbEsc(p.error||''):'Publishing needs a connected publishing service.'}</div>${why.length?admGuide(why.map(w=>['rec',onbEsc(w)])):''}</div><button class="onb-btn primary" ${adm.busy?'disabled':''} onclick="admPublish()">${adm.busy?'Publishing…':'Publish'}</button></div>`; }
-function admSummary(d,mode){ const edit=n=>mode==='view'?`admEdit(${n})`:`admGo(${n})`, i=d.info, canH=true;
-  const sec=(n,title,body)=>`<div class="onb-sec adm-sum"><div class="adm-sum-h"><span class="onb-sec-h" style="margin:0">${title}</span><button class="onb-editbtn" onclick="${edit(n)}">Edit</button></div>${body}</div>`;
+function admSummary(d,mode){ const view=mode==='view', i=d.info;
+  const sec=(n,title,body)=>`<div class="onb-sec adm-sum"><div class="adm-sum-h"><span class="onb-sec-h" style="margin:0">${title}</span>${view||!n?'':`<button class="onb-editbtn" onclick="admGo(${n})">Edit</button>`}</div>${body}</div>`;
   const kv=(k,v)=>`<div class="adm-kv"><span>${k}</span><div>${v||'<span class="adm-help" style="margin:0">Not provided</span>'}</div></div>`;
   const v=d.validation, c=admCounts(v);
   return sec(1,'Domain information', kv('Domain name',onbEsc(i.name))+kv('Description', onbEsc(i.specText))+kv('Specification document (BRD)', i.specFile?`<span class="mono">${onbEsc(i.specFile.name)}</span>${i.specFile.sample?' <span class="adm-ph">sample filename</span>':''}`:'')+kv('Databricks workspace',onbEsc(i.workspace))+kv('Databricks AD groups', i.adGroups.filter(g=>g.name.trim()).map(g=>`<span class="mono">${onbEsc(g.name)}</span>${g.purpose?` — ${onbEsc(g.purpose)}`:''}`).join('<br>'))+kv('GitHub', i.gitUrl?`<span class="mono">${onbEsc(i.gitUrl)}</span>${i.gitAd?` · AD group <span class="mono">${onbEsc(i.gitAd)}</span>`:''}`:'')+kv('Catalogues', i.catalogs.length?`<div class="nuc-chips">${i.catalogs.map(x=>`<span class="onb-hf-chip mono">${onbEsc(x)}</span>`).join('')}</div>`:''))
    +sec(2,`Dimensions · ${d.dims.length}`, d.dims.length?d.dims.map(x=>`<div class="adm-item"><b>${onbEsc(x.name||'(unnamed)')}</b><div class="${x.def?'':'adm-help'}">${x.def?onbEsc(x.def):'No definition yet'}</div>${x.diff?`<div class="adm-help">Differs: ${onbEsc(x.diff)}</div>`:''}${(x.maps||[]).filter(mp=>mp.table).length?`<div class="adm-help">Mapped to: ${(x.maps||[]).filter(mp=>mp.table).map(mp=>`<span class="mono">${onbEsc(mp.table)}.${onbEsc(mp.col||'?')}</span>`).join(', ')}</div>`:''}</div>`).join(''):'<div class="adm-help">No dimensions yet.</div>')
-   +sec(3,`Verticals / hierarchies · ${d.verts.length}`, d.verts.length?d.verts.map((x,vi)=>`<div class="adm-item"><b>${onbEsc(x.name||'(unnamed)')}</b><div class="${x.def?'':'adm-help'}">${x.def?onbEsc(x.def):'No definition yet'}</div>${x.diff?`<div class="adm-help">Differs: ${onbEsc(x.diff)}</div>`:''}${admHierList(x,vi,canH)}</div>`).join(''):'<div class="adm-help">No verticals yet.</div>')
+   +sec(3,`Verticals / hierarchies · ${d.verts.length}`, d.verts.length?d.verts.map((x,vi)=>`<div class="adm-item"><b>${onbEsc(x.name||'(unnamed)')}</b><div class="${x.def?'':'adm-help'}">${x.def?onbEsc(x.def):'No definition yet'}</div>${x.diff?`<div class="adm-help">Differs: ${onbEsc(x.diff)}</div>`:''}${admHierList(x,vi,view?'add':true)}</div>`).join(''):'<div class="adm-help">No verticals yet.</div>')
    +sec(4,`Weight tables · ${d.weights.length}`, d.weights.length?d.weights.map(w=>`<div class="adm-item"><b class="mono">${onbEsc(w.table||'(no table)')}</b>${w.col?` · weight column <span class="mono">${onbEsc(w.col)}</span>`:''}<div>${onbEsc(w.colDef)||'<span class="adm-help">No weight definition</span>'}</div>${w.joins.length?`<table class="adm-vtab adm-jtab"><thead><tr><th>Dimension</th><th>Hierarchy table · column</th><th>Weight table column</th></tr></thead><tbody>${w.joins.map(j=>`<tr><td>${onbEsc(j.dim||'—')}</td><td class="mono">${onbEsc(j.hierTable)}.${onbEsc(j.hierCol)}</td><td class="mono">${onbEsc(j.weightCol)}</td></tr>`).join('')}</tbody></table>`:''}</div>`).join(''):'<div class="adm-help">No weight tables yet.</div>')
-   +sec(6,`KPI &amp; metadata definitions · ${d.kpis.length+d.metadata.length}`, (d.kpis.length?`<label class="onb-flabel">KPIs</label>${d.kpis.map(x=>`<div class="adm-item"><b>${onbEsc(x.name)}</b><div>${onbEsc(x.def)}</div></div>`).join('')}`:'<div class="adm-help">No KPI definitions yet.</div>')+(d.metadata.length?`<label class="onb-flabel" style="margin-top:12px">Metadata</label>${d.metadata.map(x=>`<div class="adm-item"><b class="mono">${onbEsc(x.name)}</b><div>${onbEsc(x.def)}</div></div>`).join('')}`:''))
-   +sec(5,'Validation', v?`<div class="adm-counts">${['failed','low','pending','passed','success'].filter(k=>c[k]).map(k=>`${admStateChip(k)}<b>${c[k]}</b>`).join('')}</div><div class="adm-help">Last run ${admWhen(v.ranAt)}${admValFresh(d)?'':' · out of date'}${v.sample?' · sample confidence scores':''}</div>`:'<div class="adm-help">Not run yet.</div>')
-   +sec(6,`Enrichment changes · ${d.enrich.length}`, admEnrichList(d)); }
+   +(view&&d.tables.some(r=>r.sel.length)?sec(0,`Tables · ${d.tables.reduce((n,r)=>n+r.sel.length,0)}`, d.tables.filter(r=>r.sel.length).map(r=>`<div class="adm-item"><b class="mono">${onbEsc(r.cat)}.${onbEsc(r.schema)}</b><div class="nuc-chips" style="margin-top:6px">${r.sel.map(t=>`<span class="onb-hf-chip mono">${onbEsc(onbShortTable(t))}</span>`).join('')}</div></div>`).join('')):'')
+   +sec(5,'Validation', v?`<div class="adm-counts">${['failed','low','pending','passed','success'].filter(k=>c[k]).map(k=>`${admStateChip(k)}<b>${c[k]}</b>`).join('')}</div><div class="adm-help">Last run ${admWhen(v.ranAt)}${admValFresh(d)?'':' · out of date'}${v.sample?' · sample confidence scores':''}</div>`:'<div class="adm-help">Not run yet.</div>'); }
 function admStep7(){ const d=adm.draft;
   return `<div class="onb-dshead"><h2 class="onb-h" style="margin:0">Review &amp; publish</h2><div class="onb-dssub">Review everything below. Use Edit on any section to go back and change it.</div></div>
   ${admPublishCard(d)}<div style="height:14px"></div>${admSummary(d,'wizard')}`; }
@@ -6001,12 +5972,12 @@ function admList(){
 function admDetail(){ const dm=admDom(); if(!dm) return admList(); const d=dm.data, st=ADM_STATUS[dm.status]||ADM_STATUS.draft, empty=dm.status==='not_onboarded'&&!d.dims.length&&!d.verts.length&&!d.weights.length;
   return `<div class="onb-prereq-back" onclick="admToList()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> All domains</div>
   <div class="adm-whead"><div><h2 class="onb-h" style="margin:0">${onbEsc(dm.name)} <span class="adm-status ${st[1]}">${st[0]}</span>${dm.sample?' <span class="adm-status muted">Sample data</span>':''}</h2><div class="onb-dssub">${dm.updatedAt?`Updated ${admWhen(dm.updatedAt)}`:'No onboarding details saved yet'}</div></div>
-    ${empty?'':`<div class="adm-wactions"><button class="onb-btn" onclick="admEdit(2,d=>d.dims.unshift({id:admId(),name:'',def:'',diff:'',maps:[{table:'',col:''}],_new:true}))">＋ Add dimension</button><button class="onb-btn" onclick="admEdit(3,d=>d.verts.unshift({id:admId(),name:'',def:'',diff:'',hiers:[],_new:true}))">＋ Add vertical</button><button class="onb-btn primary" onclick="admEdit(1)">Edit domain</button></div>`}</div>
+    ${empty?'':`<div class="adm-wactions"><button class="onb-btn" onclick="admEdit(2,d=>d.dims.unshift({id:admId(),name:'',def:'',diff:'',maps:[{table:'',col:''}],_new:true}))">＋ Add dimension</button><button class="onb-btn" onclick="admTablesOpen()">＋ Add tables</button><button class="onb-btn" onclick="admEdit(3,d=>d.verts.unshift({id:admId(),name:'',def:'',diff:'',hiers:[],_new:true}))">＋ Add vertical</button></div>`}</div>
   ${empty?`<div class="nuc-empty"><div class="nuc-empty-h">${onbEsc(dm.name)} hasn't been onboarded yet</div><div class="nuc-empty-p">Add its domain information, dimensions, verticals and weight tables, then validate and publish.</div><button class="onb-btn primary nuc-empty-cta" onclick="admEdit(1)">Start onboarding</button></div>`
-    :`${dm.pending?`<div class="onb-warn"><span><b>${dm.pending==='ready'?'Changes ready to publish — not yet published.':'Unpublished changes.'}</b> The published version is unchanged${dm.pending==='ready'?'; no publishing service is connected to this app':'; open Review &amp; publish to validate and publish them'}.</span></div>`:d.publish&&d.publish.state==='not_connected'?'<div class="onb-warn"><span><b>Not published.</b> Marked Ready to publish, but no publishing service is connected to this app.</span></div>':''}
-      ${dm.status==='published'&&d.publish&&d.publish.state==='published'?`<div class="onb-appr approved" style="margin-bottom:14px"><div><div class="onb-appr-t">✓ Published ${admWhen(d.publish.at)}</div><div class="onb-appr-s">${d.publish.sample?'Sample domain shown as published. ':''}Edit any section to update it, then send it to publish again.</div></div><button class="onb-btn" onclick="admEdit(7)">Review &amp; publish</button></div>`:''}
+    :`${dm.pending?`<div class="onb-warn"><span><b>${dm.pending==='ready'?'Changes ready to publish — not yet published.':'Unpublished changes.'}</b> The published version is unchanged${dm.pending==='ready'?'; no publishing service is connected to this app':'; validate and publish them from Review &amp; publish'}.</span></div>`:d.publish&&d.publish.state==='not_connected'?'<div class="onb-warn"><span><b>Not published.</b> Marked Ready to publish, but no publishing service is connected to this app.</span></div>':''}
+      ${dm.status==='published'&&d.publish&&d.publish.state==='published'?`<div class="onb-appr approved" style="margin-bottom:14px"><div><div class="onb-appr-t">✓ Published ${admWhen(d.publish.at)}</div><div class="onb-appr-s">${d.publish.sample?'Sample domain shown as published. ':''}Use the actions above to add dimensions, tables or verticals, then send it to publish again.</div></div><button class="onb-btn" onclick="admEdit(6)">Review &amp; publish</button></div>`:''}
       ${admSummary(d,'view')}`}`; }
-function admWizard(){ const d=adm.draft, body=[admStep1,admStep2,admStep3,admStep4,admStep5,admStep6,admStep7][adm.step-1]();
+function admWizard(){ const d=adm.draft, body=[admStep1,admStep2,admStep3,admStep4,admStep5,admStep7][adm.step-1]();
   return `<div class="onb-prereq-back" onclick="admExit()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> ${adm.id?'Save &amp; back to domain':'Save &amp; back to domains'}</div>
   <div class="adm-whead"><div><h2 class="onb-h" style="margin:0">${adm.id?`Edit · ${onbEsc(admDom()?admDom().name:d.info.name)}`:'Add new domain'}</h2><div class="adm-savestate ${adm.dirty?'dirty':''}" id="admSaveState">${admSaveLabel()}</div></div>
     <div class="adm-wactions">${adm.discardAsk||adm.dirty?`<button class="onb-btn" onclick="admDiscard()">Discard changes</button>`:''}${adm.mode==='edit'&&adm.step<=4?`<button class="onb-btn primary" onclick="admValidateGo()">Validate</button>`:`<button class="onb-btn" onclick="admSaveDraft()">Save draft</button>`}</div></div>
@@ -6014,10 +5985,54 @@ function admWizard(){ const d=adm.draft, body=[admStep1,admStep2,admStep3,admSte
   ${adm.step<=4?`<div class="adm-demo"><b>Demo mode:</b> every field is optional and you can move between steps freely. ${admGuide([['req','business rule to enforce later'],['rec','best practice']]).replace('adm-guide','adm-guide adm-guide-inline')}</div>`:''}
   ${body}
   <div class="onb-footer"><button class="onb-btn" onclick="${adm.step>1?'admBack()':'admExit()'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> ${adm.step>1?'Back':'Cancel'}</button>
-    <div class="onb-footer-right">${adm.step<ADM_STEPS.length?`<button class="onb-btn primary" onclick="admNext()">${adm.step===6?'Review &amp; publish':'Next'}</button>`:''}</div></div>`; }
+    <div class="onb-footer-right">${adm.step<ADM_STEPS.length?`<button class="onb-btn primary" onclick="admNext()">${adm.step===5?'Review &amp; publish':'Next'}</button>`:''}</div></div>`; }
 function admStepper(){ return `<div class="onb-steps onb-fsteps adm-steps">${ADM_STEPS.map((s,idx)=>{ const n=idx+1, can=true;
   return `${idx?`<div class="onb-sline ${n<=adm.step?'on':''}"></div>`:''}<div class="onb-s ${can?'clickable':''} ${n===adm.step?'current':''} ${n<=adm.step?'active':''}" ${can?`onclick="admGo(${n})"`:''} title="${s}"><span class="onb-sd">${n<adm.step?'✓':n}</span><span class="onb-sl">${s}</span></div>`; }).join('')}</div>`; }
-function admRender(){ return adm.view==='edit'&&adm.draft?admWizard():adm.view==='view'?admDetail():admList(); }
+function admRender(){ return adm.view==='edit'&&adm.draft?admWizard():adm.view==='tables'&&adm.draft?admTablesView():adm.view==='view'?admDetail():admList(); }
+/* ── Add tables (from the domain page): catalogue + schema rows → fetch → multi-select tables → Run validation ──
+   No table-discovery API exists in this prototype: "Fetch tables" lists the tables this app already knows for that catalogue/schema. */
+function admTRow(){ return {id:admId(), cat:'', schema:'', fetchedFor:'', sel:[], open:false}; }
+function admTablesOpen(){ const dom=admDom(); if(!dom) return; const d=admNorm(admClone(dom.data)); if(!d.tables.length) d.tables.push(admTRow());
+  Object.assign(adm,{view:'tables', mode:'edit', draft:d, step:5, err:{}, dirty:false, savedAt:null, tblRan:false}); renderONB(); window.scrollTo(0,0); }
+function admTablesSave(){ const d=adm.draft; d.tables.forEach(r=>{ r.open=false; const c=r.cat.trim(); if(c && r.sel.length && !d.info.catalogs.some(x=>x.toLowerCase()===c.toLowerCase())) d.info.catalogs.push(c); }); admCommit(); }
+function admTablesBack(){ if(adm.dirty) admTablesSave(); adm.draft=null; admOpen(adm.id); }
+function admTablesIn(cat,schema){ const c=cat.trim().toLowerCase(), sc=schema.trim().toLowerCase(); if(!c) return [];
+  const all=new Set(Object.keys(admTableCols()).concat(ONB_API_TABLES.fact,ONB_API_TABLES.dim,ONB_API_TABLES.weights));
+  return [...all].filter(t=>{ const p=t.toLowerCase().split('.'); return p[0]===c && (p.length===2 || p[1]===sc); }).sort(); }
+function admTRowAdd(){ adm.draft.tables.push(admTRow()); adm.dirty=true; renderONB(); }
+function admTRowDel(k){ adm.draft.tables.splice(k,1); if(!adm.draft.tables.length) adm.draft.tables.push(admTRow()); adm.dirty=true; renderONB(); }
+function admTSet(k,f,v){ adm.draft.tables[k][f]=v; adm.dirty=true; }
+function admTChanged(k){ const r=adm.draft.tables[k]; if(r.fetchedFor && r.fetchedFor!==`${r.cat.trim()}|${r.schema.trim()}`){ r.fetchedFor=''; r.open=false; renderONB(); } }
+function admTFetch(k){ const r=adm.draft.tables[k]; if(!r.cat.trim()||!r.schema.trim()){ f6Toast('Enter a catalogue and schema name first.'); return; }
+  r.fetchedFor=`${r.cat.trim()}|${r.schema.trim()}`; const av=admTablesIn(r.cat,r.schema); r.sel=r.sel.filter(t=>av.includes(t)); r.open=true; adm.dirty=true; renderONB(); }
+function admTToggle(k){ const r=adm.draft.tables[k]; adm.draft.tables.forEach((x,i)=>{ if(i!==k) x.open=false; }); r.open=!r.open; renderONB(); }
+function admTPick(k,t,on){ const a=adm.draft.tables[k].sel, i=a.indexOf(t); if(on&&i<0) a.push(t); if(!on&&i>=0) a.splice(i,1); adm.dirty=true; renderONB(); }
+function admTAll(k,on){ const r=adm.draft.tables[k]; r.sel=on?admTablesIn(r.cat,r.schema):[]; adm.dirty=true; renderONB(); }
+function admTablesRun(){ admTablesSave(); adm.tblRan=true; admRunValidation(); }
+function admTablesView(){ const dm=admDom(), d=adm.draft, n=d.tables.reduce((s,r)=>s+r.sel.length,0);
+  const rows=d.tables.map((r,k)=>{ const ready=r.fetchedFor===`${r.cat.trim()}|${r.schema.trim()}`&&r.fetchedFor, av=ready?admTablesIn(r.cat,r.schema):[], all=av.length&&av.every(t=>r.sel.includes(t));
+    return `<div class="onb-jcard adm-trow">
+      <div class="adm-trow-g">
+        <div class="adm-f"><label class="onb-flabel">Catalogue name</label><input class="onb-input sm adm-in" placeholder="e.g. commercial_gold" value="${onbEsc(r.cat)}" oninput="admTSet(${k},'cat',this.value)" onchange="admTChanged(${k})"></div>
+        <div class="adm-f"><label class="onb-flabel">Schema name</label><input class="onb-input sm adm-in" placeholder="e.g. sales" value="${onbEsc(r.schema)}" oninput="admTSet(${k},'schema',this.value)" onchange="admTChanged(${k})"></div>
+        <button class="onb-btn adm-tfetch" onclick="admTFetch(${k})">Fetch tables</button>
+        <button class="onb-tsrow-del adm-del" title="Remove row" onclick="admTRowDel(${k})">${ONB_TRASH}</button>
+      </div>
+      <div class="adm-f" style="margin-top:12px"><label class="onb-flabel">Tables</label>
+        ${ready?`<div class="adm-ms"><button class="onb-select sm adm-ms-btn" onclick="admTToggle(${k})">${r.sel.length?`${r.sel.length} table${r.sel.length>1?'s':''} selected`:'Select tables'}</button>
+          ${r.open?`<div class="adm-ms-panel">${av.length?`<label class="onb-check ${all?'on':''}"><input type="checkbox" ${all?'checked':''} onchange="admTAll(${k},this.checked)"><span class="onb-check-box"></span><span class="onb-check-lbl"><b>Select all</b> (${av.length})</span></label>${av.map(t=>{ const on=r.sel.includes(t); return `<label class="onb-check ${on?'on':''}"><input type="checkbox" ${on?'checked':''} onchange="admTPick(${k},'${t}',this.checked)"><span class="onb-check-box"></span><span class="onb-check-lbl">${onbEsc(t)}</span></label>`; }).join('')}`
+            :`<div class="adm-help" style="padding:6px 4px">No tables known for <span class="mono">${onbEsc(r.cat)}.${onbEsc(r.schema)}</span>. Table discovery isn't connected to this prototype, so only tables already known to this app are listed.</div>`}</div>`:''}</div>
+          ${r.sel.length?`<div class="nuc-chips" style="margin-top:8px">${r.sel.map(t=>`<span class="onb-hf-chip mono">${onbEsc(t)}<button type="button" aria-label="Remove ${onbEsc(t)}" onclick="admTPick(${k},'${t}',false)">✕</button></span>`).join('')}</div>`:''}`
+        :'<span class="onb-select-wrap"><select class="onb-select sm" disabled><option>Enter catalogue and schema, then fetch tables</option></select></span>'}
+        ${admGuide([['req','Catalogue and schema name'],['req','Fetch tables before selecting them']])}
+      </div>
+    </div>`; }).join('');
+  return `<div class="onb-prereq-back" onclick="admTablesBack()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> Back to ${onbEsc(dm?dm.name:'domain')}</div>
+  <div class="adm-whead"><div><h2 class="onb-h" style="margin:0">Add tables · ${onbEsc(dm?dm.name:'')}</h2><div class="onb-dssub">Enter a catalogue and schema, fetch its tables and select the ones to add. Use one row per catalogue / schema.</div></div></div>
+  ${rows}
+  <button class="onb-btn onb-addrow adm-add" onclick="admTRowAdd()">＋ Add catalogue / schema</button>
+  <div class="adm-run"><button class="onb-btn primary" ${adm.busy?'disabled':''} onclick="admTablesRun()">Run validation</button><div class="adm-help">${n} table${n===1?'':'s'} selected · saved to this domain when you run validation</div></div>
+  ${adm.tblRan?`<div class="adm-tval">${admStep5()}</div>`:''}`; }
 function onbTopBar(){ return `<div class="onb-topbar">${onbRoleToggle()}</div>`; }
 function renderONB(){
   const inner = onb.phase==='prereq'

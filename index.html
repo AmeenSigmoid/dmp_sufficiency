@@ -896,6 +896,46 @@ td.grand-cell .val-num { font-weight: 800; }
 .onb-addrow-wrap { padding: 4px 18px 16px; display: flex; justify-content: flex-end; }
 .onb-addrow { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #001DCA; cursor: pointer; }
 .onb-addrow:hover { color: #00337B; }
+/* accessible AD groups */
+.onb-access-groups { margin-bottom: 30px; }
+.onb-access-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 16px; }
+.onb-access-head .onb-h { margin-bottom: 5px; }
+.onb-access-desc { color: #667085; font-size: 13px; line-height: 1.5; }
+.onb-ad-search { position: relative; max-width: 560px; margin-bottom: 16px; }
+.onb-ad-search .onb-input { padding-left: 44px; padding-right: 44px; }
+.onb-ad-search-icon { position: absolute; left: 17px; top: 50%; transform: translateY(-50%); color: #98A2B3; display: inline-flex; pointer-events: none; }
+.onb-ad-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border: none; border-radius: 50%; background: transparent; color: #667085; cursor: pointer; font-size: 16px; line-height: 1; }
+.onb-ad-clear:hover { color: #001DCA; background: #EEF2FE; }
+.onb-ad-list { border: 1px solid #E7E9EE; border-radius: 14px; overflow: hidden; background: #fff; }
+.onb-ad-item { display: flex; align-items: center; gap: 12px; min-height: 51px; padding: 11px 16px; border-bottom: 1px solid #EEF0F4; }
+.onb-ad-item:last-child { border-bottom: none; }
+.onb-ad-icon { width: 30px; height: 30px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; color: #001DCA; background: #EAF0FE; }
+.onb-ad-name { color: #101828; font-size: 13px; font-weight: 700; font-family: 'Menlo', ui-monospace, monospace; word-break: break-word; }
+.onb-ad-pagination { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+.onb-ad-summary { color: #667085; font-size: 12.5px; }
+.onb-ad-pages { display: flex; align-items: center; gap: 5px; }
+.onb-ad-page { min-width: 33px; height: 33px; padding: 0 10px; border: 1px solid #D9DDE3; border-radius: 8px; background: #fff; color: #344054; font-size: 12px; font-weight: 700; cursor: pointer; }
+.onb-ad-page:hover:not(:disabled) { border-color: #001DCA; color: #001DCA; }
+.onb-ad-page.current { border-color: #001DCA; background: #001DCA; color: #fff; }
+.onb-ad-page:disabled { color: #B8BEC8; background: #F7F8FA; cursor: not-allowed; }
+.onb-ad-empty { border: 1px dashed #CDD3DD; border-radius: 14px; padding: 30px 18px; text-align: center; color: #667085; background: #FAFBFC; font-size: 13px; }
+.onb-ad-request { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 0 0 18px; padding: 17px 19px; border: 1px solid #D6E2FB; border-radius: 13px; background: #F5F8FF; }
+.onb-ad-request-copy { display: flex; align-items: flex-start; gap: 12px; }
+.onb-ad-request-copy .onb-ad-icon { margin-top: 1px; }
+.onb-ad-request-title { color: #101828; font-size: 14px; font-weight: 800; margin-bottom: 3px; }
+.onb-ad-request-text { color: #667085; font-size: 12.5px; line-height: 1.45; }
+.onb-ad-request .onb-btn { white-space: nowrap; }
+.onb-mail-desc { min-height: 96px; resize: vertical; border-radius: 14px; font-family: inherit; line-height: 1.45; }
+.onb-required { color: #C0392B; margin-left: 3px; }
+@media (max-width: 720px) {
+  .onb-ad-request { align-items: flex-start; flex-direction: column; }
+  .onb-ad-request .onb-btn { width: 100%; justify-content: center; }
+  .onb-ad-pagination { align-items: flex-start; flex-direction: column; }
+  .onb-ad-pages { width: 100%; overflow-x: auto; padding-bottom: 2px; }
+  .onb-thead { display: none; }
+  .onb-trow { grid-template-columns: 1fr; gap: 10px; border-bottom: 1px solid #E7E9EE; }
+  .onb-grid-3, .onb-grid-4 { grid-template-columns: 1fr; }
+}
 /* catalog card */
 .onb-card { border: 1px solid #E7E9EE; border-radius: 16px; padding: 22px 24px; }
 .onb-card-h { font-size: 15px; font-weight: 800; color: #101828; margin-bottom: 18px; }
@@ -4018,7 +4058,7 @@ let nucHmView='summary', nucHmGroup='market', nucHmTree=null, nucHmPage=0;
 /* Heat-map owner switch — lets New use cases AND New usecase onboarding share ONE heat-map implementation */
 let hmOwner='nuc', nucHmTreeStore=null, onbHmTreeStore=null;
 function hmR(){ return hmOwner==='onb'?renderONB():renderNUC(); }
-function hmName(){ return hmOwner==='onb' ? (onbEsc(onb.dataProductName)||'Untitled data product') : (nucEsc(nuc.name)||'Untitled use case'); }
+function hmName(){ return hmOwner==='onb' ? (onbEsc(onb.ucName)||'Untitled use case') : (nucEsc(nuc.name)||'Untitled use case'); }
 function hmFocusTitle(){ if(hmOwner==='onb') return 'New data product'; if(nucEditingId==null) return 'Draft use case';
   const cur=nucSaved.find(x=>x.id===nucEditingId), latest=cur?(cur.version||1):1;
   return (nucViewingVersion!=null && nucViewingVersion<latest) ? 'Viewing older version' : 'Editing use case'; }
@@ -4607,9 +4647,10 @@ const onb={
   newJoin:null, metaNew:null,                          // Define-new-join form · Add-new-KDE form
   expByTable:{},                                       // Expected grain per table: {table:{dim:{htype,grain}}}
   proc:{ status:'idle', stage:0, prog:0, issues:[], log:[], seen:[] },  // AI validation / processing
-  dataProductName:'',
+  accessQuery:'', accessPage:1,
+  accessMail:{open:false,name:'',desc:'',error:''},
   adGroups:[{name:'',desc:'',status:''}],
-  catalog:[{appOwner:'Yes', dbx:'', adAvail:'Yes', env:'DEV', adDetails:'', extLoc:'', perm:''}],
+  catalog:[{dbx:'', dbxUrl:'', adDetails:''}], catalogErrors:{},
   ts:{
     fact:   {sources:[{cat:'', schema:''}], fetched:false, selected:[], colsShown:false, kpis:[], validated:null},
     dim:    {sources:[{cat:'', schema:''}], fetched:false, selected:[], validated:null},
@@ -4711,18 +4752,42 @@ function onbTblLetter(t){ return String.fromCharCode(65 + (onbTblIdx(t)%26)); }
 function onbTblBadge(t){ const col=onbTblColor(t); return `<span class="onb-tbadge" style="color:${col};background:${col}1A;border-color:${col}66" title="${t}">${onbTblLetter(t)}</span>`; }
 function onbAllColsFor(tables){ const out=[]; (tables||[]).forEach(t=>(ONB_TABLE_COLUMNS[t]||[]).forEach(c=>{ if(!out.includes(c)) out.push(c); })); return out; }
 const ONB_TRASH='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+const ONB_GROUP_ICON='<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>';
+const ONB_ACCESS_GROUPS=[
+  'APP_DMP_READ','APP_DMP_WRITE','APP_DMP_ADMIN','APP_DATA_ANALYST','APP_DATA_ENGINEER',
+  'APP_DATA_SCIENTIST','APP_DATABRICKS_DEV','APP_DATABRICKS_QA','APP_DATABRICKS_PROD','APP_POWERBI_VIEWER',
+  'APP_POWERBI_CREATOR','APP_SNOWFLAKE_READ','APP_SNOWFLAKE_WRITE','APP_AZURE_DATA_LAKE_READ','APP_AZURE_DATA_LAKE_WRITE',
+  'APP_COMMERCIAL_ANALYTICS','APP_CUSTOMER_INSIGHTS','APP_FINANCE_REPORTING','APP_MARKETING_ANALYTICS','APP_SUPPLY_CHAIN_READ',
+  'APP_SUPPLY_CHAIN_WRITE','APP_GOVERNANCE_STEWARD','APP_METADATA_CATALOG','APP_DATA_QUALITY_USER','APP_DMP_SERVICE_ACCOUNT'
+];
 function onbEsc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
-function onbSetProduct(v){ onb.dataProductName=v; }
 function onbAd(i,f,v){ onb.adGroups[i][f]=v; }
-function onbCat(i,f,v){ onb.catalog[i][f]=v; }
-function onbCatToggle(i,f,v){ onb.catalog[i][f]=v; renderONB(); }
+function onbCat(i,f,v,el){
+  onb.catalog[i][f]=v; delete onb.catalogErrors[`${i}.${f}`];
+  if(el){ el.classList.remove('adm-bad'); el.removeAttribute('aria-invalid'); el.removeAttribute('aria-describedby'); const err=el.parentElement&&el.parentElement.querySelector('.adm-err'); if(err) err.remove(); }
+}
 function onbAddAdGroup(){ onb.adGroups.push({name:'',desc:'',status:''}); renderONB(); }
 function onbDelAd(i){ onb.adGroups.splice(i,1); if(!onb.adGroups.length) onb.adGroups.push({name:'',desc:'',status:''}); renderONB(); }
 function onbGetStatus(i){ onb.adGroups[i].status='Requested'; renderONB(); f6Toast('AD group status requested (prototype).'); }
-function onbAddCatalog(){ onb.catalog.push({appOwner:'Yes', dbx:'', adAvail:'Yes', env:'DEV', adDetails:'', extLoc:'', perm:''}); renderONB(); }
-function onbDelCatalog(i){ onb.catalog.splice(i,1); if(!onb.catalog.length) onbAddCatalog(); else renderONB(); }
-function onbOpenPrereq(){ onb.phase='prereq'; onbStep=1; renderONB(); window.scrollTo(0,0); }
+function onbAddCatalog(){ onb.catalog.push({dbx:'',dbxUrl:'',adDetails:''}); onb.catalogErrors={}; renderONB(); }
+function onbDelCatalog(i){ onb.catalog.splice(i,1); onb.catalogErrors={}; if(!onb.catalog.length) onbAddCatalog(); else renderONB(); }
+function onbOpenPrereq(){ onb.phase='access'; onbStep=1; onb.accessQuery=''; onb.accessPage=1; renderONB(); window.scrollTo(0,0); }
 function onbClosePrereq(){ onb.phase='form'; renderONB(); window.scrollTo(0,0); }
+function onbAdminOpenAccess(){ onb.phase='prereq'; onbStep=1; onb.catalogErrors={}; renderONB(); window.scrollTo(0,0); }
+function onbAdminCloseAccess(){ onb.phase='form'; admToList(); }
+function onbValidHttpUrl(v){ try{ const u=new URL(v); return u.protocol==='http:'||u.protocol==='https:'; }catch(e){ return false; } }
+function onbValidateCatalog(){
+  const errors={};
+  onb.catalog.forEach((c,i)=>{
+    if(!c.dbx.trim()) errors[`${i}.dbx`]='Workspace name is required.';
+    if(!c.dbxUrl.trim()) errors[`${i}.dbxUrl`]='Workspace URL is required.';
+    else if(!onbValidHttpUrl(c.dbxUrl.trim())) errors[`${i}.dbxUrl`]='Enter a valid http:// or https:// URL.';
+    if(!c.adDetails.trim()) errors[`${i}.adDetails`]='AD group details are required.';
+  });
+  onb.catalogErrors=errors;
+  if(Object.keys(errors).length){ renderONB(); f6Toast('Complete all required ServiceNow fields.'); return false; }
+  return true;
+}
 function onbPrev(){
   if(onb.phase==='prereq'){
     if(onbStep>1){ onbStep--; } else { onb.phase='form'; }
@@ -4732,7 +4797,7 @@ function onbPrev(){
 function onbNext(){
   if(onb.phase==='prereq'){
     if(onbStep<2){ onbStep++; renderONB(); window.scrollTo(0,0); }
-    else { onb.phase='form'; renderONB(); window.scrollTo(0,0); f6Toast('Access request submitted (prototype).'); }
+    else if(onbValidateCatalog()){ onb.phase='form'; admToList(); f6Toast('Access request submitted (prototype).'); }
   } else {
     if(onbKey()==='join' && onbGapsOpen()){ const n=onbGapsOpen(); f6Toast(`Answer the ${n} missing-join question${n>1?'s':''} from AI first — define the join or mark it as not required.`); return; }
     if(onbKey()==='ai' && onb.proc.status!=='done'){ f6Toast('Finish AI validation first — resolve any failed joins, then continue.'); return; }
@@ -5422,7 +5487,7 @@ function onbTsSection(kind,title,note){
 }
 function onbFormTableSelect(){
   return `<div class="onb-access-bar">
-    <div class="onb-access-txt"><b>Need access first?</b> Raising an AD group &amp; catalog request is only required if you don't already have DMP service-account access.</div>
+    <div class="onb-access-txt"><b>Need access first?</b> View the AD Groups you can access, or email the administrator to request access to another group.</div>
     <button class="onb-btn" onclick="onbOpenPrereq()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Raise access request</button>
   </div>
   <h2 class="onb-h">Table selection</h2>
@@ -5449,7 +5514,7 @@ function onbStepper(){
   return `<div class="onb-steps">
     <div class="onb-s ${onbStep>=1?'active':''}"><span class="onb-sd">${onbStep>1?'✓':'1'}</span><span class="onb-sl">Raise AD Group</span></div>
     <div class="onb-sline ${onbStep>=2?'on':''}"></div>
-    <div class="onb-s ${onbStep>=2?'active':''}"><span class="onb-sd">2</span><span class="onb-sl">Service Now</span></div>
+    <div class="onb-s ${onbStep>=2?'active':''}"><span class="onb-sd">2</span><span class="onb-sl">ServiceNow</span></div>
   </div>`;
 }
 function onbFooter(){
@@ -5460,12 +5525,82 @@ function onbFooter(){
     </div>
   </div>`;
 }
+function onbAccessFiltered(){
+  const q=onb.accessQuery.trim().toLowerCase();
+  return q ? ONB_ACCESS_GROUPS.filter(name=>name.toLowerCase().includes(q)) : ONB_ACCESS_GROUPS;
+}
+function onbAccessResults(){
+  const groups=onbAccessFiltered(), pageCount=Math.max(1,Math.ceil(groups.length/10));
+  onb.accessPage=Math.min(Math.max(1,onb.accessPage),pageCount);
+  const start=(onb.accessPage-1)*10, shown=groups.slice(start,start+10);
+  const list=shown.length
+    ? `<div class="onb-ad-list" role="list" aria-label="AD Groups you can access">${shown.map(name=>`<div class="onb-ad-item" role="listitem"><span class="onb-ad-icon" aria-hidden="true">${ONB_GROUP_ICON}</span><span class="onb-ad-name">${onbEsc(name)}</span></div>`).join('')}</div>`
+    : '<div class="onb-ad-empty" role="status">No AD Groups found matching your search.</div>';
+  if(groups.length<=10) return list;
+  return `${list}<div class="onb-ad-pagination"><span class="onb-ad-summary">Showing ${start+1}&ndash;${Math.min(start+10,groups.length)} of ${groups.length} AD Groups</span><nav class="onb-ad-pages" aria-label="AD Group pages"><button class="onb-ad-page" onclick="onbAccessGoPage(${onb.accessPage-1})" ${onb.accessPage===1?'disabled':''}>Previous</button>${Array.from({length:pageCount},(_,i)=>i+1).map(p=>`<button class="onb-ad-page ${p===onb.accessPage?'current':''}" onclick="onbAccessGoPage(${p})" ${p===onb.accessPage?'aria-current="page"':''}>${p}</button>`).join('')}<button class="onb-ad-page" onclick="onbAccessGoPage(${onb.accessPage+1})" ${onb.accessPage===pageCount?'disabled':''}>Next</button></nav></div>`;
+}
+function onbAccessRefresh(){ const host=document.getElementById('onbAccessResults'); if(host) host.innerHTML=onbAccessResults(); }
+function onbAccessSearch(v){ onb.accessQuery=v; onb.accessPage=1; onbAccessRefresh(); }
+function onbAccessClear(){
+  onb.accessQuery=''; onb.accessPage=1;
+  const input=document.getElementById('onbAdSearch'); if(input){ input.value=''; input.focus(); }
+  const clear=document.getElementById('onbAdClear'); if(clear) clear.classList.add('hidden');
+  onbAccessRefresh();
+}
+function onbAccessSearchInput(el){
+  onbAccessSearch(el.value);
+  const clear=document.getElementById('onbAdClear'); if(clear) clear.classList.toggle('hidden',!el.value);
+}
+function onbAccessGoPage(page){
+  const pageCount=Math.max(1,Math.ceil(onbAccessFiltered().length/10));
+  onb.accessPage=Math.min(Math.max(1,page),pageCount); onbAccessRefresh();
+}
+function onbStartAccessFlow(){
+  onb.accessMail={open:true,name:'',desc:'',error:''}; renderONB();
+  setTimeout(()=>{ const el=document.getElementById('onbMailName'); if(el) el.focus(); },0);
+}
+function onbAccessMailSet(f,v,el){
+  onb.accessMail[f]=v;
+  if(f==='name'&&onb.accessMail.error){ onb.accessMail.error=''; if(el){ el.classList.remove('adm-bad'); el.removeAttribute('aria-invalid'); el.removeAttribute('aria-describedby'); const err=el.parentElement&&el.parentElement.querySelector('.adm-err'); if(err) err.remove(); } }
+}
+function onbAccessMailClose(){ onb.accessMail={open:false,name:'',desc:'',error:''}; renderONB(); setTimeout(()=>{ const el=document.getElementById('onbMailOpen'); if(el) el.focus(); },0); }
+function onbAccessMailSubmit(){
+  if(!onb.accessMail.name.trim()){
+    onb.accessMail.error='AD Group Name is required.'; renderONB();
+    setTimeout(()=>{ const el=document.getElementById('onbMailName'); if(el) el.focus(); },0); return;
+  }
+  onbAccessMailClose(); f6Toast('Email sent to admin (prototype).');
+}
+function onbAccessMailTrap(e,el){
+  if(e.key!=='Tab') return;
+  const a=[...el.querySelectorAll('button,input,textarea')].filter(x=>!x.disabled), first=a[0], last=a[a.length-1];
+  if(e.shiftKey&&document.activeElement===first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey&&document.activeElement===last){ e.preventDefault(); first.focus(); }
+}
+function onbAccessMailModal(){
+  const m=onb.accessMail; if(!m.open) return '';
+  return `<div class="onb-modal-back" role="presentation" onclick="onbAccessMailClose()">
+    <div class="onb-modal" role="dialog" aria-modal="true" aria-labelledby="onbMailTitle" onclick="event.stopPropagation()" onkeydown="onbAccessMailTrap(event,this)">
+      <div class="onb-modal-h" id="onbMailTitle">Request AD Group access</div>
+      <div class="onb-modal-sub">Send an email request to the administrator.</div>
+      <div class="onb-modal-body">
+        <div class="onb-field"><label class="onb-label" for="onbMailName">AD Group Name<span class="onb-required" aria-hidden="true">*</span></label><input id="onbMailName" class="onb-input ${m.error?'adm-bad':''}" placeholder="Enter AD group name" value="${onbEsc(m.name)}" oninput="onbAccessMailSet('name',this.value,this)" onkeydown="if(event.key==='Enter')onbAccessMailSubmit()" aria-required="true" ${m.error?'aria-invalid="true" aria-describedby="onbMailError"':''}>${m.error?`<div class="adm-err" id="onbMailError">${onbEsc(m.error)}</div>`:''}</div>
+        <div class="onb-field"><label class="onb-label" for="onbMailDesc">AD Group Description <span class="adm-opt">optional</span></label><textarea id="onbMailDesc" class="onb-input onb-mail-desc" placeholder="Enter an optional description" oninput="onbAccessMailSet('desc',this.value,this)">${onbEsc(m.desc)}</textarea></div>
+      </div>
+      <div class="onb-modal-foot"><button class="onb-btn" onclick="onbAccessMailClose()">Cancel</button><button class="onb-btn primary" onclick="onbAccessMailSubmit()">Submit</button></div>
+    </div>
+  </div>`;
+}
+function onbAccessSection(){
+  return `<section class="onb-access-groups" aria-labelledby="onbAccessTitle">
+    <div class="onb-access-head"><div><h2 class="onb-h" id="onbAccessTitle">AD Group List</h2><p class="onb-access-desc">View and search the AD Groups you currently have access to.</p></div></div>
+    <div class="onb-ad-request"><div class="onb-ad-request-copy"><span class="onb-ad-icon" aria-hidden="true">${ONB_GROUP_ICON}</span><div><div class="onb-ad-request-title">Can't find your AD Group?</div><div class="onb-ad-request-text">If the AD Group you're looking for isn't listed, you can raise a request to get access.</div></div></div><button class="onb-btn primary" id="onbMailOpen" onclick="onbStartAccessFlow()">Raise Access Request</button></div>
+    <div class="onb-ad-search"><span class="onb-ad-search-icon" aria-hidden="true"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input id="onbAdSearch" class="onb-input" type="search" aria-label="Search AD Groups" placeholder="Search AD Groups..." value="${onbEsc(onb.accessQuery)}" oninput="onbAccessSearchInput(this)"><button id="onbAdClear" class="onb-ad-clear ${onb.accessQuery?'':'hidden'}" aria-label="Clear AD Group search" onclick="onbAccessClear()">&times;</button></div>
+    <div id="onbAccessResults">${onbAccessResults()}</div>
+  </section>`;
+}
 function onbStepAdGroup(){
   return `<h2 class="onb-h">Raise AD group request</h2>
-  <div class="onb-field">
-    <label class="onb-label">Data Product Name</label>
-    <input class="onb-input" placeholder="Enter name here.." value="${onbEsc(onb.dataProductName)}" oninput="onbSetProduct(this.value)">
-  </div>
   <div class="onb-subhead">Raise AD Group for DMP service account</div>
   <div class="onb-table">
     <div class="onb-thead"><span>AD Group Name</span><span>Description</span><span>Status</span><span></span></div>
@@ -5479,28 +5614,13 @@ function onbStepAdGroup(){
   </div>
   ${onbFooter()}`;
 }
-function onbSeg(i,field,val){
-  return `<div class="onb-seg">
-    <button class="onb-seg-opt ${val==='Yes'?'on':''}" onclick="onbCatToggle(${i},'${field}','Yes')"><span class="onb-radio"></span>Yes</button>
-    <button class="onb-seg-opt ${val==='No'?'on':''}" onclick="onbCatToggle(${i},'${field}','No')"><span class="onb-radio"></span>No</button>
-  </div>`;
-}
 function onbStepServiceNow(){
-  const envs=['DEV','QA','PROD'];
   return `<h2 class="onb-h">Raise catalog request</h2>
   <div class="onb-card">
     <div class="onb-card-h">Raise Catalog Request</div>
     ${onb.catalog.map((c,i)=>`<div class="onb-catrow">
       <div class="onb-grid onb-grid-3">
-        <div class="onb-field"><label class="onb-label">App Owner Approval Attached</label>${onbSeg(i,'appOwner',c.appOwner)}</div>
-        <div class="onb-field"><label class="onb-label">Databricks Workspace Name</label><input class="onb-input" placeholder="Type here.." value="${onbEsc(c.dbx)}" oninput="onbCat(${i},'dbx',this.value)"></div>
-        <div class="onb-field"><label class="onb-label">AD Group Details Available</label>${onbSeg(i,'adAvail',c.adAvail)}</div>
-      </div>
-      <div class="onb-grid onb-grid-4">
-        <div class="onb-field"><label class="onb-label">Environment</label><span class="onb-select-wrap"><select class="onb-select" onchange="onbCat(${i},'env',this.value)">${envs.map(e=>`<option ${e===c.env?'selected':''}>${e}</option>`).join('')}</select></span></div>
-        <div class="onb-field"><label class="onb-label">AD Group Details</label><input class="onb-input" placeholder="Type here.." value="${onbEsc(c.adDetails)}" oninput="onbCat(${i},'adDetails',this.value)"></div>
-        <div class="onb-field"><label class="onb-label">External Location</label><input class="onb-input" placeholder="Type here.." value="${onbEsc(c.extLoc)}" oninput="onbCat(${i},'extLoc',this.value)"></div>
-        <div class="onb-field"><label class="onb-label">AD Group Access Permission Level</label><input class="onb-input" placeholder="e.g., READ" value="${onbEsc(c.perm)}" oninput="onbCat(${i},'perm',this.value)"></div>
+        ${[['dbx','Databricks Workspace Name','Enter workspace name','text'],['dbxUrl','Databricks Workspace URL','https://...','url'],['adDetails','AD Group Details','Enter AD group details','text']].map(([f,l,p,t])=>{ const err=onb.catalogErrors[`${i}.${f}`], id=`onbCat${i}${f}`; return `<div class="onb-field"><label class="onb-label" for="${id}">${l}<span class="onb-required" aria-hidden="true">*</span></label><input id="${id}" class="onb-input ${err?'adm-bad':''}" type="${t}" placeholder="${p}" value="${onbEsc(c[f])}" oninput="onbCat(${i},'${f}',this.value,this)" aria-required="true" ${err?`aria-invalid="true" aria-describedby="onbCatErr${i}${f}"`:''}>${err?`<div class="adm-err" id="onbCatErr${i}${f}">${onbEsc(err)}</div>`:''}</div>`; }).join('')}
       </div>
       ${onb.catalog.length>1?`<div class="onb-catrow-del"><button class="onb-trash" onclick="onbDelCatalog(${i})">${ONB_TRASH} Remove</button></div>`:''}
     </div>`).join('')}
@@ -5966,7 +6086,7 @@ function admList(){
         <div class="nuc-uc-chips">${[[x.dims.length,'dimension'],[x.verts.length,'vertical'],[x.verts.reduce((n,v)=>n+v.hiers.length,0),'hierarch',1],[x.weights.length,'weight table'],[x.kpis.length,'KPI']].map(([n,l,y])=>`<span class="nuc-uc-chip">${n} ${y?l+(n===1?'y':'ies'):l+(n===1?'':'s')}</span>`).join('')}</div>
         <div class="nuc-uc-meta">${dm.pending?`<span class="adm-status warn">${dm.pending==='ready'?'Changes ready to publish':'Unpublished changes'}</span> `:''}${dm.status==='published'&&x.publish&&x.publish.state==='published'?`Published ${admWhen(x.publish.at)}`:dm.updatedAt?`Updated ${admWhen(dm.updatedAt)}`:'No onboarding details saved yet'}${dm.sample?' · Sample data':''}</div>
       </div></div>`; }).join('');
-  return `<div class="nuc-list-head"><div><h2 class="onb-h" style="margin:0">Domains</h2><div class="nuc-list-sub">Select a domain to view or edit its onboarding details, or onboard a new domain.</div></div><button class="onb-btn primary" onclick="admNew()">＋ Add new domain</button></div>
+  return `<div class="nuc-list-head"><div><h2 class="onb-h" style="margin:0">Domains</h2><div class="nuc-list-sub">Select a domain to view or edit its onboarding details, or onboard a new domain.</div></div><div class="adm-wactions"><button class="onb-btn" onclick="onbAdminOpenAccess()">Raise Access Request</button><button class="onb-btn primary" onclick="admNew()">＋ Add new domain</button></div></div>
   <div class="nuc-list-grid">${tiles}<button class="adm-add-card" onclick="admNew()"><span class="nuc-uc-icon">＋</span><b>Add new domain</b><span>Start the onboarding wizard</span></button></div>
   <div class="adm-help" style="margin-top:14px">Domains and drafts are saved in this browser only — no domain service is connected yet.${adm.saveFail?' <b>Browser storage is unavailable, so changes will be lost when you leave the page.</b>':''}</div>`; }
 function admDetail(){ const dm=admDom(); if(!dm) return admList(); const d=dm.data, st=ADM_STATUS[dm.status]||ADM_STATUS.draft, empty=dm.status==='not_onboarded'&&!d.dims.length&&!d.verts.length&&!d.weights.length;
@@ -6035,16 +6155,19 @@ function admTablesView(){ const dm=admDom(), d=adm.draft, n=d.tables.reduce((s,r
   ${adm.tblRan?`<div class="adm-tval">${admStep5()}</div>`:''}`; }
 function onbTopBar(){ return `<div class="onb-topbar">${onbRoleToggle()}</div>`; }
 function renderONB(){
-  const inner = onb.phase==='prereq'
-    ? `<div class="onb-prereq-back" onclick="onbClosePrereq()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> Back to onboarding</div>` + onbStepper() + (onbStep===1?onbStepAdGroup():onbStepServiceNow())
+  const inner = onb.phase==='access'
+    ? `<div class="onb-prereq-back" onclick="onbClosePrereq()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> Back to onboarding</div>` + onbAccessSection()
+    : onb.phase==='prereq'
+    ? `<div class="onb-prereq-back" onclick="onbAdminCloseAccess()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="15 18 9 12 15 6"/></svg> Back to Domains</div>` + onbStepper() + (onbStep===1?onbStepAdGroup():onbStepServiceNow())
     : onb.phase==='hierform' ? onbHfPage()
     : onbIsAdmin() ? onbTopBar() + admRender()
     : onbTopBar() + onbFormStepper() + onbFormBody();
-  document.getElementById('tab-onb').innerHTML = `<div class="onb-shell">${inner}</div>${onbGrainPopupHtml()}${onbHierModalHtml()}`;
+  document.getElementById('tab-onb').innerHTML = `<div class="onb-shell">${inner}</div>${onbGrainPopupHtml()}${onbHierModalHtml()}${onbAccessMailModal()}`;
 }
 
 // init
 document.addEventListener('click',function(e){ if(nucKpiOpen && !(e.target.closest && e.target.closest('.nuc-kpi-select'))){ nucKpiOpen=false; renderNUC(); } });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape' && onb.accessMail.open) onbAccessMailClose(); });
 renderFlow6();
 </script>
 </body>
